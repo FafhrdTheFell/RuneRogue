@@ -1,7 +1,7 @@
 ﻿using RLNET;
 using RogueSharp;
 
-namespace RogueSharpV3Tutorial.Interfaces
+namespace RuneRogue.Interfaces
 {
    public interface IDrawable
    {

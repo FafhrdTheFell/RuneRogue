@@ -1,7 +1,7 @@
-﻿using RogueSharpV3Tutorial.Core;
-using RogueSharpV3Tutorial.Systems;
+﻿using RuneRogue.Core;
+using RuneRogue.Systems;
 
-namespace RogueSharpV3Tutorial.Interfaces
+namespace RuneRogue.Interfaces
 {
    public interface IBehavior
    {

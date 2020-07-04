@@ -1,4 +1,4 @@
-﻿namespace RogueSharpV3Tutorial.Core
+﻿namespace RuneRogue.Core
 {
    // Direction values correspond to numpad numbers
    public enum Direction

@@ -1,10 +1,10 @@
 ﻿using System;
 using RLNET;
 using RogueSharp.Random;
-using RogueSharpV3Tutorial.Core;
-using RogueSharpV3Tutorial.Systems;
+using RuneRogue.Core;
+using RuneRogue.Systems;
 
-namespace RogueSharpV3Tutorial
+namespace RuneRogue
 {
     public static class Game
     {

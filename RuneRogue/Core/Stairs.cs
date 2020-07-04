@@ -1,8 +1,8 @@
 ﻿using RLNET;
 using RogueSharp;
-using RogueSharpV3Tutorial.Interfaces;
+using RuneRogue.Interfaces;
 
-namespace RogueSharpV3Tutorial.Core
+namespace RuneRogue.Core
 {
    public class Stairs : IDrawable
    {

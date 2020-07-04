@@ -1,10 +1,10 @@
 ﻿using System.Linq;
 using RogueSharp;
-using RogueSharpV3Tutorial.Core;
-using RogueSharpV3Tutorial.Interfaces;
-using RogueSharpV3Tutorial.Systems;
+using RuneRogue.Core;
+using RuneRogue.Interfaces;
+using RuneRogue.Systems;
 
-namespace RogueSharpV3Tutorial.Behaviors
+namespace RuneRogue.Behaviors
 {
    public class StandardMoveAndAttack : IBehavior
    {

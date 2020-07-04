@@ -3,7 +3,7 @@ using System.Linq;
 using RLNET;
 using RogueSharp;
 
-namespace RogueSharpV3Tutorial.Core
+namespace RuneRogue.Core
 {
     // Our custom DungeonMap class extends the base RogueSharp Map class
     public class DungeonMap : Map

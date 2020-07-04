@@ -1,9 +1,9 @@
 ﻿using System;
 using RLNET;
-using RogueSharpV3Tutorial.Behaviors;
-using RogueSharpV3Tutorial.Systems;
+using RuneRogue.Behaviors;
+using RuneRogue.Systems;
 
-namespace RogueSharpV3Tutorial.Core
+namespace RuneRogue.Core
 {
    public class Monster : Actor
    {

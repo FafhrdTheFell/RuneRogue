@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using RLNET;
-using RogueSharpV3Tutorial.Core;
+using RuneRogue.Core;
 
-namespace RogueSharpV3Tutorial.Systems
+namespace RuneRogue.Systems
 {
    // Represents a queue of messages that can be added to and drawn to a RLConsole
    public class MessageLog

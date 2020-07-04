@@ -2,10 +2,10 @@
 using System.Text;
 using RogueSharp;
 using RogueSharp.DiceNotation;
-using RogueSharpV3Tutorial.Core;
-using RogueSharpV3Tutorial.Interfaces;
+using RuneRogue.Core;
+using RuneRogue.Interfaces;
 
-namespace RogueSharpV3Tutorial.Systems
+namespace RuneRogue.Systems
 {
     public class CommandSystem
     {

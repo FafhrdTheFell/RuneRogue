@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using RogueSharp;
 using RogueSharp.DiceNotation;
-using RogueSharpV3Tutorial.Core;
-using RogueSharpV3Tutorial.Monsters;
+using RuneRogue.Core;
+using RuneRogue.Monsters;
 
-namespace RogueSharpV3Tutorial.Systems
+namespace RuneRogue.Systems
 {
    public class MapGenerator
    {

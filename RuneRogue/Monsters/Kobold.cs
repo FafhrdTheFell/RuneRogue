@@ -1,7 +1,7 @@
 ﻿using RogueSharp.DiceNotation;
-using RogueSharpV3Tutorial.Core;
+using RuneRogue.Core;
 
-namespace RogueSharpV3Tutorial.Monsters
+namespace RuneRogue.Monsters
 {
    public class Kobold : Monster
    {

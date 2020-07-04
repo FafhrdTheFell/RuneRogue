@@ -1,6 +1,6 @@
 ﻿using RLNET;
 
-namespace RogueSharpV3Tutorial.Core
+namespace RuneRogue.Core
 {
    public class Player : Actor
    {
