@@ -40,6 +40,30 @@ namespace RogueSharpV3Tutorial.Systems
                         x = Game.Player.X + 1;
                         break;
                     }
+                case Direction.UpLeft:
+                    {
+                        x = Game.Player.X - 1;
+                        y = Game.Player.Y - 1;
+                        break;
+                    }
+                case Direction.UpRight:
+                    {
+                        x = Game.Player.X + 1;
+                        y = Game.Player.Y - 1;
+                        break;
+                    }
+                case Direction.DownLeft:
+                    {
+                        x = Game.Player.X - 1;
+                        y = Game.Player.Y + 1;
+                        break;
+                    }
+                case Direction.DownRight:
+                    {
+                        x = Game.Player.X + 1;
+                        y = Game.Player.Y + 1;
+                        break;
+                    }
                 default:
                     {
                         return false;

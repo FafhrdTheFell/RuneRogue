@@ -69,6 +69,7 @@ namespace RogueSharpV3Tutorial
             // Tell RLNet to use the bitmap font that we specified and that each tile is 8 x 8 pixels
             // _rootConsole = new RLRootConsole(fontFileName, _screenWidth, _screenHeight, 8, 8, 1f, consoleTitle);
             _rootConsole = new RLRootConsole(fontFileName, _screenWidth, _screenHeight, fontHeight, fontWidth, 1f, consoleTitle);
+            _rootConsole.SetWindowState(RLWindowState.Maximized);
 
             // Initialize the sub consoles that we will Blit to the root console
             _mapConsole = new RLConsole(_mapWidth, _mapHeight);
@@ -93,6 +94,8 @@ namespace RogueSharpV3Tutorial
             // Set background color and text for each console so that we can verify they are in the correct positions
             _inventoryConsole.SetBackColor(0, 0, _inventoryWidth, _inventoryHeight, Swatch.DbWood);
             _inventoryConsole.Print(1, 1, "Inventory", Colors.TextHeading);
+            _messageConsole.SetBackColor(0, 0, _messageWidth, _messageHeight, Swatch.DbDeepWater);
+            _messageConsole.Print(1, 1, "Messages", Colors.TextHeading);
 
             // Begin RLNET's game loop
             _rootConsole.Run();
@@ -108,21 +111,37 @@ namespace RogueSharpV3Tutorial
             {
                 if (keyPress != null)
                 {
-                    if (keyPress.Key == RLKey.Up)
+                    if (keyPress.Key == RLKey.Up || keyPress.Key == RLKey.Keypad8)
                     {
                         didPlayerAct = CommandSystem.MovePlayer(Direction.Up);
                     }
-                    else if (keyPress.Key == RLKey.Down)
+                    else if (keyPress.Key == RLKey.Down || keyPress.Key == RLKey.Keypad2)
                     {
                         didPlayerAct = CommandSystem.MovePlayer(Direction.Down);
                     }
-                    else if (keyPress.Key == RLKey.Left)
+                    else if (keyPress.Key == RLKey.Left || keyPress.Key == RLKey.Keypad4)
                     {
                         didPlayerAct = CommandSystem.MovePlayer(Direction.Left);
                     }
-                    else if (keyPress.Key == RLKey.Right)
+                    else if (keyPress.Key == RLKey.Right || keyPress.Key == RLKey.Keypad6)
                     {
                         didPlayerAct = CommandSystem.MovePlayer(Direction.Right);
+                    }
+                    else if (keyPress.Key == RLKey.Keypad7)
+                    {
+                        didPlayerAct = CommandSystem.MovePlayer(Direction.UpLeft);
+                    }
+                    else if (keyPress.Key == RLKey.Keypad9)
+                    {
+                        didPlayerAct = CommandSystem.MovePlayer(Direction.UpRight);
+                    }
+                    else if (keyPress.Key == RLKey.Keypad1)
+                    {
+                        didPlayerAct = CommandSystem.MovePlayer(Direction.DownLeft);
+                    }
+                    else if (keyPress.Key == RLKey.Keypad3)
+                    {
+                        didPlayerAct = CommandSystem.MovePlayer(Direction.DownRight);
                     }
                     else if (keyPress.Key == RLKey.Escape)
                     {
@@ -168,6 +187,9 @@ namespace RogueSharpV3Tutorial
                 _mapConsole.Clear();
                 _statConsole.Clear();
                 _messageConsole.Clear();
+                _messageConsole.SetBackColor(0, 0, _messageWidth, _messageHeight, Swatch.DbDeepWater);
+                _statConsole.SetBackColor(0, 0, _statWidth, _statHeight, Swatch.DbOldStone);
+                _inventoryConsole.SetBackColor(0, 0, _inventoryWidth, _inventoryHeight, Swatch.DbWood);
 
                 DungeonMap.Draw(_mapConsole, _statConsole);
                 Player.Draw(_mapConsole, DungeonMap);
