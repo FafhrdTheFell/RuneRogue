@@ -208,7 +208,7 @@ namespace RuneRogue.Systems
         {
             if (damage > 0)
             {
-                defender.Health = defender.Health - damage;
+                defender.Health -= damage;
 
                 Game.MessageLog.Add($"  {defender.Name} was hit for {damage} damage");
 

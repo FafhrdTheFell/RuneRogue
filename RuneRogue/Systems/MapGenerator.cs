@@ -15,6 +15,7 @@ namespace RuneRogue.Systems
         private readonly int _maxRooms;
         private readonly int _roomMaxSize;
         private readonly int _roomMinSize;
+        private readonly int _mapLevel;
 
         private readonly DungeonMap _map;
 
@@ -27,6 +28,7 @@ namespace RuneRogue.Systems
             _maxRooms = maxRooms;
             _roomMaxSize = roomMaxSize;
             _roomMinSize = roomMinSize;
+            _mapLevel = mapLevel;
             _map = new DungeonMap();
         }
 
@@ -268,7 +270,7 @@ namespace RuneRogue.Systems
                         if (randomRoomLocation != null)
                         {
                             //var monsterType = Dice.Roll("1D2")-1;
-                            Monster monster = null;
+                            Monster monster;
 
                             switch (monsterType)
                             {
