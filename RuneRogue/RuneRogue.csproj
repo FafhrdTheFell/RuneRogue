@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="Behaviors\StandardMoveAndAttack.cs" />
     <Compile Include="Core\Actor.cs" />
+    <Compile Include="Core\MonsterKind.cs" />
     <Compile Include="Core\Stairs.cs" />
     <Compile Include="Core\Colors.cs" />
     <Compile Include="Core\Direction.cs" />

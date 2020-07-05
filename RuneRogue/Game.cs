@@ -49,6 +49,12 @@ namespace RuneRogue
         // We can use this instance of IRandom throughout our game when generating random number
         public static IRandom Random { get; private set; }
 
+        public static T RandomEnumValue<T>()
+        {
+            Array v = Enum.GetValues(typeof(T));
+            return (T)v.GetValue(Random.Next(v.Length - 1));
+        }
+
         public static void Main()
         {
             // Establish the seed for the random number generator from the current time

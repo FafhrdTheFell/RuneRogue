@@ -251,16 +251,29 @@ namespace RuneRogue.Systems
                         // In that case skip creating the monster
                         if (randomRoomLocation != null)
                         {
-                            var monsterType = Dice.Roll("1D2");
+                            //var monsterType = Dice.Roll("1D2")-1;
                             Monster monster = null;
-                            
-                            if (monsterType == 1)
+
+                            MonsterKind monsterType = Game.RandomEnumValue<MonsterKind> ();
+
+                            //int monsterType = (int)values.GetValue(Game.Random.Next(values.Length));
+                            Game.MessageLog.Add(monsterType.ToString());
+
+                            //MonsterKind monsterType = (MonsterKind)values.GetValue(Game.Random.Next(values.Length)+1);
+
+                            switch (monsterType)
                             {
-                                monster = Kobold.Create(Game.mapLevel);
-                            }
-                            else if (monsterType == 2)
-                            {
-                                monster = Beetle.Create(Game.mapLevel);
+                                case MonsterKind.Beetle:
+                                    monster = Beetle.Create(Game.mapLevel);
+                                    break;
+                                case MonsterKind.Kobold:
+                                    monster = Kobold.Create(Game.mapLevel);
+                                    break;
+                                default:
+                                    monster = Beetle.Create(0);
+                                    monster.Symbol = '?';
+                                    monster.Name = "Unknown";
+                                    break;
                             }
                             monster.X = randomRoomLocation.X;
                             monster.Y = randomRoomLocation.Y;
