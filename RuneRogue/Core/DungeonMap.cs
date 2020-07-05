@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using OpenTK.Graphics.OpenGL;
 using RLNET;
 using RogueSharp;
 
@@ -15,6 +16,8 @@ namespace RuneRogue.Core
         public Stairs StairsUp { get; set; }
         public Stairs StairsDown { get; set; }
 
+        public bool PlayerPeril;
+
         public DungeonMap()
         {
             Game.SchedulingSystem.Clear();
@@ -23,6 +26,7 @@ namespace RuneRogue.Core
             _monsters = new List<Monster>();
             Rooms = new List<Rectangle>();
             Doors = new List<Door>();
+            PlayerPeril = false;
         }
 
         // This method will be called any time we move the player to update field-of-view
@@ -37,7 +41,25 @@ namespace RuneRogue.Core
                 if (IsInFov(cell.X, cell.Y))
                 {
                     SetCellProperties(cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable, true);
+
+                    // check for peril, plus, keypadplus
                 }
+            }
+            PlayerPeril = false;
+            foreach (Monster m in _monsters)
+            {
+                if (IsInFov(m.X, m.Y))
+                {
+                    PlayerPeril = true;
+                }
+            }
+            if (PlayerPeril)
+            {
+                Game.MessageLog.Add("Peril");
+            }
+            else
+            {
+                Game.MessageLog.Add("No Peril");
             }
         }
 

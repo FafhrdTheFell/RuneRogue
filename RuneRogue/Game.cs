@@ -42,6 +42,10 @@ namespace RuneRogue
         public static CommandSystem CommandSystem { get; private set; }
         public static SchedulingSystem SchedulingSystem { get; private set; }
 
+        public static bool AcceleratePlayer;
+
+        private static RLKeyPress PrevKeyPress;
+
         // We can use this instance of IRandom throughout our game when generating random number
         public static IRandom Random { get; private set; }
 
@@ -77,6 +81,9 @@ namespace RuneRogue
             _statConsole = new RLConsole(_statWidth, _statHeight);
             _inventoryConsole = new RLConsole(_inventoryWidth, _inventoryHeight);
 
+            AcceleratePlayer = false;
+            PrevKeyPress = null;
+
             SchedulingSystem = new SchedulingSystem();
 
             MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, _mapLevel);
@@ -104,8 +111,24 @@ namespace RuneRogue
         // Event handler for RLNET's Update event
         private static void OnRootConsoleUpdate(object sender, UpdateEventArgs e)
         {
+            if (AcceleratePlayer && DungeonMap.PlayerPeril)
+            {
+                AcceleratePlayer = false;
+            }
+            
             bool didPlayerAct = false;
-            RLKeyPress keyPress = _rootConsole.Keyboard.GetKeyPress();
+            RLKeyPress keyPress;
+
+            // if player requested acceleration and we collected the keypress to
+            // repeat, use it, else get new keypress
+            if (AcceleratePlayer && !(PrevKeyPress.Key == RLKey.Plus || PrevKeyPress.Key == RLKey.KeypadPlus))
+            {
+                keyPress = PrevKeyPress;
+            }
+            else {
+                keyPress = _rootConsole.Keyboard.GetKeyPress();
+            }
+
 
             if (CommandSystem.IsPlayerTurn)
             {
@@ -143,6 +166,11 @@ namespace RuneRogue
                     {
                         didPlayerAct = CommandSystem.MovePlayer(Direction.DownRight);
                     }
+                    else if (keyPress.Key == RLKey.Plus || keyPress.Key == RLKey.KeypadPlus)
+                    {
+                        AcceleratePlayer = true;
+                        didPlayerAct = false;
+                    }
                     else if (keyPress.Key == RLKey.Escape)
                     {
                         _rootConsole.Close();
@@ -163,6 +191,7 @@ namespace RuneRogue
                     {
                         _rootConsole.Close();
                     }
+                    PrevKeyPress = keyPress;
                 }
 
                 if (didPlayerAct)
@@ -170,6 +199,13 @@ namespace RuneRogue
                     _renderRequired = true;
                     CommandSystem.EndPlayerTurn();
                 }
+                if (!(keyPress == null) && !(didPlayerAct)) 
+                    {
+                    if (!((keyPress.Key == RLKey.Plus) || (keyPress.Key == RLKey.KeypadPlus)))
+                        {
+                        AcceleratePlayer = false;
+                        }
+                    }
             }
             else
             {
