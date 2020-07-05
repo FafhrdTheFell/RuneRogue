@@ -16,6 +16,7 @@ namespace RuneRogue.Core
         public Stairs StairsUp { get; set; }
         public Stairs StairsDown { get; set; }
 
+        // PlayerPeril is true if player can see monster
         public bool PlayerPeril;
 
         public DungeonMap()
@@ -52,14 +53,6 @@ namespace RuneRogue.Core
                 {
                     PlayerPeril = true;
                 }
-            }
-            if (PlayerPeril)
-            {
-                Game.MessageLog.Add("Peril");
-            }
-            else
-            {
-                Game.MessageLog.Add("No Peril");
             }
         }
 
