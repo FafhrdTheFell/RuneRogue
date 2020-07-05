@@ -253,14 +253,14 @@ namespace RuneRogue.Systems
                         {
                             var monsterType = Dice.Roll("1D2");
                             Monster monster = null;
-                            // Temporarily hard code this monster to be created at level 1
+                            
                             if (monsterType == 1)
                             {
-                                monster = Kobold.Create(1);
+                                monster = Kobold.Create(Game.mapLevel);
                             }
                             else if (monsterType == 2)
                             {
-                                monster = Beetle.Create(1);
+                                monster = Beetle.Create(Game.mapLevel);
                             }
                             monster.X = randomRoomLocation.X;
                             monster.Y = randomRoomLocation.Y;

@@ -7,18 +7,18 @@ namespace RuneRogue.Monsters
    {
       public static Beetle Create( int level )
       {
-         int health = Dice.Roll( "2D3" );
+         int health = Dice.Roll( "1D4" );
          return new Beetle {
-            Attack = Dice.Roll( "1D3" ) + level / 3,
-            AttackChance = Dice.Roll( "25D3" ),
+            Attack = Dice.Roll( "1D2" ) + level / 3,
+            AttackChance = Dice.Roll( "25D2" ),
             Awareness = 10,
             Color = Colors.BeetleColor,
             Defense = Dice.Roll( "2D2" ) + level / 3,
-            DefenseChance = Dice.Roll( "10D4" ),
+            DefenseChance = Dice.Roll( "8D4" ),
             Gold = 0,
             Health = health,
             MaxHealth = health,
-            Name = "Beetle",
+            Name = "Giant Beetle",
             Speed = 7,
             Symbol = 'b'
          };

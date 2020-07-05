@@ -33,7 +33,7 @@ namespace RuneRogue
         private static readonly int _inventoryHeight = 11;
         private static RLConsole _inventoryConsole;
 
-        private static int _mapLevel = 1;
+        public static int mapLevel = 1;
         private static bool _renderRequired = true;
 
         public static Player Player { get; set; }
@@ -63,7 +63,7 @@ namespace RuneRogue
 
 
             // The title will appear at the top of the console window along with the seed used to generate the level
-            string consoleTitle = $"RougeSharp V3 Tutorial - Level {_mapLevel} - Seed {seed}";
+            string consoleTitle = $"RuneRogue - Level {mapLevel} - Seed {seed}";
 
             // Create a new MessageLog and print the random seed used to generate the level
             MessageLog = new MessageLog();
@@ -86,7 +86,7 @@ namespace RuneRogue
 
             SchedulingSystem = new SchedulingSystem();
 
-            MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, _mapLevel);
+            MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, mapLevel);
             DungeonMap = mapGenerator.CreateMap();
             DungeonMap.UpdatePlayerFieldOfView();
 
@@ -179,11 +179,11 @@ namespace RuneRogue
                     {
                         if (DungeonMap.CanMoveDownToNextLevel())
                         {
-                            MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, ++_mapLevel);
+                            MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, ++mapLevel);
                             DungeonMap = mapGenerator.CreateMap();
                             MessageLog = new MessageLog();
                             CommandSystem = new CommandSystem();
-                            _rootConsole.Title = $"RougeSharp RLNet Tutorial - Level {_mapLevel}";
+                            _rootConsole.Title = $"RougeSharp RLNet Tutorial - Level {mapLevel}";
                             didPlayerAct = true;
                         }
                     }
