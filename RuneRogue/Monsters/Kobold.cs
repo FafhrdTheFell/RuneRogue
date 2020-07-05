@@ -5,7 +5,9 @@ namespace RuneRogue.Monsters
 {
    public class Kobold : Monster
    {
-      public static Kobold Create( int level )
+        public const string NumberAppearing = "5-2d4k1";
+
+        public static Kobold Create( int level )
       {
          int health = Dice.Roll( "2D5" );
          return new Kobold {

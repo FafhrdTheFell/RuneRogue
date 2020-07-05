@@ -1,11 +1,15 @@
 ﻿using RogueSharp.DiceNotation;
 using RuneRogue.Core;
+using RuneRogue.Interfaces;
 
 namespace RuneRogue.Monsters
 {
-   public class Beetle : Monster
-   {
-      public static Beetle Create( int level )
+    public class Beetle : Monster
+    {
+ 
+        public const string NumberAppearing = "d3+d6-1";
+
+        public static Beetle Create( int level )
       {
          int health = Dice.Roll( "1D4" );
          return new Beetle {
@@ -21,6 +25,7 @@ namespace RuneRogue.Monsters
             Name = "Giant Beetle",
             Speed = 7,
             Symbol = 'b'
+            //NumberAppearing = "2D3"
          };
       }
    }

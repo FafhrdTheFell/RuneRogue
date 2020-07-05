@@ -67,6 +67,7 @@
     <Compile Include="Core\Swatch.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Interfaces\IActor.cs" />
+    <Compile Include="Interfaces\INPC.cs" />
     <Compile Include="Interfaces\IBehavior.cs" />
     <Compile Include="Interfaces\IDrawable.cs" />
     <Compile Include="Interfaces\IScheduleable.cs" />

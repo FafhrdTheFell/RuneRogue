@@ -241,8 +241,24 @@ namespace RuneRogue.Systems
                 // Each room has a 60% chance of having monsters
                 if (Dice.Roll("1D10") < 7)
                 {
-                    // Generate between 1 and 4 monsters
-                    var numberOfMonsters = Dice.Roll("1D4");
+                    MonsterKind monsterType = Game.RandomEnumValue<MonsterKind>();
+
+                    string numInRoomDice;
+                    switch (monsterType)
+                    {
+                        case MonsterKind.Beetle:
+                            numInRoomDice = Beetle.NumberAppearing;
+                            break;
+                        case MonsterKind.Kobold:
+                            numInRoomDice = Kobold.NumberAppearing;
+                            break;
+                        default:
+                            numInRoomDice = "1d1";
+                            break;
+                    }
+                           
+                    var numberOfMonsters = Dice.Roll(numInRoomDice);
+                    
                     for (int i = 0; i < numberOfMonsters; i++)
                     {
                         // Find a random walkable location in the room to place the monster
@@ -253,13 +269,6 @@ namespace RuneRogue.Systems
                         {
                             //var monsterType = Dice.Roll("1D2")-1;
                             Monster monster = null;
-
-                            MonsterKind monsterType = Game.RandomEnumValue<MonsterKind> ();
-
-                            //int monsterType = (int)values.GetValue(Game.Random.Next(values.Length));
-                            Game.MessageLog.Add(monsterType.ToString());
-
-                            //MonsterKind monsterType = (MonsterKind)values.GetValue(Game.Random.Next(values.Length)+1);
 
                             switch (monsterType)
                             {
