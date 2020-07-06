@@ -243,24 +243,29 @@ namespace RuneRogue.Systems
                 // Each room has a 60% chance of having monsters
                 if (Dice.Roll("1D10") < 7)
                 {
-                    MonsterKind monsterType = Game.RandomEnumValue<MonsterKind>();
+                    MonsterKind monsterType = MonsterKind.Beetle;
+                    MonsterGenerator monsterGenerator;
+                    string numInRoomDice = "1d1";
 
-                    string numInRoomDice;
-                    switch (monsterType)
+                    bool rerollMonster = true;
+                    while (rerollMonster)
                     {
-                        case MonsterKind.Beetle:
-                            numInRoomDice = Beetle.NumberAppearing;
-                            break;
-                        case MonsterKind.Kobold:
-                            numInRoomDice = Kobold.NumberAppearing;
-                            break;
-                        default:
-                            numInRoomDice = "1d1";
-                            break;
+                        monsterType = Game.RandomEnumValue<MonsterKind>();
+                        rerollMonster = false;
+
+                        monsterGenerator = new MonsterGenerator(monsterType);
+                        Monster monster = monsterGenerator.CreateMonster();
+                        numInRoomDice = monster.NumberAppearing;
+                        if (_mapLevel < monster.MinLevel || _mapLevel > monster.MaxLevel)
+                        {
+                            rerollMonster = true;
+                        }
                     }
-                           
+                        
                     var numberOfMonsters = Dice.Roll(numInRoomDice);
-                    
+
+                    monsterGenerator = new MonsterGenerator(monsterType);
+
                     for (int i = 0; i < numberOfMonsters; i++)
                     {
                         // Find a random walkable location in the room to place the monster
@@ -269,23 +274,8 @@ namespace RuneRogue.Systems
                         // In that case skip creating the monster
                         if (randomRoomLocation != null)
                         {
-                            //var monsterType = Dice.Roll("1D2")-1;
-                            Monster monster;
-
-                            switch (monsterType)
-                            {
-                                case MonsterKind.Beetle:
-                                    monster = Beetle.Create(Game.mapLevel);
-                                    break;
-                                case MonsterKind.Kobold:
-                                    monster = Kobold.Create(Game.mapLevel);
-                                    break;
-                                default:
-                                    monster = Beetle.Create(0);
-                                    monster.Symbol = '?';
-                                    monster.Name = "Unknown";
-                                    break;
-                            }
+                            Monster monster = monsterGenerator.CreateMonster();
+                            Console.WriteLine("adding " + monster.Name);
                             monster.X = randomRoomLocation.X;
                             monster.Y = randomRoomLocation.Y;
                             _map.AddMonster(monster);

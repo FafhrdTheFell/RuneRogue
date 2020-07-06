@@ -99,7 +99,7 @@ namespace RuneRogue.Systems
                 IsPlayerTurn = true;
                 Game.SchedulingSystem.Add(Game.Player);
             }
-            else
+            else if (scheduleable is Monster)
             {
                 Monster monster = scheduleable as Monster;
 

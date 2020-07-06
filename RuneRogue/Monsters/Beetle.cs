@@ -6,8 +6,10 @@ namespace RuneRogue.Monsters
 {
     public class Beetle : Monster
     {
- 
-        public const string NumberAppearing = "d3+d6-1";
+
+        //public override string NumberAppearing { get { return "d3+d6-1"; } }
+        //NumberAppearing = "d3+d6-1";
+        
 
         public static Beetle Create( int level )
       {
@@ -24,9 +26,12 @@ namespace RuneRogue.Monsters
             MaxHealth = health,
             Name = "Giant Beetle",
             Speed = 7,
-            Symbol = 'b'
-            //NumberAppearing = "2D3"
-         };
+            Symbol = 'b',
+            NumberAppearing = "d3+d6-1",
+            MinLevel = 1,
+            MaxLevel = 6
+        //NumberAppearing = "2D3"
+    };
       }
    }
 }

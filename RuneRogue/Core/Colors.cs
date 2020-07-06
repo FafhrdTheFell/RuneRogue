@@ -26,5 +26,6 @@ namespace RuneRogue.Core
         public static RLColor Player = Swatch.DbLight;
         public static RLColor KoboldColor = Swatch.DbBrightWood;
         public static RLColor BeetleColor = Swatch.DbGrass;
+        public static RLColor DragonColor = Swatch.DbBlood;
     }
 }

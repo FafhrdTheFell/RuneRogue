@@ -6,9 +6,47 @@ using RuneRogue.Systems;
 
 namespace RuneRogue.Core
 {
-    public class Monster : Actor
+    public class Monster : Actor, INPC
     {
         public int? TurnsAlerted { get; set; }
+
+        private string _numberAppearing;
+        private int _minLevel;
+        private int _maxLevel;
+
+        public string NumberAppearing
+        {
+            get
+            {
+                return _numberAppearing;
+            }
+            set
+            {
+                _numberAppearing = value;
+            }
+        }
+        public int MinLevel
+        {
+            get
+            {
+                return _minLevel;
+            }
+            set
+            {
+                _minLevel = value;
+            }
+        }
+        public int MaxLevel
+        {
+            get
+            {
+                return _maxLevel;
+            }
+            set
+            {
+                _maxLevel = value;
+            }
+        }
 
         public void DrawStats(RLConsole statConsole, int position)
         {

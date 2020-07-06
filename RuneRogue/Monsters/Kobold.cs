@@ -5,7 +5,6 @@ namespace RuneRogue.Monsters
 {
    public class Kobold : Monster
    {
-        public const string NumberAppearing = "5-2d4k1";
 
         public static Kobold Create( int level )
       {
@@ -22,8 +21,11 @@ namespace RuneRogue.Monsters
             MaxHealth = health,
             Name = "Kobold",
             Speed = 14,
-            Symbol = 'k'
+            Symbol = 'k',
+            NumberAppearing = "5-2d4k1",
+            MinLevel = 1,
+            MaxLevel = 3
          };
-      }
-   }
+        }
+    }
 }
