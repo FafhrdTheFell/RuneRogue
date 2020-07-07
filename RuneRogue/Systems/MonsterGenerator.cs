@@ -8,7 +8,7 @@ using RuneRogue.Monsters;
 
 namespace RuneRogue.Systems
 {
-    class MonsterGenerator
+    public class MonsterGenerator
     {
         private readonly MonsterKind _monsterType;
 

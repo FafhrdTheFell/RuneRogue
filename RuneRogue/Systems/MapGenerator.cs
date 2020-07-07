@@ -275,7 +275,6 @@ namespace RuneRogue.Systems
                         if (randomRoomLocation != null)
                         {
                             Monster monster = monsterGenerator.CreateMonster();
-                            Console.WriteLine("adding " + monster.Name);
                             monster.X = randomRoomLocation.X;
                             monster.Y = randomRoomLocation.Y;
                             _map.AddMonster(monster);

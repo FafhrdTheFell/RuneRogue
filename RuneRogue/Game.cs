@@ -33,6 +33,10 @@ namespace RuneRogue
         private static readonly int _inventoryHeight = 11;
         private static RLConsole _inventoryConsole;
 
+        private static InputSystem _inputSystem;
+        private static bool _quittingGame;
+        private static bool _triggerQuit;
+
         public static int mapLevel = 1;
         private static bool _renderRequired = true;
 
@@ -89,6 +93,9 @@ namespace RuneRogue
 
             AcceleratePlayer = false;
             PrevKeyPress = null;
+            _inputSystem = new InputSystem();
+            _quittingGame = false;
+            _triggerQuit = false;
 
             SchedulingSystem = new SchedulingSystem();
 
@@ -110,8 +117,17 @@ namespace RuneRogue
             _messageConsole.SetBackColor(0, 0, _messageWidth, _messageHeight, Swatch.DbDeepWater);
             _messageConsole.Print(1, 1, "Messages", Colors.TextHeading);
 
+            //RLKeyPress keyPress = _rootConsole.Keyboard.GetKeyPress();
+
+
             // Begin RLNET's game loop
             _rootConsole.Run();
+        }
+
+        public static void QuitGame()
+        {
+            Game.MessageLog.Add($"Goodbye! Press any key to exit.");
+            _triggerQuit = true;
         }
 
         // Event handler for RLNET's Update event
@@ -136,66 +152,44 @@ namespace RuneRogue
             }
 
 
-            if (CommandSystem.IsPlayerTurn)
+            if (CommandSystem.IsPlayerTurn || _quittingGame)
             {
                 if (keyPress != null)
                 {
-                    if (keyPress.Key == RLKey.Up || keyPress.Key == RLKey.Keypad8)
-                    {
-                        didPlayerAct = CommandSystem.MovePlayer(Direction.Up);
-                    }
-                    else if (keyPress.Key == RLKey.Down || keyPress.Key == RLKey.Keypad2)
-                    {
-                        didPlayerAct = CommandSystem.MovePlayer(Direction.Down);
-                    }
-                    else if (keyPress.Key == RLKey.Left || keyPress.Key == RLKey.Keypad4)
-                    {
-                        didPlayerAct = CommandSystem.MovePlayer(Direction.Left);
-                    }
-                    else if (keyPress.Key == RLKey.Right || keyPress.Key == RLKey.Keypad6)
-                    {
-                        didPlayerAct = CommandSystem.MovePlayer(Direction.Right);
-                    }
-                    else if (keyPress.Key == RLKey.Keypad7)
-                    {
-                        didPlayerAct = CommandSystem.MovePlayer(Direction.UpLeft);
-                    }
-                    else if (keyPress.Key == RLKey.Keypad9)
-                    {
-                        didPlayerAct = CommandSystem.MovePlayer(Direction.UpRight);
-                    }
-                    else if (keyPress.Key == RLKey.Keypad1)
-                    {
-                        didPlayerAct = CommandSystem.MovePlayer(Direction.DownLeft);
-                    }
-                    else if (keyPress.Key == RLKey.Keypad3)
-                    {
-                        didPlayerAct = CommandSystem.MovePlayer(Direction.DownRight);
-                    }
-                    else if (keyPress.Key == RLKey.Plus || keyPress.Key == RLKey.KeypadPlus)
-                    {
-                        AcceleratePlayer = true;
-                        didPlayerAct = false;
-                    }
-                    else if (keyPress.Key == RLKey.Escape)
+                    if (_quittingGame)
                     {
                         _rootConsole.Close();
                     }
-                    else if (keyPress.Key == RLKey.Period)
+                    else if (Game.Player.Health <= 0)
                     {
-                        if (DungeonMap.CanMoveDownToNextLevel())
+                        QuitGame();
+                        _renderRequired = true;
+                    }
+                    else
+                    {
+                        Direction direction = _inputSystem.MoveDirection(keyPress);
+                        if (direction != Direction.None)
                         {
-                            MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, ++mapLevel);
-                            DungeonMap = mapGenerator.CreateMap();
-                            MessageLog = new MessageLog();
-                            CommandSystem = new CommandSystem();
-                            _rootConsole.Title = $"RougeSharp RLNet Tutorial - Level {mapLevel}";
-                            didPlayerAct = true;
+                            didPlayerAct = CommandSystem.MovePlayer(direction);
+                            AcceleratePlayer = _inputSystem.ShiftDown(keyPress);
                         }
-                    }
-                if (Game.Player.Health <= 0)
-                    {
-                        _rootConsole.Close();
+                        if (_inputSystem.QuitKeyPressed(keyPress))
+                        {
+                            QuitGame();
+                            _renderRequired = true;
+                        }
+                        if (keyPress.Key == RLKey.Period)
+                        {
+                            if (DungeonMap.CanMoveDownToNextLevel())
+                            {
+                                MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, ++mapLevel);
+                                DungeonMap = mapGenerator.CreateMap();
+                                MessageLog = new MessageLog();
+                                CommandSystem = new CommandSystem();
+                                _rootConsole.Title = $"RuneRogue - Level {mapLevel}";
+                                didPlayerAct = true;
+                            }
+                        }
                     }
                     PrevKeyPress = keyPress;
                 }
@@ -205,13 +199,8 @@ namespace RuneRogue
                     _renderRequired = true;
                     CommandSystem.EndPlayerTurn();
                 }
-                if (!(keyPress == null) && !(didPlayerAct)) 
-                    {
-                    if (!((keyPress.Key == RLKey.Plus) || (keyPress.Key == RLKey.KeypadPlus)))
-                        {
-                        AcceleratePlayer = false;
-                        }
-                    }
+
+                _quittingGame = _triggerQuit;
             }
             else
             {
