@@ -5,6 +5,7 @@
    {
       Kobold = 0,
       Beetle = 1,
-      Dragon = 2
+      Dragon = 2,
+      BoneClaws = 3
    }
 }

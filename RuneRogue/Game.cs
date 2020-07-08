@@ -16,11 +16,13 @@ namespace RuneRogue
 
         // The map console takes up most of the screen and is where the map will be drawn
         private static readonly int _mapWidth = 80;
-        private static readonly int _mapHeight = 48;
+        //private static readonly int _mapHeight = 48;
+        private static readonly int _mapHeight = 56;
         private static RLConsole _mapConsole;
 
         // Below the map console is the message console which displays attack rolls and other information
         private static readonly int _messageWidth = 80;
+        //private static readonly int _messageHeight = 11;
         private static readonly int _messageHeight = 11;
         private static RLConsole _messageConsole;
 
@@ -244,7 +246,7 @@ namespace RuneRogue
                 _messageConsole.Clear();
                 _messageConsole.SetBackColor(0, 0, _messageWidth, _messageHeight, Swatch.DbDeepWater);
                 _statConsole.SetBackColor(0, 0, _statWidth, _statHeight, Swatch.DbOldStone);
-                _inventoryConsole.SetBackColor(0, 0, _inventoryWidth, _inventoryHeight, Swatch.DbWood);
+                //_inventoryConsole.SetBackColor(0, 0, _inventoryWidth, _inventoryHeight, Swatch.DbWood);
 
                 DungeonMap.Draw(_mapConsole, _statConsole);
                 Player.Draw(_mapConsole, DungeonMap);
@@ -252,10 +254,11 @@ namespace RuneRogue
                 MessageLog.Draw(_messageConsole);
 
                 // Blit the sub consoles to the root console in the correct locations
-                RLConsole.Blit(_mapConsole, 0, 0, _mapWidth, _mapHeight, _rootConsole, 0, _inventoryHeight);
+                //RLConsole.Blit(_mapConsole, 0, 0, _mapWidth, _mapHeight, _rootConsole, 0, _inventoryHeight);
+                RLConsole.Blit(_mapConsole, 0, 0, _mapWidth, _mapHeight, _rootConsole, 0, 0);
                 RLConsole.Blit(_messageConsole, 0, 0, _messageWidth, _messageHeight, _rootConsole, 0, _screenHeight - _messageHeight);
                 RLConsole.Blit(_statConsole, 0, 0, _statWidth, _statHeight, _rootConsole, _mapWidth, 0);
-                RLConsole.Blit(_inventoryConsole, 0, 0, _inventoryWidth, _inventoryHeight, _rootConsole, 0, 0);
+                //RLConsole.Blit(_inventoryConsole, 0, 0, _inventoryWidth, _inventoryHeight, _rootConsole, 0, 0);
 
                 // Tell RLNET to draw the console that we set
                 _rootConsole.Draw();

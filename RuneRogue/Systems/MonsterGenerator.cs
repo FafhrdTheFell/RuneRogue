@@ -30,6 +30,9 @@ namespace RuneRogue.Systems
                 case MonsterKind.Dragon:
                     monster = Dragon.Create(Game.mapLevel);
                     break;
+                case MonsterKind.BoneClaws:
+                    monster = BoneClaws.Create(Game.mapLevel);
+                    break;
                 default:
                     monster = Beetle.Create(0);
                     monster.Symbol = '?';
