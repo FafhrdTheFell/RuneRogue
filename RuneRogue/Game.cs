@@ -199,6 +199,11 @@ namespace RuneRogue
                     _renderRequired = true;
                     CommandSystem.EndPlayerTurn();
                 }
+                if (!(keyPress == null) && !(didPlayerAct))
+                {
+                    AcceleratePlayer = false;
+                }
+                // check for different kepress
 
                 _quittingGame = _triggerQuit;
             }
