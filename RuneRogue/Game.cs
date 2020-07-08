@@ -138,7 +138,7 @@ namespace RuneRogue
             {
                 AcceleratePlayer = false;
             }
-            
+
             bool didPlayerAct = false;
             RLKeyPress keyPress;
 
@@ -149,11 +149,16 @@ namespace RuneRogue
                 keyPress = _rootConsole.Keyboard.GetKeyPress();
                 if (keyPress != null)
                 {
-                        AcceleratePlayer = false;
+                    AcceleratePlayer = false;
+                    keyPress = null;
                 }
-                keyPress = PrevKeyPress;
+                else
+                {
+                    keyPress = PrevKeyPress;
+                }
             }
-            else {
+            else
+            {
                 keyPress = _rootConsole.Keyboard.GetKeyPress();
             }
 
@@ -176,15 +181,18 @@ namespace RuneRogue
                         Direction direction = _inputSystem.MoveDirection(keyPress);
                         if (direction != Direction.None)
                         {
-                            didPlayerAct = CommandSystem.MovePlayer(direction);
+                            // the acceleration system is ugly. AcceleratePlayer sometimes
+                            // gets set in the Command System, so need to check shift before
+                            // carrying out move.
                             AcceleratePlayer = _inputSystem.ShiftDown(keyPress);
+                            didPlayerAct = CommandSystem.MovePlayer(direction);
                         }
-                        if (_inputSystem.QuitKeyPressed(keyPress))
+                        else if (_inputSystem.QuitKeyPressed(keyPress))
                         {
                             QuitGame();
                             _renderRequired = true;
                         }
-                        if (keyPress.Key == RLKey.Period)
+                        else if (_inputSystem.DescendStairs(keyPress))
                         {
                             if (DungeonMap.CanMoveDownToNextLevel())
                             {
@@ -195,6 +203,10 @@ namespace RuneRogue
                                 _rootConsole.Title = $"RuneRogue - Level {mapLevel}";
                                 didPlayerAct = true;
                             }
+                        }
+                        else if (_inputSystem.WaitKey(keyPress))
+                        {
+                            didPlayerAct = true;
                         }
                     }
                     PrevKeyPress = keyPress;
@@ -211,7 +223,6 @@ namespace RuneRogue
                 {
                     AcceleratePlayer = false;
                 }
-                // check for different kepress
 
                 _quittingGame = _triggerQuit;
             }

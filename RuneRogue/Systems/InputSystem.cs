@@ -93,6 +93,17 @@ namespace RuneRogue.Systems
             }
             return yesquit;
         }
+
+        public bool DescendStairs(RLKeyPress keyPress)
+        {
+            return (keyPress.Key == RLKey.Period && keyPress.Shift);
+        }
+
+        public bool WaitKey(RLKeyPress keyPress)
+        {
+            return (((keyPress.Key == RLKey.Period) && !(keyPress.Shift)) ||
+                (keyPress.Key == RLKey.Number5));
+        }
     }
 
 }

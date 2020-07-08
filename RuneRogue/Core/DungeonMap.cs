@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Graphics.OpenGL;
 using RLNET;
@@ -59,6 +60,14 @@ namespace RuneRogue.Core
         // Returns true when able to place the Actor on the cell or false otherwise
         public bool SetActorPosition(Actor actor, int x, int y)
         {
+            // Don't open doors on acceleration.
+            if (actor == Game.Player && Game.AcceleratePlayer && (GetDoor(x,y) != null))
+            {
+                if (!GetDoor(x,y).IsOpen)
+                {
+                    return false;
+                }
+            }
             // Only allow actor placement if the cell is walkable
             if (GetCell(x, y).IsWalkable)
             {
@@ -76,6 +85,11 @@ namespace RuneRogue.Core
                 {
                     UpdatePlayerFieldOfView();
                 }
+                // stop acceleration on stairs
+                if (CheckStairs(actor.X, actor.Y) && actor == Game.Player)
+                {
+                    Game.AcceleratePlayer = false;
+                }
                 return true;
             }
             return false;
@@ -85,6 +99,11 @@ namespace RuneRogue.Core
         public Door GetDoor(int x, int y)
         {
             return Doors.SingleOrDefault(d => d.X == x && d.Y == y);
+        }
+        public bool CheckStairs(int x, int y)
+        {
+            return ((StairsDown.X == x && StairsDown.Y == y) ||
+                (StairsUp.X == x && StairsUp.Y == y));
         }
 
         // The actor opens the door located at the x,y position
