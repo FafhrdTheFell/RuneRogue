@@ -1,4 +1,5 @@
 ﻿using System;
+using OpenTK.Input;
 using RLNET;
 using RogueSharp.Random;
 using RuneRogue.Core;
@@ -141,10 +142,15 @@ namespace RuneRogue
             bool didPlayerAct = false;
             RLKeyPress keyPress;
 
-            // if player requested acceleration and we collected the keypress to
-            // repeat, use it, else get new keypress
-            if (AcceleratePlayer && !(PrevKeyPress.Key == RLKey.Plus || PrevKeyPress.Key == RLKey.KeypadPlus))
+            // if player requested acceleration, use the previous keypress,
+            // but turn off acceleration if a key is pressed to stop it.
+            if (AcceleratePlayer)
             {
+                keyPress = _rootConsole.Keyboard.GetKeyPress();
+                if (keyPress != null)
+                {
+                        AcceleratePlayer = false;
+                }
                 keyPress = PrevKeyPress;
             }
             else {
@@ -199,6 +205,8 @@ namespace RuneRogue
                     _renderRequired = true;
                     CommandSystem.EndPlayerTurn();
                 }
+                // if player did not act and there was a keypress, it hit a wall
+                // or something else, probably. Therefore stop acceleration loop.
                 if (!(keyPress == null) && !(didPlayerAct))
                 {
                     AcceleratePlayer = false;
