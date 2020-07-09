@@ -14,7 +14,7 @@ namespace RuneRogue.Core
 
         public List<Rectangle> Rooms { get; set; }
         public List<Door> Doors { get; set; }
-        public List<ShopMap> Shops { get; set; }
+        public List<Shop> Shops { get; set; }
         public Stairs StairsUp { get; set; }
         public Stairs StairsDown { get; set; }
 
@@ -29,7 +29,7 @@ namespace RuneRogue.Core
             _monsters = new List<Monster>();
             Rooms = new List<Rectangle>();
             Doors = new List<Door>();
-            Shops = new List<ShopMap>();
+            Shops = new List<Shop>();
             PlayerPeril = false;
         }
 
@@ -80,6 +80,8 @@ namespace RuneRogue.Core
                 actor.Y = y;
                 // The new cell the actor is on is now not walkable
                 SetIsWalkable(actor.X, actor.Y, false);
+                // Enter shop if one exists here
+                EnterShop(actor, x, y);
                 // Try to open a door if one exists here
                 OpenDoor(actor, x, y);
                 // Don't forget to update the field of view if we just repositioned the player
@@ -102,12 +104,26 @@ namespace RuneRogue.Core
         {
             return Doors.SingleOrDefault(d => d.X == x && d.Y == y);
         }
+        public Shop GetShop(int x, int y)
+        {
+            return Shops.SingleOrDefault(d => d.X == x && d.Y == y);
+        }
         public bool CheckStairs(int x, int y)
         {
             return ((StairsDown.X == x && StairsDown.Y == y) ||
                 (StairsUp.X == x && StairsUp.Y == y));
         }
 
+        private void EnterShop(Actor actor, int x, int y)
+        {
+            Shop shop = GetShop(x, y);
+            if (shop != null && actor == Game.Player)
+            {
+                Game.SecondaryConsoleActive = true;
+                Game.AcceleratePlayer = false;
+                Game.CurrentShop = shop;
+            }
+        }
         // The actor opens the door located at the x,y position
         private void OpenDoor(Actor actor, int x, int y)
         {
@@ -217,7 +233,7 @@ namespace RuneRogue.Core
                 door.Draw(mapConsole, this);
             }
 
-            foreach (ShopMap shop in Shops)
+            foreach (Shop shop in Shops)
             {
                 shop.Draw(mapConsole, this);
             }

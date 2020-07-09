@@ -168,10 +168,10 @@ namespace RuneRogue.Systems
             Cell shopCell = (Cell)v.GetValue(Game.Random.Next(v.Length - 1));
 
             // Each room has a 3% chance of having a shop
-            if (Dice.Roll("1D100") <= 3)
+            if (Dice.Roll("1D100") <= 30)
             {
 
-                _map.Shops.Add(new ShopMap
+                _map.Shops.Add(new Shop
                 {
                     X = shopCell.X,
                     Y = shopCell.Y

@@ -54,7 +54,7 @@ namespace RuneRogue
         public static CommandSystem CommandSystem { get; private set; }
         public static SchedulingSystem SchedulingSystem { get; private set; }
 
-        public static ShopScreen CurrentShop { get; set; } 
+        public static Shop CurrentShop { get; set; } 
 
         public static bool AcceleratePlayer;
         public static bool SecondaryConsoleActive;
@@ -103,11 +103,11 @@ namespace RuneRogue
             _statConsole = new RLConsole(_statWidth, _statHeight);
             _inventoryConsole = new RLConsole(_inventoryWidth, _inventoryHeight);
 
-            CurrentShop = new ShopScreen();
+            CurrentShop = new Shop();
 
             AcceleratePlayer = false;
             PrevKeyPress = null;
-            SecondaryConsoleActive = true;
+            SecondaryConsoleActive = false;
             _inputSystem = new InputSystem();
             _quittingGame = false;
             _triggerQuit = false;
@@ -292,7 +292,7 @@ namespace RuneRogue
                     DungeonMap.Draw(_mapConsole, _statConsole);
                     Player.DrawStats(_statConsole);
                     MessageLog.Draw(_messageConsole);
-                    CurrentShop.Draw(_secondaryConsole);
+                    CurrentShop.DrawConsole(_secondaryConsole);
                 }
 
                 // Blit the sub consoles to the root console in the correct locations
