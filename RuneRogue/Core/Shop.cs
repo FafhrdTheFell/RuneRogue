@@ -9,12 +9,24 @@ namespace RuneRogue.Core
    public class Shop : IDrawable
    {
 
-        private readonly List<string> _goods;
-        private readonly List<int> _costs;
+        protected  List<string> _goods;
+        protected  List<int> _costs;
 
         // for shop prices display:
         private int _verticalOffset = 4;
         private int _horizontalOffset = 4;
+
+        public List<string> Goods
+        {
+            get { return _goods; }
+            set { _goods = value; }
+        }
+
+        public List<int> Costs
+        {
+            get { return _costs; }
+            set { _costs = value; }
+        }
 
         public Shop()
       {
@@ -51,6 +63,11 @@ namespace RuneRogue.Core
       {
          get; set;
       }
+
+        public virtual void UpdateCosts()
+        {
+
+        }
 
         // return false if still shopping, true if finished
         public virtual bool PurchaseChoice(RLKeyPress rLKeyPress)
@@ -124,14 +141,27 @@ namespace RuneRogue.Core
         // items and prices
         public void DrawConsole(RLConsole console)
         {
-            string[] lines = _goods.ToArray();
+            UpdateCosts();
+            //string[] lines = _goods.ToArray();
+            //int displayNumber;
+            //for (int i = 0; i < lines.Length; i++)
+            //{
+            //    displayNumber = i + 1;
+            //    console.Print(_horizontalOffset, _verticalOffset + 2 * i, "(" + displayNumber.ToString() + ") " + lines[i], Colors.Text);
+            //}
             int displayNumber;
-            for (int i = 0; i < lines.Length; i++)
+            string nameOfGood;
+            string costString;
+            for (int i = 0; i < _goods.Count; i++)
             {
                 displayNumber = i + 1;
-                console.Print(_horizontalOffset, _verticalOffset + 2 * i, "(" + displayNumber.ToString() + ") " + lines[i], Colors.Text);
+                nameOfGood = Goods[i];
+                costString = Costs[i].ToString();
+                console.Print(_horizontalOffset, _verticalOffset + 2 * i, "(" + displayNumber.ToString() + ")", Colors.Text);
+                console.Print(_horizontalOffset + 4, _verticalOffset + 2 * i, nameOfGood, Colors.Text);
+                console.Print(_horizontalOffset + 64, _verticalOffset + 2 * i, costString, Colors.Text);
             }
-            console.Print(_horizontalOffset, 1 + _verticalOffset + 2 * lines.Length, "( X ) Exit shop.", Colors.Text);
+            console.Print(_horizontalOffset, 1 + _verticalOffset + 2 * _goods.Count, "( X ) Exit shop.", Colors.Text);
         }
     }
 }

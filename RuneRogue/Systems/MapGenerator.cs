@@ -45,7 +45,9 @@ namespace RuneRogue.Systems
                 int roomWidth = Game.Random.Next(_roomMinSize, _roomMaxSize);
                 int roomHeight = Game.Random.Next(_roomMinSize, _roomMaxSize);
                 int roomXPosition = Game.Random.Next(0, _width - roomWidth - 1);
-                int roomYPosition = Game.Random.Next(0, _height - roomHeight - 1);
+                // bug with rooms at minumum or maximum Y
+                int roomYPosition = Game.Random.Next(1, _height - roomHeight - 2);
+                //int roomYPosition = Game.Random.Next(0, _height - roomHeight - 1);
 
                 // All of our rooms can be represented as Rectangles
                 var newRoom = new Rectangle(roomXPosition, roomYPosition, roomWidth, roomHeight);
@@ -168,10 +170,10 @@ namespace RuneRogue.Systems
             Cell shopCell = (Cell)v.GetValue(Game.Random.Next(v.Length - 1));
 
             // Each room has a 3% chance of having a shop
-            if (Dice.Roll("1D100") <= 30)
+            if (Dice.Roll("1D100") <= 3)
             {
 
-                _map.Shops.Add(new Shop
+                _map.Shops.Add(new TrainingShop
                 {
                     X = shopCell.X,
                     Y = shopCell.Y
