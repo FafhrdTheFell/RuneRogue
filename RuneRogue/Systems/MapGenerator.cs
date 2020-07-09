@@ -91,6 +91,7 @@ namespace RuneRogue.Systems
             foreach (Rectangle room in _map.Rooms)
             {
                 CreateRoom(room);
+                CreateShop(room);
                 CreateDoors(room);
             }
 
@@ -131,6 +132,51 @@ namespace RuneRogue.Systems
             for (int y = Math.Min(yStart, yEnd); y <= Math.Max(yStart, yEnd); y++)
             {
                 _map.SetCellProperties(xPosition, y, true, true);
+            }
+        }
+
+        private void CreateShop(Rectangle room)
+        {
+            // The the boundaries of the room
+            int xMin = room.Left;
+            int xMax = room.Right;
+            int yMin = room.Top;
+            int yMax = room.Bottom;
+
+            // Put the rooms border cells into a list
+            List<Cell> borderCells = _map.GetCellsAlongLine(xMin, yMin, xMax, yMin).ToList();
+            borderCells.AddRange(_map.GetCellsAlongLine(xMin, yMin, xMin, yMax));
+            borderCells.AddRange(_map.GetCellsAlongLine(xMin, yMax, xMax, yMax));
+            borderCells.AddRange(_map.GetCellsAlongLine(xMax, yMin, xMax, yMax));
+
+            List<Cell> validPositions = new List<Cell>();
+
+            // Go through each of the rooms border cells and look for locations to place doors.
+            foreach (Cell cell in borderCells)
+            {
+                if (!IsPotentialDoor(cell))
+                {
+                    // do not place in corners:
+                    if (!(cell.X == xMin || cell.X == xMax) && (cell.Y == yMin || cell.Y == yMax))
+                    {
+                        validPositions.Add(cell);
+                    }
+                }
+            }
+
+            Array v = validPositions.ToArray();
+            Cell shopCell = (Cell)v.GetValue(Game.Random.Next(v.Length - 1));
+
+            // Each room has a 3% chance of having a shop
+            if (Dice.Roll("1D100") <= 3)
+            {
+
+                _map.Shops.Add(new ShopMap
+                {
+                    X = shopCell.X,
+                    Y = shopCell.Y
+                });
+                _map.SetCellProperties(shopCell.X, shopCell.Y, true, true);
             }
         }
 

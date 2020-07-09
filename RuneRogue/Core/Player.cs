@@ -12,7 +12,7 @@ namespace RuneRogue.Core
          Color = Colors.Player;
          Defense = 2;
          DefenseChance = 40;
-         Gold = 0;
+         Gold = 100;
          Health = 25;
          MaxHealth = 25;
          Name = "Rogue";

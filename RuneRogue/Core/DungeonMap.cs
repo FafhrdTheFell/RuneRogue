@@ -14,6 +14,7 @@ namespace RuneRogue.Core
 
         public List<Rectangle> Rooms { get; set; }
         public List<Door> Doors { get; set; }
+        public List<ShopMap> Shops { get; set; }
         public Stairs StairsUp { get; set; }
         public Stairs StairsDown { get; set; }
 
@@ -28,6 +29,7 @@ namespace RuneRogue.Core
             _monsters = new List<Monster>();
             Rooms = new List<Rectangle>();
             Doors = new List<Door>();
+            Shops = new List<ShopMap>();
             PlayerPeril = false;
         }
 
@@ -213,6 +215,11 @@ namespace RuneRogue.Core
             foreach (Door door in Doors)
             {
                 door.Draw(mapConsole, this);
+            }
+
+            foreach (ShopMap shop in Shops)
+            {
+                shop.Draw(mapConsole, this);
             }
 
             StairsUp.Draw(mapConsole, this);
