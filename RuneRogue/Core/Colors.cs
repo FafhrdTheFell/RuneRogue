@@ -1,7 +1,15 @@
 ﻿using RLNET;
+using System;
 
 namespace RuneRogue.Core
 {
+    class ColorNotDefinedException : Exception
+    {
+        public ColorNotDefinedException(string message)
+        {
+        }
+    }
+
     public class Colors
     {
         public static RLColor FloorBackground = RLColor.Black;
@@ -29,5 +37,48 @@ namespace RuneRogue.Core
         public static RLColor DragonColor = Swatch.DbBlood;
         public static RLColor BoneClawsColor = Swatch.DbOldStone;
 
+        public static RLColor ColorLookup(string color)
+        {
+            switch (color)
+            {
+                case "DbDark":
+                    return Swatch.DbDark;
+                case "DbBrightWood":
+                    return Swatch.DbBrightWood;
+                case "DbGrass":
+                    return Swatch.DbGrass;
+                case "DbBlood":
+                    return Swatch.DbBlood;
+                case "DbOldStone":
+                    return Swatch.DbOldStone;
+                case "DbDeepWater":
+                    return Swatch.DbDeepWater;
+                case "DbWood":
+                    return Swatch.DbWood;
+                case "DbVegetation":
+                    return Swatch.DbVegetation;
+                case "DbOldBlood":
+                    return Swatch.DbOldBlood;
+                case "DbStone":
+                    return Swatch.DbStone;
+                case "DbWater":
+                    return Swatch.DbWater;
+                case "DbMetal":
+                    return Swatch.DbMetal;
+                case "DbSkin":
+                    return Swatch.DbSkin;
+                case "DbSky":
+                    return Swatch.DbSky;
+                case "DbSun":
+                    return Swatch.DbSun;
+                case "DbLight":
+                    return Swatch.DbLight;
+                default:
+                    throw new ColorNotDefinedException($"{color} not defined in ColorLookup.");
+            }
+        }
+
+
     }
+
 }

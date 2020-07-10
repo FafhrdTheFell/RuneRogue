@@ -1,13 +1,8 @@
-﻿namespace RuneRogue.Core
+﻿using System;
+
+namespace RuneRogue.Core
 {
-    //// Direction values correspond to numpad numbers
-    //public enum MonsterKind
-    //{
-    //    Kobold = 0,
-    //    Beetle = 1,
-    //    Dragon = 2,
-    //    BoneClaws = 3
-    //}
+
 
     public class MonsterStats
     {
@@ -15,7 +10,7 @@
         public string Attack { get; set; }
         public string AttackChance { get; set; }
         public int Awareness { get; set; }
-        public RLNET.RLColor Color { get; set; }
+        public string Color { get; set; }
         public string Defense { get; set; }
         public string DefenseChance { get; set; }
         public string Gold { get; set; }

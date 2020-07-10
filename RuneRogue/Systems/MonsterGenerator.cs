@@ -11,6 +11,7 @@ using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using System.Diagnostics;
+using RLNET;
 
 namespace RuneRogue.Systems
 {
@@ -176,7 +177,12 @@ namespace RuneRogue.Systems
             monster.Attack = Dice.Roll(_monsterManual[page].Attack);
             monster.AttackChance = Dice.Roll(_monsterManual[page].AttackChance);
             monster.Awareness = _monsterManual[page].Awareness;
-            monster.Color = _monsterManual[page].Color;
+            //int r = _monsterManual[page].Color[0];
+            //int g = _monsterManual[page].Color[1];
+            //int b = _monsterManual[page].Color[2];
+            //Console.WriteLine($"{r} {g} {b}");
+            //monster.Color = new RLColor(r, g, b);
+            monster.Color = Colors.ColorLookup(_monsterManual[page].Color);
             monster.Defense = Dice.Roll(_monsterManual[page].Defense);
             monster.DefenseChance = Dice.Roll(_monsterManual[page].DefenseChance);
             monster.Gold = Dice.Roll(_monsterManual[page].Gold);
