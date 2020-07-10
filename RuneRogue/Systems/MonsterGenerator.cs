@@ -5,40 +5,180 @@ using RogueSharp;
 using RogueSharp.DiceNotation;
 using RuneRogue.Core;
 using RuneRogue.Monsters;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.IO;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
+using System.Diagnostics;
 
 namespace RuneRogue.Systems
 {
     public class MonsterGenerator
     {
-        private readonly MonsterKind _monsterType;
+        private MonsterStats[] _monsterManual;
+        private Dictionary<MonsterKind, int> _manualPage;
+        private string _monsterDataFile;
+        private JsonSerializerOptions _jsonOptions;
 
-        public MonsterGenerator(MonsterKind monsterKind)
+        public string MonsterDataFile
         {
-            _monsterType = monsterKind;
+            get { return _monsterDataFile; }
+            set { _monsterDataFile = value; }
         }
-        public Monster CreateMonster()
+
+        public MonsterGenerator()
         {
-            Monster monster;
-            switch (_monsterType)
+            _jsonOptions = new JsonSerializerOptions
             {
-                case MonsterKind.Beetle:
-                    monster = Beetle.Create(Game.mapLevel);
-                    break;
-                case MonsterKind.Kobold:
-                    monster = Kobold.Create(Game.mapLevel);
-                    break;
-                case MonsterKind.Dragon:
-                    monster = Dragon.Create(Game.mapLevel);
-                    break;
-                case MonsterKind.BoneClaws:
-                    monster = BoneClaws.Create(Game.mapLevel);
-                    break;
-                default:
-                    monster = Beetle.Create(0);
-                    monster.Symbol = '?';
-                    monster.Name = "Unknown";
-                    break;
+                WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                ReadCommentHandling = JsonCommentHandling.Skip,
+            };
+            // serialize enums as strings
+            _jsonOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+        }
+
+        public void ReadMonsterData(string FileName)
+        {
+            MonsterDataFile = FileName;
+            string jsonString = File.ReadAllText(MonsterDataFile);
+            _monsterManual = JsonSerializer.Deserialize<MonsterStats[]>(jsonString, _jsonOptions);
+            //_monsterManual = new MonsterStats[]
+            //{
+            //    new MonsterStats()
+            //    {
+            //        Kind=MonsterKind.Beetle,
+            //        Attack = "1D2",
+            //        AttackChance = "25D2",
+            //        Awareness = 10,
+            //        Color = Colors.BeetleColor,
+            //        Defense =  "2D2",
+            //        DefenseChance = "8D4",
+            //        Gold = "0",
+            //        MaxHealth = "D4",
+            //        Name = "Giant Beetle",
+            //        Speed = 7,
+            //        Symbol = 'b',
+            //        NumberAppearing = "d3+d6-1",
+            //        MinLevel = 1,
+            //        MaxLevel = 6
+            //    },
+            //    new MonsterStats()
+            //    {
+            //        Kind=MonsterKind.BoneClaws,
+            //        Attack = "2D3" ,
+            //        AttackChance = "25D4",
+            //        Awareness = 10,
+            //        Color = Colors.BoneClawsColor,
+            //        Defense = "3D2" ,
+            //        DefenseChance =  "15D3" ,
+            //        Gold = "5D5",
+            //        MaxHealth = "1D3",
+            //        Name = "Bone Claws",
+            //        Speed = 12,
+            //        Symbol = 'b',
+            //        NumberAppearing = "5-2d4k1",
+            //        MinLevel = 1,
+            //        MaxLevel = 5
+            //    },
+            //    new MonsterStats()
+            //    {
+            //        Kind = MonsterKind.Dragon,
+            //        Attack = "5D2",
+            //        AttackChance = "25D3+20",
+            //        Awareness = 10,
+            //        Color = Colors.DragonColor,
+            //        Defense = "3d3k2",
+            //        DefenseChance = "8D8",
+            //        Gold = "10D20",
+            //        MaxHealth = "6D6",
+            //        Name = "Dragon",
+            //        Speed = 14,
+            //        Symbol = 'D',
+            //        NumberAppearing = "1",
+            //        MinLevel = 2,
+            //        MaxLevel = 10
+            //    },
+            //    new MonsterStats()
+            //    {
+            //        Kind = MonsterKind.Kobold,
+            //        Attack = "1D3",
+            //        AttackChance = "25D3",
+            //        Awareness = 10,
+            //        Color = Colors.KoboldColor,
+            //        Defense = "1D3",
+            //        DefenseChance = "10D4",
+            //        Gold = "5D5",
+            //        MaxHealth = "2D5",
+            //        Name = "Kobold",
+            //        Speed = 14,
+            //        Symbol = 'k',
+            //        NumberAppearing = "5-2d4k1",
+            //        MinLevel = 1,
+            //        MaxLevel = 3
+            //    }
+            //};
+            GenerateIndex();
+        }
+
+        void WriteMonsterData(string FileName)
+        {
+            string jsonString = JsonSerializer.Serialize(_monsterManual, _jsonOptions);
+            File.WriteAllText(FileName, jsonString);
+        }
+
+        public void GenerateIndex()
+        {
+            _manualPage = new Dictionary<MonsterKind, int>();
+            for (int i = 0; i < _monsterManual.Length; i++)
+            {
+                _manualPage.Add(_monsterManual[i].Kind, i);
             }
+        }
+
+        public Monster CreateMonster(MonsterKind monsterKind)
+        {
+            Monster monster = new Monster();
+            int page = _manualPage[monsterKind];
+            monster.Attack = Dice.Roll(_monsterManual[page].Attack);
+            monster.AttackChance = Dice.Roll(_monsterManual[page].AttackChance);
+            monster.Awareness = _monsterManual[page].Awareness;
+            monster.Color = _monsterManual[page].Color;
+            monster.Defense = Dice.Roll(_monsterManual[page].Defense);
+            monster.DefenseChance = Dice.Roll(_monsterManual[page].DefenseChance);
+            monster.Gold = Dice.Roll(_monsterManual[page].Gold);
+            monster.MaxHealth = Dice.Roll(_monsterManual[page].MaxHealth);
+            monster.Health = monster.MaxHealth;
+            monster.Name = _monsterManual[page].Name;
+            monster.Speed = _monsterManual[page].Speed;
+            monster.Symbol = _monsterManual[page].Symbol;
+            monster.NumberAppearing = _monsterManual[page].NumberAppearing;
+            monster.MinLevel = _monsterManual[page].MinLevel;
+            monster.MaxLevel = _monsterManual[page].MaxLevel;
+
+            //switch (_monsterType)
+            //{
+            //    case MonsterKind.Beetle:
+            //        monster = Beetle.Create(Game.mapLevel);
+            //        break;
+            //    case MonsterKind.Kobold:
+            //        monster = Kobold.Create(Game.mapLevel);
+            //        break;
+            //    case MonsterKind.Dragon:
+            //        monster = Dragon.Create(Game.mapLevel);
+            //        break;
+            //    case MonsterKind.BoneClaws:
+            //        monster = BoneClaws.Create(Game.mapLevel);
+            //        break;
+            //    default:
+            //        monster = Beetle.Create(0);
+            //        monster.Symbol = '?';
+            //        monster.Name = "Unknown";
+            //        break;
+            //}
+            //Console.WriteLine(jsonString);
             return monster;
         }
     }

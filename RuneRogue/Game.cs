@@ -53,6 +53,7 @@ namespace RuneRogue
         public static MessageLog MessageLog { get; private set; }
         public static CommandSystem CommandSystem { get; private set; }
         public static SchedulingSystem SchedulingSystem { get; private set; }
+        public static MonsterGenerator MonsterGenerator { get; private set; }
 
         public static Shop CurrentShop { get; set; } 
 
@@ -113,6 +114,10 @@ namespace RuneRogue
             _triggerQuit = false;
 
             SchedulingSystem = new SchedulingSystem();
+
+            MonsterGenerator = new MonsterGenerator();
+            MonsterGenerator.ReadMonsterData("Resources/Monsters.json");
+            
 
             MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, mapLevel);
             DungeonMap = mapGenerator.CreateMap();

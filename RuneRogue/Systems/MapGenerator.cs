@@ -292,7 +292,7 @@ namespace RuneRogue.Systems
                 if (Dice.Roll("1D10") < 7)
                 {
                     MonsterKind monsterType = MonsterKind.Beetle;
-                    MonsterGenerator monsterGenerator;
+                    MonsterGenerator monsterGenerator = Game.MonsterGenerator;
                     string numInRoomDice = "1d1";
 
                     bool rerollMonster = true;
@@ -301,8 +301,7 @@ namespace RuneRogue.Systems
                         monsterType = Game.RandomEnumValue<MonsterKind>();
                         rerollMonster = false;
 
-                        monsterGenerator = new MonsterGenerator(monsterType);
-                        Monster monster = monsterGenerator.CreateMonster();
+                        Monster monster = monsterGenerator.CreateMonster(monsterType);
                         numInRoomDice = monster.NumberAppearing;
                         if (_mapLevel < monster.MinLevel || _mapLevel > monster.MaxLevel)
                         {
@@ -312,8 +311,6 @@ namespace RuneRogue.Systems
                         
                     var numberOfMonsters = Dice.Roll(numInRoomDice);
 
-                    monsterGenerator = new MonsterGenerator(monsterType);
-
                     for (int i = 0; i < numberOfMonsters; i++)
                     {
                         // Find a random walkable location in the room to place the monster
@@ -322,7 +319,7 @@ namespace RuneRogue.Systems
                         // In that case skip creating the monster
                         if (randomRoomLocation != null)
                         {
-                            Monster monster = monsterGenerator.CreateMonster();
+                            Monster monster = monsterGenerator.CreateMonster(monsterType);
                             monster.X = randomRoomLocation.X;
                             monster.Y = randomRoomLocation.Y;
                             _map.AddMonster(monster);
