@@ -86,8 +86,6 @@
     <Compile Include="Behaviors\StandardMoveAndAttack.cs" />
     <Compile Include="Core\Actor.cs" />
     <Compile Include="Core\Shop.cs" />
-    <Compile Include="Core\ShopMap.cs" />
-    <Compile Include="Core\ShopScreen.cs" />
     <Compile Include="Core\MonsterStats.cs" />
     <Compile Include="Core\Stairs.cs" />
     <Compile Include="Core\Colors.cs" />
