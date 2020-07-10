@@ -71,6 +71,11 @@ namespace RuneRogue
             return (T)v.GetValue(Random.Next(v.Length - 1));
         }
 
+        public static object RandomArrayValue(Array array)
+        {
+            return array.GetValue(Random.Next(array.Length - 1));
+        }
+
         public static void Main()
         {
             // Establish the seed for the random number generator from the current time

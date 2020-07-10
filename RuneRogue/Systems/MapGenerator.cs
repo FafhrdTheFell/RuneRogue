@@ -291,14 +291,15 @@ namespace RuneRogue.Systems
                 // Each room has a 60% chance of having monsters
                 if (Dice.Roll("1D10") < 7)
                 {
-                    MonsterKind monsterType = MonsterKind.Beetle;
+                    string monsterType = "beetle";
                     MonsterGenerator monsterGenerator = Game.MonsterGenerator;
                     string numInRoomDice = "1d1";
 
                     bool rerollMonster = true;
                     while (rerollMonster)
                     {
-                        monsterType = Game.RandomEnumValue<MonsterKind>();
+                        //monsterType = Game.RandomEnumValue<MonsterKind>();
+                        monsterType = (string)Game.RandomArrayValue(Game.MonsterGenerator.MonsterKinds);
                         rerollMonster = false;
 
                         Monster monster = monsterGenerator.CreateMonster(monsterType);

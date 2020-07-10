@@ -14,10 +14,20 @@ using System.Diagnostics;
 
 namespace RuneRogue.Systems
 {
+    class KindsNotUniqueException : Exception
+    {
+        public KindsNotUniqueException(string message)
+        {
+        }
+    }
+
+
     public class MonsterGenerator
     {
         private MonsterStats[] _monsterManual;
-        private Dictionary<MonsterKind, int> _manualPage;
+        private Dictionary<string, int> _manualPage;
+        private Array _monsterKinds;
+
         private string _monsterDataFile;
         private JsonSerializerOptions _jsonOptions;
 
@@ -25,6 +35,11 @@ namespace RuneRogue.Systems
         {
             get { return _monsterDataFile; }
             set { _monsterDataFile = value; }
+        }
+ 
+        public Array MonsterKinds
+        {
+            get { return _monsterKinds; }
         }
 
         public MonsterGenerator()
@@ -120,6 +135,7 @@ namespace RuneRogue.Systems
             //        MaxLevel = 3
             //    }
             //};
+            GenerateKinds();
             GenerateIndex();
         }
 
@@ -131,14 +147,29 @@ namespace RuneRogue.Systems
 
         public void GenerateIndex()
         {
-            _manualPage = new Dictionary<MonsterKind, int>();
+            _manualPage = new Dictionary<string, int>();
             for (int i = 0; i < _monsterManual.Length; i++)
             {
                 _manualPage.Add(_monsterManual[i].Kind, i);
             }
         }
 
-        public Monster CreateMonster(MonsterKind monsterKind)
+        public void GenerateKinds()
+        {
+            List<string> monsterKinds = new List<string>();
+            for (int i = 0; i < _monsterManual.Length; i++)
+            {
+                monsterKinds.Add(_monsterManual[i].Kind);
+            }
+            bool isUnique = monsterKinds.Distinct().Count() == monsterKinds.Count();
+            if (!isUnique)
+            {
+                throw new KindsNotUniqueException($"Monster kinds values not unique: {monsterKinds.ToArray().ToString()}.");
+            }
+            _monsterKinds = monsterKinds.ToArray();
+        }
+
+        public Monster CreateMonster(string monsterKind)
         {
             Monster monster = new Monster();
             int page = _manualPage[monsterKind];
