@@ -208,7 +208,6 @@ namespace RuneRogue
             if (CommandSystem.IsPlayerTurn && keyPress != null)
             {
                 Player.CheckAdvancement();
-                Console.WriteLine($"{Player.XpAttackSkill} {Player.XpDefenseSkill} {Player.XpHealth}");
             }
 
             if (CommandSystem.IsPlayerTurn || _quittingGame)

@@ -81,7 +81,7 @@ namespace RuneRogue.Core
 
         public void CheckAdvancement()
         {
-            int factor = 20;
+            int factor = 12;
             int factorHealth = 3;
             if (XpAttackSkill >= AttackSkill * factor)
             {
