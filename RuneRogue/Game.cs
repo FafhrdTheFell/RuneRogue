@@ -177,6 +177,7 @@ namespace RuneRogue
                     _renderRequired = true;
                 }
             }
+
             if (AcceleratePlayer && DungeonMap.PlayerPeril)
             {
                 AcceleratePlayer = false;
@@ -203,7 +204,11 @@ namespace RuneRogue
             {
                 keyPress = _rootConsole.Keyboard.GetKeyPress();
             }
-
+            
+            if (CommandSystem.IsPlayerTurn && keyPress != null)
+            {
+                Player.CheckAdvancement();
+            }
 
             if (CommandSystem.IsPlayerTurn || _quittingGame)
             {
