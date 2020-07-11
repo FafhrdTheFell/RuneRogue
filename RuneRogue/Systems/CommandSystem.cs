@@ -144,6 +144,10 @@ namespace RuneRogue.Systems
             if (hits > 0)
             {
                 damage = ResolveArmor(defender, attacker, attackMessage, defenseMessage);
+                if (defender == Game.Player)
+                {
+                    Game.Player.XpHealth += damage;
+                }
             }
             if (!string.IsNullOrWhiteSpace(attackMessage.ToString()))
             {
@@ -170,6 +174,12 @@ namespace RuneRogue.Systems
             {
                 attackMessage.AppendFormat("{0} attacks {1} and rolls {2}: {1} hits.", attacker.Name, defender.Name, roll);
                 hits += 1;
+                // Player gets attack XP on hit
+                if (attacker == Game.Player)
+                {
+                    Game.Player.XpAttackSkill += Math.Max(defender.DefenseSkill - attacker.AttackSkill, 1);
+                    Game.Player.XpHealth += 1;
+                }
             }
             else if (roll > 101 - unadjustedChanceInt)
             {
@@ -179,7 +189,12 @@ namespace RuneRogue.Systems
             {
                 attackMessage.AppendFormat("{0} attacks {1} and rolls {2}: {1} misses.", attacker.Name, defender.Name, roll);
             }
+            if (roll > 101 - unadjustedChanceInt && defender == Game.Player)
+            {
+                Game.Player.XpDefenseSkill += Math.Max(attacker.AttackSkill - defender.DefenseSkill, 1);
+                Game.Player.XpHealth += 1;
 
+            }
             //Console.WriteLine(attacker.Name);
             //Console.WriteLine($"chance {chanceInt} D {defender.DefenseSkill} A {attacker.AttackSkill}");
 

@@ -1,13 +1,61 @@
 ﻿using RLNET;
 using System;
+using RogueSharp;
+using RogueSharp.DiceNotation;
 
 namespace RuneRogue.Core
 {
     public class Player : Actor
     {
+        private int _xpAttackSkill;
+        private int _xpDefenseSkill;
+        private int _xpHealth;
+        private int _xpTotalReceived;
 
+        public int XpAttackSkill
+        {
+            get { return _xpAttackSkill; }
+            set 
+            {
+                if (value > _xpAttackSkill)
+                {
+                    XpTotalReceived += value - _xpAttackSkill;
+                }
+                _xpAttackSkill = value; 
+            }
+        }
 
+        public int XpDefenseSkill
+        {
+            get { return _xpDefenseSkill; }
+            set 
+            {
+                if (value > _xpHealth)
+                {
+                    XpTotalReceived += value - _xpDefenseSkill;
+                }
+                _xpDefenseSkill = value; 
+            }
+        }
 
+        public int XpHealth
+        {
+            get { return _xpHealth; }
+            set
+            {
+                if (value > _xpHealth)
+                {
+                    XpTotalReceived += value - _xpHealth;
+                }
+                _xpHealth = value;
+            }
+        }
+
+        public int XpTotalReceived
+        {
+            get { return _xpTotalReceived; }
+            set { _xpTotalReceived = value; }
+        }
 
         public Player()
         {
@@ -20,6 +68,10 @@ namespace RuneRogue.Core
             DefenseChance = 40;
             DefenseSkill = 4;
             Gold = 100;
+            XpAttackSkill = 0;
+            XpDefenseSkill = 0;
+            XpHealth = 0;
+            XpTotalReceived = 0;
             Health = 25;
             MaxHealth = 25;
             Name = "Rogue";
@@ -27,6 +79,30 @@ namespace RuneRogue.Core
             Symbol = '@';
         }
 
+        public void CheckAdvancement()
+        {
+            int factor = 20;
+            int factorHealth = 3;
+            if (XpAttackSkill >= AttackSkill * factor)
+            {
+                XpAttackSkill -= AttackSkill * factor;
+                AttackSkill += 1;
+                Game.MessageLog.Add($"{Name} has learned more about attacking.");
+            }
+            if (XpDefenseSkill >= DefenseSkill * factor)
+            {
+                XpDefenseSkill -= DefenseSkill * factor;
+                DefenseSkill += 1;
+                Game.MessageLog.Add($"{Name} has learned more about defending.");
+            }
+            if (XpHealth >= MaxHealth * factorHealth)
+            {
+                XpHealth -= MaxHealth * factorHealth;
+                MaxHealth += Dice.Roll("2d3k1");
+                Health = MaxHealth;
+                Game.MessageLog.Add($"{Name} has gotten tougher.");
+            }
+        }
         public void DrawStats(RLConsole statConsole)
         {
             statConsole.Print(1,  1, $"Name:", Colors.Text);
