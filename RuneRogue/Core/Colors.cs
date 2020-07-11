@@ -73,6 +73,12 @@ namespace RuneRogue.Core
                     return Swatch.DbSun;
                 case "DbLight":
                     return Swatch.DbLight;
+                case "DwReddishGray":
+                    return Swatch.DwReddishGray;
+                case "DwForestGreen":
+                    return Swatch.DwForestGreen;
+                case "DwPurple":
+                    return Swatch.DwPurple;
                 default:
                     throw new ColorNotDefinedException($"{color} not defined in ColorLookup.");
             }

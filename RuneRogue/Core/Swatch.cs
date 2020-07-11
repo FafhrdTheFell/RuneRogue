@@ -49,5 +49,8 @@ namespace RuneRogue.Core
       public static RLColor DbSun = new RLColor( 218, 212, 94 );
       public static RLColor DbLight = new RLColor( 222, 238, 214 );
 
+        public static RLColor DwReddishGray = new RLColor(165, 140, 140);
+        public static RLColor DwForestGreen = new RLColor(66, 150, 44);
+
    }
 }
