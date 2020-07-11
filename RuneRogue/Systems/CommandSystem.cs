@@ -129,21 +129,13 @@ namespace RuneRogue.Systems
         public void Attack(Actor attacker, Actor defender)
         {
             StringBuilder attackMessage = new StringBuilder();
-            StringBuilder defenseMessage = new StringBuilder();
 
             int hits = ResolveAttack(attacker, defender, attackMessage);
-
-            //int blocks = ResolveDefense(defender, hits, attackMessage, defenseMessage);
-
-            //Game.MessageLog.Add(attackMessage.ToString());
-            
-
-            //int damage = hits - blocks;
 
             int damage = 0;
             if (hits > 0)
             {
-                damage = ResolveArmor(defender, attacker, attackMessage, defenseMessage);
+                damage = ResolveArmor(defender, attacker, attackMessage);
                 if (defender == Game.Player)
                 {
                     Game.Player.XpHealth += damage;
@@ -195,14 +187,12 @@ namespace RuneRogue.Systems
                 Game.Player.XpHealth += 1;
 
             }
-            //Console.WriteLine(attacker.Name);
-            //Console.WriteLine($"chance {chanceInt} D {defender.DefenseSkill} A {attacker.AttackSkill}");
 
             return hits;
 
         }
 
-        private static int ResolveArmor(Actor defender, Actor attacker, StringBuilder attackMessage, StringBuilder defenseMessage)
+        private static int ResolveArmor(Actor defender, Actor attacker, StringBuilder attackMessage)
         {
             string attackDice = "1d" + attacker.Attack.ToString();
             int attackResult = Dice.Roll(attackDice);

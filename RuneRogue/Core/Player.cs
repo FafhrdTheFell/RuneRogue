@@ -11,6 +11,27 @@ namespace RuneRogue.Core
         private int _xpDefenseSkill;
         private int _xpHealth;
         private int _xpTotalReceived;
+        private int _lifetimeGold;
+
+        public int LifetimeGold
+        {
+            get { return _lifetimeGold; }
+            set { _lifetimeGold = value; }
+        }
+
+        public override int Gold
+        {
+            get
+            {
+                return _gold;
+            }
+            set
+            {
+                int increase = Math.Max(value - _gold, 0);
+                LifetimeGold += increase;
+                _gold = value;
+            }
+        }
 
         public int XpAttackSkill
         {

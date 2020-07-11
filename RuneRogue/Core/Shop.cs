@@ -77,7 +77,7 @@ namespace RuneRogue.Core
             {
                 return false;
             }
-            if (rLKeyPress.Key == RLKey.X)
+            if (rLKeyPress.Key == RLKey.X || rLKeyPress.Key == RLKey.Escape)
             {
                 return true;
             }

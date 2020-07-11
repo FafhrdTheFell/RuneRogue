@@ -4,7 +4,6 @@ using System.Linq;
 using RogueSharp;
 using RogueSharp.DiceNotation;
 using RuneRogue.Core;
-using RuneRogue.Monsters;
 
 namespace RuneRogue.Systems
 {

@@ -17,18 +17,14 @@ namespace RuneRogue.Core
         private int _defense;
         private int _defenseChance;
         private int _defenseSkill;
-        private int _gold;
+        protected int _gold;
         private int _health;
         private int _maxHealth;
         private string _name;
         private int _speed;
-        private int _lifetimeGold;
 
-        public int LifetimeGold
-        {
-            get { return _lifetimeGold; }
-            set { _lifetimeGold = value; }
-        }
+
+
 
         public int Attack
         {
@@ -114,7 +110,7 @@ namespace RuneRogue.Core
             }
         }
 
-        public int Gold
+        public virtual int Gold
         {
             get
             {
@@ -122,8 +118,6 @@ namespace RuneRogue.Core
             }
             set
             {
-                int increase = Math.Max(value - _gold, 0);
-                LifetimeGold += increase;
                 _gold = value;
             }
         }

@@ -83,11 +83,8 @@ namespace RuneRogue.Systems
         public bool QuitKeyPressed(RLKeyPress keyPress)
         {
             bool yesquit = false;
-            if (keyPress.Key == RLKey.Escape)
-            {
-                yesquit = true;
-            }
-            else if (keyPress.Key == RLKey.C && keyPress.Control)
+            if ((keyPress.Key == RLKey.X || keyPress.Key == RLKey.C)
+                && keyPress.Control)
             {
                 yesquit = true;
             }
