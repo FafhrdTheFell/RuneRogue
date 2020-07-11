@@ -141,12 +141,13 @@ namespace RuneRogue.Systems
                     Game.Player.XpHealth += damage;
                 }
             }
+
+            ResolveDamage(attacker, defender, damage, attackMessage);
+
             if (!string.IsNullOrWhiteSpace(attackMessage.ToString()))
             {
                 Game.MessageLog.Add(attackMessage.ToString());
             }
-
-            ResolveDamage(attacker, defender, damage);
         }
 
         // The attacker rolls based on his stats to see if he gets any hits
@@ -164,8 +165,26 @@ namespace RuneRogue.Systems
             int roll = Dice.Roll("1D100");
             if (roll > 101 - chanceInt)
             {
-                attackMessage.AppendFormat("{0} attacks {1} and rolls {2}: {1} hits.", attacker.Name, defender.Name, roll);
+                attackMessage.AppendFormat("{0} attacks {1} and rolls {2}: {0} hits.", attacker.Name, defender.Name, roll);
                 hits += 1;
+                if (attacker.LifedrainOnHit)
+                {
+                    if (defender.Health == defender.MaxHealth)
+                    {
+                        defender.Health--;
+                        defender.MaxHealth--;
+                    }
+                    else
+                    {
+                        defender.MaxHealth--;
+                    }
+                    if (defender == Game.Player)
+                    {
+                        Game.Player.XpHealth += 3;
+                    }
+                    attackMessage.AppendFormat("{0} feels cold.", defender.Name);
+                }
+                
                 // Player gets attack XP on hit
                 if (attacker == Game.Player)
                 {
@@ -175,11 +194,11 @@ namespace RuneRogue.Systems
             }
             else if (roll > 101 - unadjustedChanceInt)
             {
-                attackMessage.AppendFormat("{0} attacks {1} and rolls {2}: {2} dodges.", attacker.Name, defender.Name, roll);
+                attackMessage.AppendFormat("{0} attacks {1} and rolls {2}: {1} dodges.", attacker.Name, defender.Name, roll);
             }
             else
             {
-                attackMessage.AppendFormat("{0} attacks {1} and rolls {2}: {1} misses.", attacker.Name, defender.Name, roll);
+                attackMessage.AppendFormat("{0} attacks {1} and rolls {2}: {0} misses.", attacker.Name, defender.Name, roll);
             }
             if (roll > 101 - unadjustedChanceInt && defender == Game.Player)
             {
@@ -215,11 +234,21 @@ namespace RuneRogue.Systems
 
 
         // Apply any damage that wasn't blocked to the defender
-        private static void ResolveDamage(Actor attacker, Actor defender, int damage)
+        private static void ResolveDamage(Actor attacker, Actor defender, int damage, StringBuilder attackMessage)
         {
             if (damage > 0)
             {
                 defender.Health -= damage;
+                if (damage > 0 && attacker.LifedrainOnDamage)
+                {
+                    int drain = Math.Max(damage / 2, 1);
+                    defender.MaxHealth -= drain;
+                    attackMessage.AppendFormat(" {0} feels cold.", defender.Name);
+                    if (defender == Game.Player)
+                    {
+                        Game.Player.XpHealth += drain * 3;
+                    }
+                }
                 if (defender.Health > 0)
                 {
                     Game.MessageLog.Add($"  {defender.Name} takes {damage} damage");

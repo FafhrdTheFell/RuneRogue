@@ -174,11 +174,6 @@ namespace RuneRogue.Systems
             monster.AttackChance = Dice.Roll(_monsterManual[page].AttackChance);
             monster.AttackSkill = monster.AttackChance / 10;
             monster.Awareness = _monsterManual[page].Awareness;
-            //int r = _monsterManual[page].Color[0];
-            //int g = _monsterManual[page].Color[1];
-            //int b = _monsterManual[page].Color[2];
-            //Console.WriteLine($"{r} {g} {b}");
-            //monster.Color = new RLColor(r, g, b);
             monster.Color = Colors.ColorLookup(_monsterManual[page].Color);
             monster.Defense = Dice.Roll(_monsterManual[page].Defense);
             monster.DefenseChance = Dice.Roll(_monsterManual[page].DefenseChance);
@@ -192,28 +187,10 @@ namespace RuneRogue.Systems
             monster.NumberAppearing = _monsterManual[page].NumberAppearing;
             monster.MinLevel = _monsterManual[page].MinLevel;
             monster.MaxLevel = _monsterManual[page].MaxLevel;
+            monster.LifedrainOnHit = _monsterManual[page].LifedrainOnHit;
+            monster.LifedrainOnDamage = _monsterManual[page].LifedrainOnDamage; 
+            monster.Regeneration = _monsterManual[page].Regeneration;
 
-            //switch (_monsterType)
-            //{
-            //    case MonsterKind.Beetle:
-            //        monster = Beetle.Create(Game.mapLevel);
-            //        break;
-            //    case MonsterKind.Kobold:
-            //        monster = Kobold.Create(Game.mapLevel);
-            //        break;
-            //    case MonsterKind.Dragon:
-            //        monster = Dragon.Create(Game.mapLevel);
-            //        break;
-            //    case MonsterKind.BoneClaws:
-            //        monster = BoneClaws.Create(Game.mapLevel);
-            //        break;
-            //    default:
-            //        monster = Beetle.Create(0);
-            //        monster.Symbol = '?';
-            //        monster.Name = "Unknown";
-            //        break;
-            //}
-            //Console.WriteLine(jsonString);
             return monster;
         }
     }

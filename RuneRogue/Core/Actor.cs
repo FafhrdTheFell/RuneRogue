@@ -22,7 +22,9 @@ namespace RuneRogue.Core
         private int _maxHealth;
         private string _name;
         private int _speed;
-
+        private bool _lifedrainOnHit;
+        private bool _lifedrainOnDamage;
+        private bool _regeneration;
 
 
 
@@ -168,6 +170,23 @@ namespace RuneRogue.Core
             {
                 _speed = value;
             }
+        }
+
+        public bool LifedrainOnHit
+        {
+            get { return _lifedrainOnHit; }
+            set { _lifedrainOnHit = value; }
+        }
+        public bool LifedrainOnDamage
+        {
+            get { return _lifedrainOnDamage; }
+            set { _lifedrainOnDamage = value; }
+        }
+
+        public bool Regeneration
+        {
+            get { return _regeneration; }
+            set { _regeneration = value; }
         }
 
         // IDrawable

@@ -22,6 +22,11 @@ namespace RuneRogue.Core
         public string NumberAppearing { get; set; }
         public int MinLevel { get; set; }
         public int MaxLevel { get; set; }
+
+        public bool LifedrainOnDamage { get; set; }
+        public bool LifedrainOnHit { get; set; }
+        public bool Regeneration { get; set; }
+       
     }
 
 }
