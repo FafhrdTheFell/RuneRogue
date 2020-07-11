@@ -6,6 +6,7 @@ using RuneRogue.Core;
 using RuneRogue.Interfaces;
 using System;
 using System.Runtime.ExceptionServices;
+using System.Security.Policy;
 
 namespace RuneRogue.Systems
 {
@@ -239,6 +240,12 @@ namespace RuneRogue.Systems
             if (damage > 0)
             {
                 defender.Health -= damage;
+                if (attacker.Vampiric)
+                {
+                    int gain = damage;
+                    attacker.Health = Math.Min(attacker.Health + gain, attacker.MaxHealth);
+                    attackMessage.AppendFormat(" {0} feeds on {1}'s life.", attacker.Name, defender.Name);
+                }
                 if (damage > 0 && attacker.LifedrainOnDamage)
                 {
                     int drain = Math.Max(damage / 2, 1);

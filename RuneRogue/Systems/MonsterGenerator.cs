@@ -190,6 +190,7 @@ namespace RuneRogue.Systems
             monster.LifedrainOnHit = _monsterManual[page].LifedrainOnHit;
             monster.LifedrainOnDamage = _monsterManual[page].LifedrainOnDamage; 
             monster.Regeneration = _monsterManual[page].Regeneration;
+            monster.Vampiric = _monsterManual[page].Vampiric;
 
             return monster;
         }

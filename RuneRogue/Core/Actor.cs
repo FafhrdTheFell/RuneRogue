@@ -25,6 +25,7 @@ namespace RuneRogue.Core
         private bool _lifedrainOnHit;
         private bool _lifedrainOnDamage;
         private bool _regeneration;
+        private bool _vampiric;
 
 
 
@@ -187,6 +188,12 @@ namespace RuneRogue.Core
         {
             get { return _regeneration; }
             set { _regeneration = value; }
+        }
+
+        public bool Vampiric
+        {
+            get { return _vampiric; }
+            set { _vampiric = value; }
         }
 
         // IDrawable

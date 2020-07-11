@@ -26,7 +26,9 @@ namespace RuneRogue.Core
         public bool LifedrainOnDamage { get; set; }
         public bool LifedrainOnHit { get; set; }
         public bool Regeneration { get; set; }
-       
+        public bool Doppelganger { get; set; }
+        public bool Vampiric { get; set; }
+
     }
 
 }
