@@ -135,7 +135,6 @@ namespace RuneRogue.Core
                 // Once the door is opened it should be marked as transparent and no longer block field-of-view
                 SetCellProperties(x, y, true, cell.IsWalkable, cell.IsExplored);
 
-                Game.MessageLog.Add($"{actor.Name} opened a door");
             }
         }
 

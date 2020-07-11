@@ -4,6 +4,8 @@ using RogueSharp;
 using RogueSharp.DiceNotation;
 using RuneRogue.Core;
 using RuneRogue.Interfaces;
+using System;
+using System.Runtime.ExceptionServices;
 
 namespace RuneRogue.Systems
 {
@@ -131,15 +133,22 @@ namespace RuneRogue.Systems
 
             int hits = ResolveAttack(attacker, defender, attackMessage);
 
-            int blocks = ResolveDefense(defender, hits, attackMessage, defenseMessage);
+            //int blocks = ResolveDefense(defender, hits, attackMessage, defenseMessage);
 
-            Game.MessageLog.Add(attackMessage.ToString());
-            if (!string.IsNullOrWhiteSpace(defenseMessage.ToString()))
+            //Game.MessageLog.Add(attackMessage.ToString());
+            
+
+            //int damage = hits - blocks;
+
+            int damage = 0;
+            if (hits > 0)
             {
-                Game.MessageLog.Add(defenseMessage.ToString());
+                damage = ResolveArmor(defender, attacker, attackMessage, defenseMessage);
             }
-
-            int damage = hits - blocks;
+            if (!string.IsNullOrWhiteSpace(attackMessage.ToString()))
+            {
+                Game.MessageLog.Add(attackMessage.ToString());
+            }
 
             ResolveDamage(attacker, defender, damage);
         }
@@ -149,59 +158,56 @@ namespace RuneRogue.Systems
         {
             int hits = 0;
 
-            attackMessage.AppendFormat("{0} attacks {1} and rolls: ", attacker.Name, defender.Name);
-
-            // Roll a number of 100-sided dice equal to the Attack value of the attacking actor
-            DiceExpression attackDice = new DiceExpression().Dice(attacker.Attack, 100);
-            DiceResult attackResult = attackDice.Roll();
-
-            // Look at the face value of each single die that was rolled
-            foreach (TermResult termResult in attackResult.Results)
+            int diff = attacker.AttackSkill - defender.DefenseSkill;
+            double chanceDouble = Math.Exp(0.11 * Convert.ToDouble(diff)) /
+                (1 + Math.Exp(0.11 * Convert.ToDouble(diff)));
+            double unadjustedChanceDouble = Math.Exp(0.11 * Convert.ToDouble(attacker.AttackSkill)) /
+                (1 + Math.Exp(0.11 * Convert.ToDouble(attacker.AttackSkill)));
+            int chanceInt = Convert.ToInt32(chanceDouble * 100 + 0.5);
+            int unadjustedChanceInt = Convert.ToInt32(unadjustedChanceDouble * 100 + 0.5);
+            int roll = Dice.Roll("1D100");
+            if (roll > 101 - chanceInt)
             {
-                attackMessage.Append(termResult.Value + ", ");
-                // Compare the value to 100 minus the attack chance and add a hit if it's greater
-                if (termResult.Value >= 100 - attacker.AttackChance)
-                {
-                    hits++;
-                }
+                attackMessage.AppendFormat("{0} attacks {1} and rolls {2}: {1} hits.", attacker.Name, defender.Name, roll);
+                hits += 1;
             }
-
-            return hits;
-        }
-
-        // The defender rolls based on his stats to see if he blocks any of the hits from the attacker
-        private static int ResolveDefense(Actor defender, int hits, StringBuilder attackMessage, StringBuilder defenseMessage)
-        {
-            int blocks = 0;
-
-            if (hits > 0)
+            else if (roll > 101 - unadjustedChanceInt)
             {
-                attackMessage.AppendFormat("scoring {0} hits.", hits);
-                defenseMessage.AppendFormat("  {0} defends and rolls: ", defender.Name);
-
-                // Roll a number of 100-sided dice equal to the Defense value of the defendering actor
-                DiceExpression defenseDice = new DiceExpression().Dice(defender.Defense, 100);
-                DiceResult defenseRoll = defenseDice.Roll();
-
-                // Look at the face value of each single die that was rolled
-                foreach (TermResult termResult in defenseRoll.Results)
-                {
-                    defenseMessage.Append(termResult.Value + ", ");
-                    // Compare the value to 100 minus the defense chance and add a block if it's greater
-                    if (termResult.Value >= 100 - defender.DefenseChance)
-                    {
-                        blocks++;
-                    }
-                }
-                defenseMessage.AppendFormat("resulting in {0} blocks.", blocks);
+                attackMessage.AppendFormat("{0} attacks {1} and rolls {2}: {2} dodges.", attacker.Name, defender.Name, roll);
             }
             else
             {
-                attackMessage.Append("and misses completely.");
+                attackMessage.AppendFormat("{0} attacks {1} and rolls {2}: {1} misses.", attacker.Name, defender.Name, roll);
             }
 
-            return blocks;
+            //Console.WriteLine(attacker.Name);
+            //Console.WriteLine($"chance {chanceInt} D {defender.DefenseSkill} A {attacker.AttackSkill}");
+
+            return hits;
+
         }
+
+        private static int ResolveArmor(Actor defender, Actor attacker, StringBuilder attackMessage, StringBuilder defenseMessage)
+        {
+            string attackDice = "1d" + attacker.Attack.ToString();
+            int attackResult = Dice.Roll(attackDice);
+            if (attackResult <= defender.Defense && attackResult >= 4)
+            {
+                attackMessage.AppendFormat(" {0}'s blow bounces off {1}.", attacker.Name, defender.Name);
+            }
+            else if (attackResult <= defender.Defense)
+            {
+                attackMessage.AppendFormat(" {0}'s weak blow does no damage.", attacker.Name);
+            }
+            else if (attackResult >= defender.Defense * 2)
+            {
+                attackMessage.AppendFormat(" {0}'s blow lands hard!", attacker.Name);
+            }
+
+            return Math.Max(attackResult - defender.Defense, 0);
+
+        }
+
 
         // Apply any damage that wasn't blocked to the defender
         private static void ResolveDamage(Actor attacker, Actor defender, int damage)
@@ -209,17 +215,15 @@ namespace RuneRogue.Systems
             if (damage > 0)
             {
                 defender.Health -= damage;
-
-                Game.MessageLog.Add($"  {defender.Name} was hit for {damage} damage");
-
+                if (defender.Health > 0)
+                {
+                    Game.MessageLog.Add($"  {defender.Name} takes {damage} damage");
+                }
                 if (defender.Health <= 0)
                 {
+                    Game.MessageLog.Add($"  {defender.Name} is killed");
                     ResolveDeath(attacker, defender);
                 }
-            }
-            else
-            {
-                Game.MessageLog.Add($"  {defender.Name} blocked all damage");
             }
         }
 
@@ -228,14 +232,14 @@ namespace RuneRogue.Systems
         {
             if (defender is Player)
             {
-                Game.MessageLog.Add($"  {defender.Name} was killed, GAME OVER MAN!");
+                Game.MessageLog.Add($"  Game Over!");
                 
             }
             else if (defender is Monster)
             {
                 Game.DungeonMap.RemoveMonster((Monster)defender);
 
-                Game.MessageLog.Add($"  {defender.Name} died and dropped {defender.Gold} gold");
+                Game.MessageLog.Add($"  {defender.Name} dropped {defender.Gold} gold");
 
                 if (attacker is Player)
                 {

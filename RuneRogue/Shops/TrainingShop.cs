@@ -57,10 +57,16 @@ namespace RuneRogue.Core
 
         }
 
+        private int RoundFive(double number)
+        {
+            double rem = (number + 2.5) % 5;
+            return Convert.ToInt32(number + 2.5 - rem);
+        }
+
         public override void UpdateCosts()
         {
-            Costs[0] = 5 * Game.Player.Attack * Game.Player.Attack;
-            Costs[1] = 5 * Game.Player.Defense * Game.Player.Defense;
+            Costs[0] = RoundFive(1.5 * Math.Pow(Convert.ToDouble(Game.Player.Attack + 1), 1.35));
+            Costs[1] = RoundFive(3.0 * Math.Pow(Convert.ToDouble(Game.Player.Defense + 1), 1.65));
             if (Game.Player.Health == Game.Player.MaxHealth)
             {
                 Costs[2] = 10;
@@ -132,15 +138,7 @@ namespace RuneRogue.Core
                     }
                     break;
             }
-            //switch (purchase)
-            //{
-            //    case 1:
-            //        Game.Player.Attack += 1;
-            //        Game.MessageLog.Add(Game.Player.Name + " upgrades their weaponry.");
-            //        break;
-            //    default:
-            //        break;
-            //}
+
         }
     }
 }

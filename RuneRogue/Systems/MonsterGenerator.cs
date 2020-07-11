@@ -176,6 +176,7 @@ namespace RuneRogue.Systems
             int page = _manualPage[monsterKind];
             monster.Attack = Dice.Roll(_monsterManual[page].Attack);
             monster.AttackChance = Dice.Roll(_monsterManual[page].AttackChance);
+            monster.AttackSkill = monster.AttackChance / 10;
             monster.Awareness = _monsterManual[page].Awareness;
             //int r = _monsterManual[page].Color[0];
             //int g = _monsterManual[page].Color[1];
@@ -185,6 +186,7 @@ namespace RuneRogue.Systems
             monster.Color = Colors.ColorLookup(_monsterManual[page].Color);
             monster.Defense = Dice.Roll(_monsterManual[page].Defense);
             monster.DefenseChance = Dice.Roll(_monsterManual[page].DefenseChance);
+            monster.DefenseSkill = monster.DefenseChance / 10;
             monster.Gold = Dice.Roll(_monsterManual[page].Gold);
             monster.MaxHealth = Dice.Roll(_monsterManual[page].MaxHealth);
             monster.Health = monster.MaxHealth;
