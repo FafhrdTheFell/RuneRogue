@@ -116,7 +116,7 @@ namespace RuneRogue.Core
             statConsole.Print(1, 17, $"    {Defense} armor", Colors.Text);
             statConsole.Print(1, 19, $"Gold:", Colors.Gold);
             statConsole.Print(1, 21, $"    {Gold}", Colors.Gold);
-            statConsole.Print(1, 22, $"    {Gold} (lifetime)", Colors.Gold);
+            statConsole.Print(1, 22, $"    {LifetimeGold} (lifetime)", Colors.Gold);
 
             // print health bar
             // Begin the line by printing the health numbers 
