@@ -26,6 +26,8 @@ namespace RuneRogue.Core
         private bool _lifedrainOnDamage;
         private bool _regeneration;
         private bool _vampiric;
+        private bool _doppelganger;
+        private bool _highImpactAttack;
 
 
 
@@ -173,27 +175,59 @@ namespace RuneRogue.Core
             }
         }
 
-        public bool LifedrainOnHit
+        public bool SALifedrainOnHit
         {
             get { return _lifedrainOnHit; }
             set { _lifedrainOnHit = value; }
         }
-        public bool LifedrainOnDamage
+        public bool SALifedrainOnDamage
         {
             get { return _lifedrainOnDamage; }
             set { _lifedrainOnDamage = value; }
         }
 
-        public bool Regeneration
+        public bool SARegeneration
         {
             get { return _regeneration; }
             set { _regeneration = value; }
         }
 
-        public bool Vampiric
+        public bool SAVampiric
         {
             get { return _vampiric; }
             set { _vampiric = value; }
+        }
+
+        public bool SADoppelganger
+        {
+            get { return _doppelganger; }
+            set { _doppelganger = value; }
+        }
+
+        // attack is more likely to overcome armor and also
+        // does more damage
+        public bool SAHighImpact
+        {
+            get { return _highImpactAttack; }
+            set { _highImpactAttack = value; }
+        }
+
+        public void DoppelgangTransform()
+        {
+            // if @, already transformed
+            if (Symbol == '@')
+            {
+                return;
+            }
+            Symbol = '@';
+            MaxHealth = Game.Player.MaxHealth / 3;
+            Health = MaxHealth;
+            Attack = Convert.ToInt32((double)Game.Player.Attack * 0.8);
+            Defense = Convert.ToInt32((double)Game.Player.Defense * 0.8);
+            Gold = Game.Player.Gold / 2;
+            AttackSkill = Game.Player.AttackSkill - 2;
+            DefenseSkill = Game.Player.DefenseSkill - 2;
+            Speed = Game.Player.Speed;
         }
 
         // IDrawable

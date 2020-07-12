@@ -168,7 +168,7 @@ namespace RuneRogue.Systems
             {
                 attackMessage.AppendFormat("{0} attacks {1} and rolls {2}: {0} hits.", attacker.Name, defender.Name, roll);
                 hits += 1;
-                if (attacker.LifedrainOnHit)
+                if (attacker.SALifedrainOnHit)
                 {
                     if (defender.Health == defender.MaxHealth)
                     {
@@ -185,7 +185,10 @@ namespace RuneRogue.Systems
                     }
                     attackMessage.AppendFormat("{0} feels cold.", defender.Name);
                 }
-                
+                if (attacker.SADoppelganger)
+                {
+                    attacker.DoppelgangTransform();
+                }
                 // Player gets attack XP on hit
                 if (attacker == Game.Player)
                 {
@@ -214,7 +217,15 @@ namespace RuneRogue.Systems
 
         private static int ResolveArmor(Actor defender, Actor attacker, StringBuilder attackMessage)
         {
-            string attackDice = "1d" + attacker.Attack.ToString();
+            string attackDice;
+            if (!attacker.SAHighImpact)
+            {
+                attackDice = "1d" + attacker.Attack.ToString();
+            }
+            else
+            {
+                attackDice = "2d" + attacker.Attack.ToString() + "k1";
+            }
             int attackResult = Dice.Roll(attackDice);
             if (attackResult <= defender.Defense && attackResult >= 4)
             {
@@ -240,13 +251,13 @@ namespace RuneRogue.Systems
             if (damage > 0)
             {
                 defender.Health -= damage;
-                if (attacker.Vampiric)
+                if (attacker.SAVampiric)
                 {
                     int gain = damage;
                     attacker.Health = Math.Min(attacker.Health + gain, attacker.MaxHealth);
                     attackMessage.AppendFormat(" {0} feeds on {1}'s life.", attacker.Name, defender.Name);
                 }
-                if (damage > 0 && attacker.LifedrainOnDamage)
+                if (damage > 0 && attacker.SALifedrainOnDamage)
                 {
                     int drain = Math.Max(damage / 2, 1);
                     defender.MaxHealth -= drain;

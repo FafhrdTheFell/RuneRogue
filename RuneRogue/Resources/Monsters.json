@@ -35,7 +35,7 @@
   },
   {
     "kind": "dragon",
-    "attack": "18",
+    "attack": "19",
     "attackChance": "25D3+20",
     "awareness": 10,
     "color": "DbBlood",
@@ -48,7 +48,8 @@
     "symbol": "D",
     "numberAppearing": "1",
     "minLevel": 2,
-    "maxLevel": 14
+    "maxLevel": 14,
+    "saHighImpact": true
   },
   {
     "kind": "goblin",
@@ -154,7 +155,7 @@
   },
   {
     "kind": "murdermoth",
-    "attack": "7",
+    "attack": "9",
     "attackChance": "20D4",
     "awareness": 10,
     "color": "DbGrass",
@@ -188,7 +189,7 @@
   },
   {
     "kind": "bonehemoth",
-    "attack": "14",
+    "attack": "15",
     "attackChance": "25D4",
     "awareness": 10,
     "color": "DbOldStone",
@@ -201,7 +202,8 @@
     "symbol": "H",
     "numberAppearing": "5-2d4k1",
     "minLevel": 3,
-    "maxLevel": 10
+    "maxLevel": 10,
+    "saHighImpact":  true
   },
   {
     "kind": "giantwolfspider",
@@ -210,7 +212,7 @@
     "awareness": 10,
     "color": "DwReddishGray",
     "defense": "2D3",
-    "defenseChance": "12D8",
+    "defenseChance": "12D10",
     "gold": "0",
     "maxHealth": "2D6",
     "name": "Giant Wolf Spider",
@@ -222,7 +224,7 @@
   },
   {
     "kind": "corruptedtitan",
-    "attack": "20",
+    "attack": "22",
     "attackChance": "25D10",
     "awareness": 15,
     "color": "DbSky",
@@ -247,7 +249,7 @@
     "defenseChance": "10D7",
     "gold": "5D8",
     "maxHealth": "3D5k2",
-    "name": "Goblin",
+    "name": "Goblin Huntsman",
     "speed": 10,
     "symbol": "g",
     "numberAppearing": "5-2d4k1",
@@ -304,7 +306,7 @@
     "numberAppearing": "2d3-1",
     "minLevel": 2,
     "maxLevel": 14,
-    "lifedrainOnHit": true
+    "saLifedrainOnHit": true
   },
   {
     "kind": "spectralhound",
@@ -322,7 +324,7 @@
     "numberAppearing": "2d2-1",
     "minLevel": 3,
     "maxLevel": 12,
-    "lifedrainOnDamage": true
+    "saLifedrainOnDamage": true
   },
   {
     "kind": "spectralknight",
@@ -332,7 +334,7 @@
     "color": "DbStone",
     "defense": "2D3",
     "defenseChance": "6D10",
-    "gold": "8d5",
+    "gold": "8d8",
     "maxHealth": "3d5",
     "name": "Spectral Knight",
     "speed": 12,
@@ -340,6 +342,43 @@
     "numberAppearing": "1",
     "minLevel": 4,
     "maxLevel": 14,
-    "lifedrainOnDamage": true
+    "saLifedrainOnDamage": true,
+    "saHighImpact": true
+  },
+  {
+    "kind": "mummuifiedgoblin",
+    "attack": "12",
+    "attackChance": "25D6",
+    "awareness": 14,
+    "color": "DwBandages",
+    "defense": "2D4",
+    "defenseChance": "14D5",
+    "gold": "6D10",
+    "maxHealth": "4D6k2",
+    "name": "Mummified Goblin",
+    "speed": 11,
+    "symbol": "g",
+    "numberAppearing": "1d2",
+    "minLevel": 3,
+    "maxLevel": 13,
+    "saVampiric": true
+  },
+  {
+    "kind": "doppelganger",
+    "attack": "12",
+    "attackChance": "25D6",
+    "awareness": 14,
+    "color": "DbBlood",
+    "defense": "2D4",
+    "defenseChance": "14D5",
+    "gold": "0",
+    "maxHealth": "1D10",
+    "name": "Doppelganger",
+    "speed": 11,
+    "symbol": "?",
+    "numberAppearing": "1d2",
+    "minLevel": 1,
+    "maxLevel": 4,
+    "saDoppelganger": true
   }
 ]

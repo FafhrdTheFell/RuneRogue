@@ -79,6 +79,8 @@ namespace RuneRogue.Core
                     return Swatch.DwForestGreen;
                 case "DwPurple":
                     return Swatch.DwPurple;
+                case "DwBandages":
+                    return Swatch.DwBandages;
                 default:
                     throw new ColorNotDefinedException($"{color} not defined in ColorLookup.");
             }

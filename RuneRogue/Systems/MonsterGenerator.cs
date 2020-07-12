@@ -134,12 +134,20 @@ namespace RuneRogue.Systems
             //};
             GenerateKinds();
             GenerateIndex();
+            PrintMonsterString("doppelganger");
         }
 
         void WriteMonsterData(string FileName)
         {
             string jsonString = JsonSerializer.Serialize(_monsterManual, _jsonOptions);
             File.WriteAllText(FileName, jsonString);
+        }
+
+        void PrintMonsterString(string monster)
+        {
+            MonsterStats data = _monsterManual[_manualPage[monster]];
+            string jsonString = JsonSerializer.Serialize(data, _jsonOptions);
+            Console.WriteLine(jsonString);
         }
 
         public void GenerateIndex()
@@ -187,10 +195,12 @@ namespace RuneRogue.Systems
             monster.NumberAppearing = _monsterManual[page].NumberAppearing;
             monster.MinLevel = _monsterManual[page].MinLevel;
             monster.MaxLevel = _monsterManual[page].MaxLevel;
-            monster.LifedrainOnHit = _monsterManual[page].LifedrainOnHit;
-            monster.LifedrainOnDamage = _monsterManual[page].LifedrainOnDamage; 
-            monster.Regeneration = _monsterManual[page].Regeneration;
-            monster.Vampiric = _monsterManual[page].Vampiric;
+            monster.SALifedrainOnHit = _monsterManual[page].SALifedrainOnHit;
+            monster.SALifedrainOnDamage = _monsterManual[page].SALifedrainOnDamage; 
+            monster.SARegeneration = _monsterManual[page].SARegeneration;
+            monster.SAVampiric = _monsterManual[page].SAVampiric;
+            monster.SADoppelganger = _monsterManual[page].SADoppelganger;
+            monster.SAHighImpact = _monsterManual[page].SAHighImpact; 
 
             return monster;
         }

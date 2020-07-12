@@ -48,6 +48,8 @@ namespace RuneRogue.Core
             }
         }
 
+
+
         public void DrawStats(RLConsole statConsole, int position)
         {
             // Start at Y=24 which is below the player stats.

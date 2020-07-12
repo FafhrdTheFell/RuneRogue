@@ -287,6 +287,12 @@ namespace RuneRogue.Systems
         {
             foreach (var room in _map.Rooms)
             {
+                //no monsters in first room
+                if (room == _map.Rooms.First() && _mapLevel == 1)
+                {
+                    continue;
+                }
+
                 // Each room has a 60% chance of having monsters
                 if (Dice.Roll("1D10") < 7)
                 {
@@ -308,7 +314,7 @@ namespace RuneRogue.Systems
                             rerollMonster = true;
                         }
                     }
-                        
+                       
                     var numberOfMonsters = Dice.Roll(numInRoomDice);
 
                     for (int i = 0; i < numberOfMonsters; i++)

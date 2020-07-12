@@ -23,11 +23,12 @@ namespace RuneRogue.Core
         public int MinLevel { get; set; }
         public int MaxLevel { get; set; }
 
-        public bool LifedrainOnDamage { get; set; }
-        public bool LifedrainOnHit { get; set; }
-        public bool Regeneration { get; set; }
-        public bool Doppelganger { get; set; }
-        public bool Vampiric { get; set; }
+        public bool SALifedrainOnDamage { get; set; }
+        public bool SALifedrainOnHit { get; set; }
+        public bool SARegeneration { get; set; }
+        public bool SADoppelganger { get; set; }
+        public bool SAVampiric { get; set; }
+        public bool SAHighImpact { get; set; }
 
     }
 
