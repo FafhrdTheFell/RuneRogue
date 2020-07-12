@@ -203,7 +203,7 @@
     "numberAppearing": "5-2d4k1",
     "minLevel": 3,
     "maxLevel": 10,
-    "saHighImpact":  true
+    "saHighImpact": true
   },
   {
     "kind": "giantwolfspider",
@@ -380,5 +380,23 @@
     "minLevel": 1,
     "maxLevel": 4,
     "saDoppelganger": true
+  },
+  {
+    "kind": "trollspider",
+    "attack": "14",
+    "attackChance": "25D4",
+    "awareness": 10,
+    "color": "DbGrass",
+    "defense": "2D3",
+    "defenseChance": "10D10",
+    "gold": "5d5",
+    "maxHealth": "2D6",
+    "name": "Troll Spider",
+    "speed": 10,
+    "symbol": "X",
+    "numberAppearing": "5-2d4k1",
+    "minLevel": 2,
+    "maxLevel": 12,
+    "saRegeneration":  true
   }
 ]

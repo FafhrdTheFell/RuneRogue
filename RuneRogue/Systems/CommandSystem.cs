@@ -110,6 +110,10 @@ namespace RuneRogue.Systems
                 {
                     monster.PerformAction(this);
                     Game.SchedulingSystem.Add(monster);
+                    if (monster.SARegeneration && monster.Health < monster.MaxHealth)
+                    {
+                        monster.Health += Dice.Roll("4-2d3k1");
+                    }
                 }
 
                 ActivateMonsters();
