@@ -14,10 +14,7 @@
     "symbol": "b",
     "numberAppearing": "d3+d6-1",
     "minLevel": 1,
-    "maxLevel": 6,
-    "followerKinds": [ "goblin" ],
-    "followerNumberAppearing": [ "1d1" ],
-    "followerProbability": [60]
+    "maxLevel": 6
   },
   {
     "kind": "boneClaws",
@@ -178,7 +175,7 @@
     "attack": "12",
     "attackChance": "20D4",
     "awareness": 13,
-    "color": "DbGrass",
+    "color": "DbWood",
     "defense": "2D3",
     "defenseChance": "8D10",
     "gold": "8d5",
@@ -349,7 +346,7 @@
     "saHighImpact": true
   },
   {
-    "kind": "mummuifiedgoblin",
+    "kind": "mummifiedgoblin",
     "attack": "12",
     "attackChance": "25D6",
     "awareness": 14,
@@ -400,6 +397,95 @@
     "numberAppearing": "5-2d4k1",
     "minLevel": 2,
     "maxLevel": 12,
-    "saRegeneration":  true
+    "saRegeneration": true
+  },
+  {
+    "kind": "goblincaptain",
+    "attack": "13",
+    "attackChance": "30D3",
+    "awareness": 10,
+    "color": "DbMetal",
+    "defense": "3d4k2",
+    "defenseChance": "13D4",
+    "gold": "8D8",
+    "maxHealth": "4D5k3",
+    "name": "Goblin Captain",
+    "speed": 11,
+    "symbol": "g",
+    "numberAppearing": "1",
+    "minLevel": 3,
+    "maxLevel": 14,
+    "followerKinds": [
+      "goblin",
+      "hugegoblin",
+      "mummifiedgoblin",
+      "goblinhuntsman"
+    ],
+    "followerNumberAppearing": [
+      "1d6",
+      "1d4",
+      "1d2",
+      "2d3k1"
+    ],
+    "followerProbability": [
+      90,
+      50,
+      40,
+      40
+    ]
+  },
+  {
+    "kind": "alphawerewolf",
+    "attack": "18",
+    "attackChance": "20D8",
+    "awareness": 14,
+    "color": "DbBlood",
+    "defense": "2D4",
+    "defenseChance": "8D14",
+    "gold": "8d8",
+    "maxHealth": "5d5",
+    "name": "Werewolf",
+    "speed": 7,
+    "symbol": "W",
+    "numberAppearing": "1",
+    "minLevel": 6,
+    "maxLevel": 13,
+    "followerKinds": [
+      "werewolf"
+    ],
+    "followerNumberAppearing": [
+      "1d6"
+    ],
+    "followerProbability": [
+      90
+    ]
+  },
+  {
+    "kind": "trollspiderqueen",
+    "attack": "17",
+    "attackChance": "25D3+20",
+    "awareness": 12,
+    "color": "DbVegetation",
+    "defense": "3d4k2",
+    "defenseChance": "8D8",
+    "gold": "10D8",
+    "maxHealth": "5D6",
+    "name": "Troll Spider Queen",
+    "speed": 10,
+    "symbol": "X",
+    "numberAppearing": "1",
+    "minLevel": 4,
+    "maxLevel": 14,
+    "saHighImpact": true,
+    "saRegeneration": true,
+    "followerKinds": [
+      "trollspider"
+    ],
+    "followerNumberAppearing": [
+      "3d3"
+    ],
+    "followerProbability": [
+      90
+    ]
   }
 ]

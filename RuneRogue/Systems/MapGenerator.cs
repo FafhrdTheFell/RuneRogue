@@ -296,28 +296,9 @@ namespace RuneRogue.Systems
                 // Each room has a 60% chance of having monsters
                 if (Dice.Roll("1D10") < 7)
                 {
-                    //string monsterType = "beetle";
-                    //MonsterGenerator monsterGenerator = Game.MonsterGenerator;
-                    //string numInRoomDice = "1d1";
-
-                    //bool rerollMonster = true;
-                    //while (rerollMonster)
-                    //{
-                    //    //monsterType = Game.RandomEnumValue<MonsterKind>();
-                    //    monsterType = (string)Game.RandomArrayValue(Game.MonsterGenerator.MonsterKinds);
-                    //    rerollMonster = false;
-
-                    //    Monster monster = monsterGenerator.CreateMonster(monsterType);
-                    //    numInRoomDice = monster.NumberAppearing;
-                    //    if (_mapLevel < monster.MinLevel || _mapLevel > monster.MaxLevel)
-                    //    {
-                    //        rerollMonster = true;
-                    //    }
-                    //}
-                       
-                    //var numberOfMonsters = Dice.Roll(numInRoomDice);
-
-                    List<Monster> monsters = Game.MonsterGenerator.CreateEncounter(_mapLevel,"beetle","1d3");
+                    // to spawn particular monsters for testing, uncomment the next line
+                    //List<Monster> monsters = Game.MonsterGenerator.CreateEncounter(_mapLevel,"goblincaptain","1");
+                    List<Monster> monsters = Game.MonsterGenerator.CreateEncounter(_mapLevel);
 
                     //for (int i = 0; i < monsters.Length; i++)
                     foreach (Monster monster in monsters)
