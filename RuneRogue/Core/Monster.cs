@@ -13,6 +13,9 @@ namespace RuneRogue.Core
         private string _numberAppearing;
         private int _minLevel;
         private int _maxLevel;
+        private string[] _followerKinds;
+        private string[] _followerNumberAppearing;
+        private int[] _followerProbability;
 
         public string NumberAppearing
         {
@@ -47,6 +50,22 @@ namespace RuneRogue.Core
                 _maxLevel = value;
             }
         }
+        public string[] FollowerKinds
+        {
+            get { return _followerKinds; }
+            set { _followerKinds = value; }
+        }
+        public string[] FollowerNumberAppearing
+        {
+            get { return _followerNumberAppearing; }
+            set { _followerNumberAppearing = value; }
+        }
+        public int[] FollowerProbability
+        {
+            get { return _followerProbability; }
+            set { _followerProbability = value; }
+        }
+
 
 
 

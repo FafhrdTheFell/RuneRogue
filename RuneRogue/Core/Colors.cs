@@ -6,6 +6,7 @@ namespace RuneRogue.Core
     class ColorNotDefinedException : Exception
     {
         public ColorNotDefinedException(string message)
+            : base(message)
         {
         }
     }

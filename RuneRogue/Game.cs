@@ -122,7 +122,6 @@ namespace RuneRogue
 
             MonsterGenerator = new MonsterGenerator();
             MonsterGenerator.ReadMonsterData("Resources/Monsters.json");
-            
 
             MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, mapLevel);
             DungeonMap = mapGenerator.CreateMap();

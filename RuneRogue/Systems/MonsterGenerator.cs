@@ -11,9 +11,10 @@ using System.Text.Encodings.Web;
 
 namespace RuneRogue.Systems
 {
-    class KindsNotUniqueException : Exception
+    class MonsterDataFormatInvalid : Exception
     {
-        public KindsNotUniqueException(string message)
+        public MonsterDataFormatInvalid(string message)
+            : base(message)
         {
         }
     }
@@ -134,18 +135,24 @@ namespace RuneRogue.Systems
             //};
             GenerateKinds();
             GenerateIndex();
-            PrintMonsterString("doppelganger");
         }
 
-        void WriteMonsterData(string FileName)
+        public void WriteMonsterData(string FileName)
         {
             string jsonString = JsonSerializer.Serialize(_monsterManual, _jsonOptions);
             File.WriteAllText(FileName, jsonString);
         }
 
-        void PrintMonsterString(string monster)
+        public void PrintMonsterString(string monster)
         {
             MonsterStats data = _monsterManual[_manualPage[monster]];
+            string jsonString = JsonSerializer.Serialize(data, _jsonOptions);
+            Console.WriteLine(jsonString);
+        }
+
+        // useful function for examining how different data structures get serialized
+        public void PrintDataStructure(object data)
+        {
             string jsonString = JsonSerializer.Serialize(data, _jsonOptions);
             Console.WriteLine(jsonString);
         }
@@ -165,13 +172,100 @@ namespace RuneRogue.Systems
             for (int i = 0; i < _monsterManual.Length; i++)
             {
                 monsterKinds.Add(_monsterManual[i].Kind);
+                // check that followers data formatted correctly
+                // could do more checks here
+                if (!(_monsterManual[i].FollowerKinds == null))
+                {
+                    bool followerFormatBad =
+                        (!(_monsterManual[i].FollowerKinds.Length == _monsterManual[i].FollowerNumberAppearing.Length) ||
+                        !(_monsterManual[i].FollowerKinds.Length == _monsterManual[i].FollowerProbability.Length));
+                    if (followerFormatBad)
+                    {
+                        throw new MonsterDataFormatInvalid($"{_monsterManual[i].Name} follower arrays of different lengths.");
+                    }
+                    // if own type is follower and has 100% chance of being generated, causes infinite loop.
+                    // note that an infinite loop also occurs if monster1 is follower of monster2 is follower
+                    // of monster1, but program does not check for that.
+                    for (int j = 0; j < _monsterManual[i].FollowerKinds.Length; j++)
+                    {
+                        if ((_monsterManual[i].FollowerKinds[j] == _monsterManual[i].Kind))
+                        {
+                            throw new MonsterDataFormatInvalid($"{_monsterManual[i].Name} creates itself as follower," +
+                                " risking infinite loop.");
+                        }
+                    }
+                }
             }
             bool isUnique = monsterKinds.Distinct().Count() == monsterKinds.Count();
             if (!isUnique)
             {
-                throw new KindsNotUniqueException($"Monster kinds values not unique: {monsterKinds.ToArray().ToString()}.");
+                throw new MonsterDataFormatInvalid($"Monster kinds values not unique: {monsterKinds.ToArray().ToString()}.");
             }
             _monsterKinds = monsterKinds.ToArray();
+        }
+
+        // if monster = GEN, generate a level-appropriate monster list, else if
+        // monster is specified, generate a list of those monsters and their followers,
+        // if any
+        public List<Monster> CreateEncounter(int DungeonLevel, string monsterToAdd="GEN", string monsterNumAppearing = "GEN")
+        {
+            List<Monster> encounterMonsters = new List<Monster>();
+            string monsterType = "compiler complains if not set";
+            string numInRoomDice = "compiler complains if not set";
+            Monster monster = new Monster();
+
+            if (monsterToAdd == "GEN")
+            {
+                bool rerollMonster = true;
+                while (rerollMonster)
+                {
+                    monsterType = (string)Game.RandomArrayValue(MonsterKinds);
+                    rerollMonster = false;
+
+                    monster = CreateMonster(monsterType);
+                    if (DungeonLevel < monster.MinLevel || DungeonLevel > monster.MaxLevel)
+                    {
+                        rerollMonster = true;
+                    }
+                }
+            }
+            else
+            {
+                monsterType = monsterToAdd;
+                monster = CreateMonster(monsterType);
+            }
+            if (monsterNumAppearing == "GEN")
+            {
+                numInRoomDice = monster.NumberAppearing;
+            }
+            else
+            {
+                numInRoomDice = monsterNumAppearing;
+            }
+
+            var numberOfMonsters = Dice.Roll(numInRoomDice);
+
+            for (int i = 0; i < numberOfMonsters; i++)
+            {
+                monster = CreateMonster(monsterType);
+                encounterMonsters.Add(monster);
+                if (!(monster.FollowerKinds == null))
+                {
+                    for (int j=0; j < monster.FollowerKinds.Length; j++)
+                    {
+                        // check if should generate this follower type
+                        if (Dice.Roll("1D100") <= monster.FollowerProbability[j])
+                        {
+                            List<Monster> followerMonsters = CreateEncounter(DungeonLevel,
+                                monster.FollowerKinds[j],
+                                monster.FollowerNumberAppearing[j]);
+                            encounterMonsters.AddRange(followerMonsters);
+                        }
+                    }
+                }
+            }
+
+            return encounterMonsters;
         }
 
         public Monster CreateMonster(string monsterKind)
@@ -200,7 +294,10 @@ namespace RuneRogue.Systems
             monster.SARegeneration = _monsterManual[page].SARegeneration;
             monster.SAVampiric = _monsterManual[page].SAVampiric;
             monster.SADoppelganger = _monsterManual[page].SADoppelganger;
-            monster.SAHighImpact = _monsterManual[page].SAHighImpact; 
+            monster.SAHighImpact = _monsterManual[page].SAHighImpact;
+            monster.FollowerKinds = _monsterManual[page].FollowerKinds;
+            monster.FollowerNumberAppearing = _monsterManual[page].FollowerNumberAppearing;
+            monster.FollowerProbability = _monsterManual[page].FollowerProbability;
 
             return monster;
         }

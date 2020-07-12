@@ -14,7 +14,10 @@
     "symbol": "b",
     "numberAppearing": "d3+d6-1",
     "minLevel": 1,
-    "maxLevel": 6
+    "maxLevel": 6,
+    "followerKinds": [ "goblin" ],
+    "followerNumberAppearing": [ "1d1" ],
+    "followerProbability": [60]
   },
   {
     "kind": "boneClaws",

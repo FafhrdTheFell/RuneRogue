@@ -29,7 +29,9 @@ namespace RuneRogue.Core
         public bool SADoppelganger { get; set; }
         public bool SAVampiric { get; set; }
         public bool SAHighImpact { get; set; }
-
+        public string[] FollowerKinds { get; set; }
+        public string[] FollowerNumberAppearing { get; set; }
+        public int[] FollowerProbability { get; set; }
     }
 
 }
