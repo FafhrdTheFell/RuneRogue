@@ -39,6 +39,7 @@ namespace RuneRogue.Shops
 
         public EquipmentShop()
         {
+            _storeDescription = "This market has stalls with various weapons and armor, as well as food.";
             _goods = new List<string>();
             _costs = new List<int>();
             _target = new List<string>();

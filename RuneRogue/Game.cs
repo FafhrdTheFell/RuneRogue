@@ -301,6 +301,7 @@ namespace RuneRogue
                 }
                 else
                 {
+                    _secondaryConsole.Clear();
                     // need to draw DungeonMap to get monster stats
                     DungeonMap.Draw(_mapConsole, _statConsole);
                     Player.DrawStats(_statConsole);

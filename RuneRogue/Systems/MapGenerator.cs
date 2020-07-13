@@ -172,10 +172,9 @@ namespace RuneRogue.Systems
             // Each room has a 3% chance of having a shop
             if (Dice.Roll("1D100") <= shopChance)
             {
-                // 50/50 EquipmentShop or BookShop
-                int roll = Dice.Roll("1d2");
-                roll = 2;
-                if (roll == 1)
+                // 40/60 EquipmentShop or BookShop
+                int roll = Dice.Roll("10");
+                if (roll < 5)
                 {
                     _map.Shops.Add(new EquipmentShop
                     {
@@ -186,7 +185,7 @@ namespace RuneRogue.Systems
                 }
                 else
                 {
-                    _map.Shops.Add(new EquipmentShop
+                    _map.Shops.Add(new BookShop
                     {
                         X = shopCell.X,
                         Y = shopCell.Y
@@ -253,7 +252,6 @@ namespace RuneRogue.Systems
                 return false;
             }
 
-            Console.WriteLine($"{right.IsWalkable} {left.IsWalkable} {top.IsWalkable} {bottom.IsWalkable}");
             // This is a good place for a door on the left or right side of the room
             if (right.IsWalkable && left.IsWalkable && !top.IsWalkable && !bottom.IsWalkable)
             {
