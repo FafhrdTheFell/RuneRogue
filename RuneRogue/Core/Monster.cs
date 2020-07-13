@@ -16,6 +16,7 @@ namespace RuneRogue.Core
         private string[] _followerKinds;
         private string[] _followerNumberAppearing;
         private int[] _followerProbability;
+        private int _encounterRarity;
 
         public string NumberAppearing
         {
@@ -65,7 +66,11 @@ namespace RuneRogue.Core
             get { return _followerProbability; }
             set { _followerProbability = value; }
         }
-
+        public int EncounterRarity
+        {
+            get { return _encounterRarity; }
+            set { _encounterRarity = value; }
+        }
 
 
 

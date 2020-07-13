@@ -8,7 +8,7 @@ using RuneRogue.Core;
 // this class handles the interface of shops that Player
 // visits
 
-namespace RuneRogue.Core
+namespace RuneRogue.Shops
 {
     //public class Ref<T> where T : struct
     //{ 
@@ -26,7 +26,7 @@ namespace RuneRogue.Core
     //    public T Item { get; set; }
     //}
 
-    public class TrainingShop : Shop
+    public class EquipmentShop : Shop
     {
 
         protected List<string> _target;
@@ -37,7 +37,7 @@ namespace RuneRogue.Core
             set { _target = value;  }
         }
 
-        public TrainingShop()
+        public EquipmentShop()
         {
             _goods = new List<string>();
             _costs = new List<int>();

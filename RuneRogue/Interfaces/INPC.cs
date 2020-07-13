@@ -8,5 +8,6 @@
         string[] FollowerKinds { get; set; }
         string[] FollowerNumberAppearing { get; set; }
         int[] FollowerProbability { get; set; }
+        int EncounterRarity { get; set; }
     }
 }

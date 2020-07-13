@@ -172,7 +172,6 @@ namespace RuneRogue
                         SecondaryConsoleActive = false;
                     }
                     keyPress = null;
-                    AcceleratePlayer = false;
                     _renderRequired = true;
                 }
             }

@@ -4,6 +4,7 @@ using System.Linq;
 using RogueSharp;
 using RogueSharp.DiceNotation;
 using RuneRogue.Core;
+using RuneRogue.Shops;
 
 namespace RuneRogue.Systems
 {
@@ -92,9 +93,12 @@ namespace RuneRogue.Systems
             foreach (Rectangle room in _map.Rooms)
             {
                 CreateRoom(room);
-                CreateShop(room);
+                //CreateShop(room);
                 CreateDoors(room);
             }
+
+            // uncomment next line to test shops
+            CreateShop(_map.Rooms[0], 100);
 
             CreateStairs();
 
@@ -136,7 +140,7 @@ namespace RuneRogue.Systems
             }
         }
 
-        private void CreateShop(Rectangle room)
+        private void CreateShop(Rectangle room, int shopChance=5)
         {
             // The the boundaries of the room
             int xMin = room.Left;
@@ -152,32 +156,43 @@ namespace RuneRogue.Systems
 
             List<Cell> validPositions = new List<Cell>();
 
-            // Go through each of the rooms border cells and look for locations to place doors.
+            // Go through each of the rooms border cells and look for locations to place shops.
             foreach (Cell cell in borderCells)
             {
-                if (!IsPotentialDoor(cell))
+                if (IsWallSpace(cell))
                 {
-                    // do not place in corners:
-                    if (!(cell.X == xMin || cell.X == xMax) && (cell.Y == yMin || cell.Y == yMax))
-                    {
-                        validPositions.Add(cell);
-                    }
+                    validPositions.Add(cell);
                 }
             }
 
             Array v = validPositions.ToArray();
+            Console.WriteLine(v.Length.ToString());
             Cell shopCell = (Cell)v.GetValue(Game.Random.Next(v.Length - 1));
 
             // Each room has a 3% chance of having a shop
-            if (Dice.Roll("1D100") <= 3)
+            if (Dice.Roll("1D100") <= shopChance)
             {
-
-                _map.Shops.Add(new TrainingShop
+                // 50/50 EquipmentShop or BookShop
+                int roll = Dice.Roll("1d2");
+                roll = 2;
+                if (roll == 1)
                 {
-                    X = shopCell.X,
-                    Y = shopCell.Y
-                });
-                _map.SetCellProperties(shopCell.X, shopCell.Y, true, true);
+                    _map.Shops.Add(new EquipmentShop
+                    {
+                        X = shopCell.X,
+                        Y = shopCell.Y
+                    });
+                    _map.SetCellProperties(shopCell.X, shopCell.Y, true, true);
+                }
+                else
+                {
+                    _map.Shops.Add(new EquipmentShop
+                    {
+                        X = shopCell.X,
+                        Y = shopCell.Y
+                    });
+                    _map.SetCellProperties(shopCell.X, shopCell.Y, true, true);
+                }
             }
         }
 
@@ -238,6 +253,7 @@ namespace RuneRogue.Systems
                 return false;
             }
 
+            Console.WriteLine($"{right.IsWalkable} {left.IsWalkable} {top.IsWalkable} {bottom.IsWalkable}");
             // This is a good place for a door on the left or right side of the room
             if (right.IsWalkable && left.IsWalkable && !top.IsWalkable && !bottom.IsWalkable)
             {
@@ -250,6 +266,43 @@ namespace RuneRogue.Systems
                 return true;
             }
             return false;
+        }
+
+        private bool IsWallSpace (Cell cell)
+        {
+            if (cell.IsWalkable)
+            {
+                return false;
+            }
+
+            // Store references to all of the neighboring cells 
+            Cell right = _map.GetCell(cell.X + 1, cell.Y);
+            Cell left = _map.GetCell(cell.X - 1, cell.Y);
+            Cell top = _map.GetCell(cell.X, cell.Y - 1);
+            Cell bottom = _map.GetCell(cell.X, cell.Y + 1);
+
+            // Make sure there is not already a door here
+            if (_map.GetDoor(cell.X, cell.Y) != null ||
+                 _map.GetDoor(right.X, right.Y) != null ||
+                 _map.GetDoor(left.X, left.Y) != null ||
+                 _map.GetDoor(top.X, top.Y) != null ||
+                 _map.GetDoor(bottom.X, bottom.Y) != null)
+            {
+                return false;
+            }
+
+            // This is a good place for a hole in the wall if only one direction walkable
+            if ((right.IsWalkable && !left.IsWalkable && !top.IsWalkable && !bottom.IsWalkable) ||
+                (!right.IsWalkable && left.IsWalkable && !top.IsWalkable && !bottom.IsWalkable) ||
+                (!right.IsWalkable && !left.IsWalkable && top.IsWalkable && !bottom.IsWalkable) ||
+                (!right.IsWalkable && !left.IsWalkable && !top.IsWalkable && bottom.IsWalkable))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         // Find the center of the first room that we created and place the Player there

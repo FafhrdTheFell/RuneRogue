@@ -41,7 +41,7 @@ namespace RuneRogue.Core
         _goods.Add("No.");
         _goods.Add("longer still");
 
-        _costs.Add(10);
+        _costs.Add(0);
         }
       public RLColor Color
       {
@@ -141,22 +141,18 @@ namespace RuneRogue.Core
         // items and prices
         public void DrawConsole(RLConsole console)
         {
-            UpdateCosts();
-            //string[] lines = _goods.ToArray();
-            //int displayNumber;
-            //for (int i = 0; i < lines.Length; i++)
-            //{
-            //    displayNumber = i + 1;
-            //    console.Print(_horizontalOffset, _verticalOffset + 2 * i, "(" + displayNumber.ToString() + ") " + lines[i], Colors.Text);
-            //}
             int displayNumber;
             string nameOfGood;
             string costString;
+
+            UpdateCosts();
+
             for (int i = 0; i < _goods.Count; i++)
             {
                 displayNumber = i + 1;
                 nameOfGood = Goods[i];
-                costString = Costs[i].ToString();
+                // trailing spaces so when costs drop from 10 to 1, the 0 gets overwritten
+                costString = Costs[i].ToString() + "   ";
                 console.Print(_horizontalOffset, _verticalOffset + 2 * i, "(" + displayNumber.ToString() + ")", Colors.Text);
                 console.Print(_horizontalOffset + 4, _verticalOffset + 2 * i, nameOfGood, Colors.Text);
                 console.Print(_horizontalOffset + 64, _verticalOffset + 2 * i, costString, Colors.Text);

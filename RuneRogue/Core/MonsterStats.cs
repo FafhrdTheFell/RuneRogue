@@ -32,6 +32,7 @@ namespace RuneRogue.Core
         public string[] FollowerKinds { get; set; }
         public string[] FollowerNumberAppearing { get; set; }
         public int[] FollowerProbability { get; set; }
+        public int EncounterRarity { get; set; }
     }
 
 }

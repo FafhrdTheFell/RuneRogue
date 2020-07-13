@@ -227,6 +227,17 @@ namespace RuneRogue.Systems
                     {
                         rerollMonster = true;
                     }
+                    // EncounterRarity is percent chance to find relative to most common
+                    // monsters on a level. Check it.
+                    if (!(monster.EncounterRarity == 0))
+                    {
+                        Console.WriteLine($"{monster.Name} {monster.EncounterRarity}");
+                        int rarityRoll = Dice.Roll("1d100");
+                        if (monster.EncounterRarity <= rarityRoll)
+                        {
+                            rerollMonster = true;
+                        }
+                    }
                 }
             }
             else
@@ -298,6 +309,7 @@ namespace RuneRogue.Systems
             monster.FollowerKinds = _monsterManual[page].FollowerKinds;
             monster.FollowerNumberAppearing = _monsterManual[page].FollowerNumberAppearing;
             monster.FollowerProbability = _monsterManual[page].FollowerProbability;
+            monster.EncounterRarity = _monsterManual[page].EncounterRarity;
 
             return monster;
         }

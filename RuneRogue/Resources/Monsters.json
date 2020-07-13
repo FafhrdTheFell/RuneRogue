@@ -83,7 +83,8 @@
     "symbol": "T",
     "numberAppearing": "1d3",
     "minLevel": 1,
-    "maxLevel": 7
+    "maxLevel": 7,
+    "rarity": 40
   },
   {
     "kind": "hugegoblin",
@@ -151,7 +152,8 @@
     "symbol": "d",
     "numberAppearing": "4-2d3k1",
     "minLevel": 1,
-    "maxLevel": 10
+    "maxLevel": 10,
+    "rarity": 40
   },
   {
     "kind": "murdermoth",
@@ -237,7 +239,8 @@
     "symbol": "T",
     "numberAppearing": "1",
     "minLevel": 5,
-    "maxLevel": 14
+    "maxLevel": 14,
+    "rarity": 40
   },
   {
     "kind": "goblinhuntsman",
@@ -254,7 +257,8 @@
     "symbol": "g",
     "numberAppearing": "5-2d4k1",
     "minLevel": 2,
-    "maxLevel": 12
+    "maxLevel": 12,
+    "rarity": 40
   },
   {
     "kind": "slime",
@@ -288,7 +292,8 @@
     "symbol": "S",
     "numberAppearing": "2d4k1",
     "minLevel": 3,
-    "maxLevel": 8
+    "maxLevel": 8,
+    "rarity": 40
   },
   {
     "kind": "willowisp",
@@ -361,6 +366,7 @@
     "numberAppearing": "1d2",
     "minLevel": 3,
     "maxLevel": 13,
+    "rarity": 40,
     "saVampiric": true
   },
   {
@@ -469,13 +475,14 @@
     "defense": "3d4k2",
     "defenseChance": "8D8",
     "gold": "10D8",
-    "maxHealth": "5D6",
+    "maxHealth": "4d6k3",
     "name": "Troll Spider Queen",
     "speed": 10,
     "symbol": "X",
     "numberAppearing": "1",
     "minLevel": 4,
     "maxLevel": 14,
+    "rarity": 40,
     "saHighImpact": true,
     "saRegeneration": true,
     "followerKinds": [
