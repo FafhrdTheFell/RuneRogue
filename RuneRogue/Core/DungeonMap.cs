@@ -110,8 +110,12 @@ namespace RuneRogue.Core
         }
         public bool CheckStairs(int x, int y)
         {
-            return ((StairsDown.X == x && StairsDown.Y == y) ||
-                (StairsUp.X == x && StairsUp.Y == y));
+            if (!(Game.mapLevel == Game.MaxDungeonLevel))
+            {
+                return ((StairsDown.X == x && StairsDown.Y == y) ||
+                    (StairsUp.X == x && StairsUp.Y == y));
+            }
+            return (StairsUp.X == x && StairsUp.Y == y);
         }
 
         private void EnterShop(Actor actor, int x, int y)
@@ -238,7 +242,10 @@ namespace RuneRogue.Core
             }
 
             StairsUp.Draw(mapConsole, this);
-            StairsDown.Draw(mapConsole, this);
+            if (!(Game.mapLevel == Game.MaxDungeonLevel))
+            {
+                StairsDown.Draw(mapConsole, this);
+            }
 
             // Keep an index so we know which position to draw monster stats at
             int i = 0;

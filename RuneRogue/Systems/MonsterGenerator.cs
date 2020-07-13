@@ -231,7 +231,6 @@ namespace RuneRogue.Systems
                     // monsters on a level. Check it.
                     if (!(monster.EncounterRarity == 0))
                     {
-                        Console.WriteLine($"{monster.Name} {monster.EncounterRarity}");
                         int rarityRoll = Dice.Roll("1d100");
                         if (monster.EncounterRarity <= rarityRoll)
                         {
@@ -254,7 +253,7 @@ namespace RuneRogue.Systems
                 numInRoomDice = monsterNumAppearing;
             }
 
-            var numberOfMonsters = Dice.Roll(numInRoomDice);
+            int numberOfMonsters = Dice.Roll(numInRoomDice);
 
             for (int i = 0; i < numberOfMonsters; i++)
             {

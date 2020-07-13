@@ -183,7 +183,7 @@ namespace RuneRogue.Systems
                     {
                         defender.MaxHealth--;
                     }
-                    if (defender == Game.Player)
+                    if (defender == Game.Player && Game.XpOnAction)
                     {
                         Game.Player.XpHealth += 3;
                     }
@@ -194,7 +194,7 @@ namespace RuneRogue.Systems
                     attacker.DoppelgangTransform();
                 }
                 // Player gets attack XP on hit
-                if (attacker == Game.Player)
+                if (attacker == Game.Player && Game.XpOnAction)
                 {
                     Game.Player.XpAttackSkill += Math.Max(defender.DefenseSkill - attacker.AttackSkill, 1);
                     Game.Player.XpHealth += 1;
@@ -208,7 +208,7 @@ namespace RuneRogue.Systems
             {
                 attackMessage.AppendFormat("{0} attacks {1} and rolls {2}: {0} misses.", attacker.Name, defender.Name, roll);
             }
-            if (roll > 101 - unadjustedChanceInt && defender == Game.Player)
+            if (roll > 101 - unadjustedChanceInt && defender == Game.Player && Game.XpOnAction)
             {
                 Game.Player.XpDefenseSkill += Math.Max(attacker.AttackSkill - defender.DefenseSkill, 1);
                 Game.Player.XpHealth += 1;

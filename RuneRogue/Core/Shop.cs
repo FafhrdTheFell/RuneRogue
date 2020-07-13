@@ -37,6 +37,7 @@ namespace RuneRogue.Core
 
         public Shop()
         {
+            
             Symbol = 'M';
             Color = Colors.Door;
             BackgroundColor = Colors.Gold;

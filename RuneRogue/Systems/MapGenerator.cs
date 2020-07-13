@@ -26,9 +26,19 @@ namespace RuneRogue.Systems
             _width = width;
             _height = height;
             _maxRooms = maxRooms;
-            _roomMaxSize = roomMaxSize;
-            _roomMinSize = roomMinSize;
             _mapLevel = mapLevel;
+            if (mapLevel < Game.MaxDungeonLevel)
+            {
+                _maxRooms = maxRooms;
+                _roomMaxSize = roomMaxSize;
+                _roomMinSize = roomMinSize;
+            }
+            else
+            {
+                _maxRooms = 1;
+                _roomMaxSize = 40;
+                _roomMinSize = 30;
+            }
             _map = new DungeonMap();
         }
 
@@ -44,10 +54,10 @@ namespace RuneRogue.Systems
                 // Determine a the size and position of the room randomly
                 int roomWidth = Game.Random.Next(_roomMinSize, _roomMaxSize);
                 int roomHeight = Game.Random.Next(_roomMinSize, _roomMaxSize);
-                int roomXPosition = Game.Random.Next(0, _width - roomWidth - 1);
-                // bug with rooms at minumum or maximum Y
+                // bug with rooms at minumum or maximum X or Y: IsWallSpace and
+                // IsPotentialDoor check non-existent cells
+                int roomXPosition = Game.Random.Next(1, _width - roomWidth - 2);
                 int roomYPosition = Game.Random.Next(1, _height - roomHeight - 2);
-                //int roomYPosition = Game.Random.Next(0, _height - roomHeight - 1);
 
                 // All of our rooms can be represented as Rectangles
                 var newRoom = new Rectangle(roomXPosition, roomYPosition, roomWidth, roomHeight);
@@ -64,9 +74,18 @@ namespace RuneRogue.Systems
             // Iterate through each room that was generated
             for (int r = 0; r < _map.Rooms.Count; r++)
             {
-                // Don't do anything with the first room
-                if (r == 0)
+                // Don't do anything with the first room until last dungeon level
+                if (r == 0 && !FinalLevel())
                 {
+                    continue;
+                }
+                else if (r == 0)
+                {
+                    //List<Monster> monsters = Game.MonsterGenerator.CreateEncounter(_mapLevel,"goblincaptain","1");
+                    List<Monster> monsters = Game.MonsterGenerator.CreateEncounter(_mapLevel,"corruptedtitan","2d4k1");
+
+                    CreateRoom(_map.Rooms[0]);
+                    AddMonstersToRoom(_map.Rooms[0], monsters);
                     continue;
                 }
                 // For all remaing rooms get the center of the room and the previous room
@@ -88,23 +107,35 @@ namespace RuneRogue.Systems
                 }
             }
 
+            // generate a shop in a random room every Game.ShopEveryNLevels, starting at level 1
+            if ((_mapLevel % Game.ShopEveryNLevels) == 1)
+            {
+                int shopRoom = Dice.Roll("1d" + _map.Rooms.Count) - 1;
+                CreateShop(_map.Rooms[shopRoom], 100);
+            }
+            
+
             // Iterate through each room that we wanted placed
             // and dig out the room and create doors for it.
             foreach (Rectangle room in _map.Rooms)
             {
                 CreateRoom(room);
-                //CreateShop(room);
+                CreateShop(room);
                 CreateDoors(room);
             }
 
             // uncomment next line to test shops
-            CreateShop(_map.Rooms[0], 100);
+            //CreateShop(_map.Rooms[0], 100);
 
             CreateStairs();
 
             PlacePlayer();
 
-            PlaceMonsters();
+            // Final level monsters already placed
+            if (!FinalLevel())
+            {
+                PlaceMonsters();
+            }
 
             return _map;
         }
@@ -318,6 +349,11 @@ namespace RuneRogue.Systems
             _map.AddPlayer(player);
         }
 
+        private bool FinalLevel()
+        {
+            return (_mapLevel == Game.MaxDungeonLevel);
+        }
+
         private void CreateStairs()
         {
             _map.StairsUp = new Stairs
@@ -326,12 +362,15 @@ namespace RuneRogue.Systems
                 Y = _map.Rooms.First().Center.Y,
                 IsUp = true
             };
-            _map.StairsDown = new Stairs
+            if (!FinalLevel())
             {
-                X = _map.Rooms.Last().Center.X,
-                Y = _map.Rooms.Last().Center.Y,
-                IsUp = false
-            };
+                _map.StairsDown = new Stairs
+                {
+                    X = _map.Rooms.Last().Center.X,
+                    Y = _map.Rooms.Last().Center.Y,
+                    IsUp = false
+                };
+            }
         }
 
         private void PlaceMonsters()
@@ -351,22 +390,24 @@ namespace RuneRogue.Systems
                     //List<Monster> monsters = Game.MonsterGenerator.CreateEncounter(_mapLevel,"goblincaptain","1");
                     List<Monster> monsters = Game.MonsterGenerator.CreateEncounter(_mapLevel);
 
-                    //for (int i = 0; i < monsters.Length; i++)
-                    foreach (Monster monster in monsters)
-                    {
-                        // Find a random walkable location in the room to place the monster
-                        Point randomRoomLocation = _map.GetRandomWalkableLocationInRoom(room);
-                        // It's possible that the room doesn't have space to place a monster
-                        // In that case skip creating the monster
-                        if (randomRoomLocation != null)
-                        {
-                            //Monster monster = monsters[i];
-                            //Monster monster = monsterGenerator.CreateMonster(monsterType);
-                            monster.X = randomRoomLocation.X;
-                            monster.Y = randomRoomLocation.Y;
-                            _map.AddMonster(monster);
-                        }
-                    }
+                    AddMonstersToRoom(room, monsters);
+                }
+            }
+        }
+
+        private void AddMonstersToRoom(Rectangle room, List<Monster> monsters)
+        {
+            foreach (Monster monster in monsters)
+            {
+                // Find a random walkable location in the room to place the monster
+                Point randomRoomLocation = _map.GetRandomWalkableLocationInRoom(room);
+                // It's possible that the room doesn't have space to place a monster
+                // In that case skip creating the monster
+                if (randomRoomLocation != null)
+                {
+                    monster.X = randomRoomLocation.X;
+                    monster.Y = randomRoomLocation.Y;
+                    _map.AddMonster(monster);
                 }
             }
         }

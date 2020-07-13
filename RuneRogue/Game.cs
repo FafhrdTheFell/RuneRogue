@@ -48,6 +48,10 @@ namespace RuneRogue
         public static int mapLevel = 1;
         private static bool _renderRequired = true;
 
+        public const int MaxDungeonLevel = 14;
+        public const bool XpOnAction = false;
+        public const int ShopEveryNLevels = 3;
+
         public static Player Player { get; set; }
         public static DungeonMap DungeonMap { get; private set; }
         public static MessageLog MessageLog { get; private set; }
@@ -241,6 +245,7 @@ namespace RuneRogue
                         {
                             if (DungeonMap.CanMoveDownToNextLevel())
                             {
+                                // MapGenerator treats Game.MaxDungeonLevel differently
                                 MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, ++mapLevel);
                                 DungeonMap = mapGenerator.CreateMap();
                                 MessageLog = new MessageLog();
