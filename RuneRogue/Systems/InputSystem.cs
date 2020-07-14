@@ -67,6 +67,30 @@ namespace RuneRogue.Systems
                     case RLKey.Keypad3:
                         direction = Direction.DownRight;
                         break;
+                    case RLKey.H:
+                        direction = Direction.Left;
+                        break;
+                    case RLKey.J:
+                        direction = Direction.Down;
+                        break;
+                    case RLKey.K:
+                        direction = Direction.Up;
+                        break;
+                    case RLKey.L:
+                        direction = Direction.Right;
+                        break;
+                    case RLKey.Y:
+                        direction = Direction.UpLeft;
+                        break;
+                    case RLKey.U:
+                        direction = Direction.UpRight;
+                        break;
+                    case RLKey.B:
+                        direction = Direction.DownLeft;
+                        break;
+                    case RLKey.N:
+                        direction = Direction.DownRight;
+                        break;
                     default:
                         direction = Direction.None;
                         break;
