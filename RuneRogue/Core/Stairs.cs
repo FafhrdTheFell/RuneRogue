@@ -47,7 +47,7 @@ namespace RuneRogue.Core
             }
 
             // stairs down are 'throne' on max level
-            if (!IsUp && Game.mapLevel == Game.MaxDungeonLevel)
+            if (!IsUp && Game.FinalLevel())
             {
                 Symbol = '&';
                 Color = Colors.Gold;

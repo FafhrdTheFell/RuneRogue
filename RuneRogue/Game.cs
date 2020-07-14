@@ -255,7 +255,7 @@ namespace RuneRogue
                                 DungeonMap = mapGenerator.CreateMap();
                                 MessageLog = new MessageLog();
                                 MessageLog.Add("The stairs collapse behind you.");
-                                if (mapLevel == MaxDungeonLevel)
+                                if (Game.FinalLevel())
                                 {
                                     MessageLog.Add("Are you ready to ascend the throne of runes?");
                                 }

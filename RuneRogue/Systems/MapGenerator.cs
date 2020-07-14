@@ -28,7 +28,7 @@ namespace RuneRogue.Systems
             _height = height;
             _maxRooms = maxRooms;
             _mapLevel = mapLevel;
-            if (mapLevel < Game.MaxDungeonLevel)
+            if (!Game.FinalLevel())
             {
                 _maxRooms = maxRooms;
                 _roomMaxSize = roomMaxSize;
@@ -113,7 +113,6 @@ namespace RuneRogue.Systems
             if ((_mapLevel % Game.ShopEveryNLevels) == 1)
             {
                 int shopRoom = Dice.Roll("1d" + _map.Rooms.Count) - 1;
-                Console.WriteLine(shopRoom.ToString());
                 CreateShop(_map.Rooms[shopRoom], 100);
             }
 

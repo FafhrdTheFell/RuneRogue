@@ -110,11 +110,6 @@ namespace RuneRogue.Core
         }
         public bool CheckStairs(int x, int y)
         {
-            if (!(Game.mapLevel == Game.MaxDungeonLevel))
-            {
-                return ((StairsDown.X == x && StairsDown.Y == y) ||
-                    (StairsUp.X == x && StairsUp.Y == y));
-            }
             return (StairsUp.X == x && StairsUp.Y == y);
         }
 
