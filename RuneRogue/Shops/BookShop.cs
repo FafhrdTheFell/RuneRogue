@@ -13,42 +13,56 @@ namespace RuneRogue.Shops
 
     public class BookShop : Shop
     {
+        // _target indicates which attribute good i increases
+        protected List<string> _targets;
 
-        protected List<string> _target;
-        private bool _bookPurchased;
+        protected readonly string[] bookSynonym =
+{
+                "Manual of increasing ",
+                "Treatise on increasing ",
+                "Scribbled notes about ",
+                "Encyclopedia of methods to increase ",
+                "Pamphlet of secrets to increase ",
+                "Crazy diagrams about increasing ",
+                "Tattered scroll praising ",
+                "Hand-written letters describing "
+            };
 
-        public List<string> Target
-        { 
-            get { return _target; }
-            set { _target = value;  }
-        }
-
-        public bool BookPurchasd
+        protected readonly string[] targetOptions =
         {
-            get { return _bookPurchased; }
-            set { _bookPurchased = value; }
+                "attack skill.",
+                "defense skill.",
+                "health."
+            };
+
+        public List<string> Targets
+        { 
+            get { return _targets; }
+            set { _targets = value;  }
         }
+
 
         public BookShop()
         {
             Symbol = 'B';
             _goods = new List<string>();
             _costs = new List<int>();
-            _target = new List<string>();
+            _targets = new List<string>();
 
-            _storeDescription = "This bookstore sells instruction manuals. LIMIT ONE BOOK PER CUSTOMER.";
-            _goods.Add("Increase attack skill.");
-            _goods.Add("Increase defense skill.");
-            _goods.Add("Learn to be tougher.");
+            int numBooks = Dice.Roll("1+2d3k1");
 
             int levelBookCost = 25 + 25 * (Game.mapLevel / 4);
-            _costs.Add(levelBookCost);
-            _costs.Add(levelBookCost);
-            _costs.Add(levelBookCost);
+            _storeDescription = "This bookstore sells instruction manuals.";
 
-            _target.Add("Attack Skill");
-            _target.Add("Defense Skill");
-            _target.Add("Health");
+            for (int i = 0; i < numBooks; i++)
+            {
+
+                string prefixString = (string)Game.RandomArrayValue(bookSynonym);
+                string target = (string)Game.RandomArrayValue(targetOptions);
+                _goods.Add(prefixString + target);
+                _targets.Add(target);
+                _costs.Add(levelBookCost);
+            }
 
         }
 
@@ -72,10 +86,11 @@ namespace RuneRogue.Shops
                 return false;
             }
             // menu starts at 1
-            if (Game.Player.Gold >= costs[purchase - 1])
+            int purchaseIndex = purchase - 1;
+            if (Game.Player.Gold >= costs[purchaseIndex])
             {
-                Game.Player.Gold -= costs[purchase - 1];
-                ReceivePurchase(purchase);
+                Game.Player.Gold -= costs[purchaseIndex];
+                ReceivePurchase(purchaseIndex);
                 return false;
             }
             else
@@ -85,27 +100,27 @@ namespace RuneRogue.Shops
             }
         }
 
-        public override void ReceivePurchase(int purchase)
+        public override void ReceivePurchase(int purchaseIndex)
         {
-            switch (_target[purchase-1])
+            switch (_targets[purchaseIndex])
             {
-                case "Attack Skill":
+                case "attack skill.":
                     Game.Player.AttackSkill += Dice.Roll("1d2+1");
                     Game.MessageLog.Add(Game.Player.Name + " learns to attack aggressively.");
                     break;
-                case "Defense Skill":
+                case "defense skill.":
                     Game.Player.DefenseSkill += Dice.Roll("1d2+1");
                     Game.MessageLog.Add(Game.Player.Name + " learns to dodge and block.");
                     break;
-                case "Health":
+                case "health.":
                     Game.Player.MaxHealth += Dice.Roll("2d3");
                     Game.Player.Health = Game.Player.MaxHealth;
                     Game.MessageLog.Add(Game.Player.Name + " toughens up.");
                     break;
             }
-            Goods = new List<string>();
-            Costs = new List<int>();
-            BookPurchasd = true;
+            _goods.RemoveAt(purchaseIndex);
+            _costs.RemoveAt(purchaseIndex);
+            _targets.RemoveAt(purchaseIndex);
         }
     }
 }
