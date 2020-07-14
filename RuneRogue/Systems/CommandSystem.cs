@@ -288,7 +288,7 @@ namespace RuneRogue.Systems
         {
             if (defender is Player)
             {
-                Game.MessageLog.Add($"  Game Over!");
+                Game.MessageLog.Add($"{defender.Name} has died. Game Over! Final score: {Game.Player.LifetimeGold}.");
                 
             }
             else if (defender is Monster)

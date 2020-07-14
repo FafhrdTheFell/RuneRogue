@@ -272,7 +272,7 @@ namespace RuneRogue
                                 }
                                 else
                                 {
-                                    MessageLog.Add($"You have won RuneRogue! Your final score is {Player.LifetimeGold}.");
+                                    MessageLog.Add($"You have won RuneRogue! Your final score is {Player.LifetimeGold * 5}.");
                                     QuitGame();
                                     didPlayerAct = true;
                                 }
