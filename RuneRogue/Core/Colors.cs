@@ -32,6 +32,9 @@ namespace RuneRogue.Core
         public static RLColor Text = Swatch.DbLight;
         public static RLColor Gold = Swatch.DbSun;
 
+        public static RLColor Shop = Swatch.DWDullGold;
+        public static RLColor ShopFov = Swatch.DbSun;
+
         public static RLColor Player = Swatch.DbLight;
         public static RLColor KoboldColor = Swatch.DbBrightWood;
         public static RLColor BeetleColor = Swatch.DbGrass;

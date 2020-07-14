@@ -249,6 +249,11 @@ namespace RuneRogue
                                 MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, ++mapLevel);
                                 DungeonMap = mapGenerator.CreateMap();
                                 MessageLog = new MessageLog();
+                                MessageLog.Add("The stairs collapse behind you.");
+                                if (mapLevel == MaxDungeonLevel)
+                                {
+                                    MessageLog.Add("Are you ready to ascend the throne of runes?");
+                                }
                                 CommandSystem = new CommandSystem();
                                 _rootConsole.Title = $"RuneRogue - Level {mapLevel}";
                                 didPlayerAct = true;

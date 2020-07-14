@@ -139,12 +139,12 @@ namespace RuneRogue.Core
 
             if (map.IsInFov(X, Y))
             {
-                Color = Colors.DoorFov;
+                Color = Colors.ShopFov;
                 BackgroundColor = Colors.DoorBackgroundFov;
             }
             else
             {
-                Color = Colors.Door;
+                Color = Colors.Shop;
                 BackgroundColor = Colors.DoorBackground;
             }
 

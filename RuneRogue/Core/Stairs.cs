@@ -42,7 +42,8 @@ namespace RuneRogue.Core
          }
          else
          {
-            Color = Colors.Floor;
+            Color = Colors.FloorFov
+                    ;
          }
 
          console.Set( X, Y, Color, null, Symbol );

@@ -197,7 +197,6 @@ namespace RuneRogue.Systems
             }
 
             Array v = validPositions.ToArray();
-            Console.WriteLine(v.Length.ToString());
             Cell shopCell = (Cell)v.GetValue(Game.Random.Next(v.Length - 1));
 
             // Each room has a 3% chance of having a shop

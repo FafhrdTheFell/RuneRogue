@@ -101,14 +101,14 @@
     "symbol": "G",
     "numberAppearing": "2d3k1",
     "minLevel": 1,
-    "maxLevel": 3
+    "maxLevel": 6
   },
   {
     "kind": "bonejumble",
     "attack": "10",
     "attackChance": "25D4",
     "awareness": 10,
-    "color": "DbOldStone",
+    "color": "DbStone",
     "defense": "3D4k2",
     "defenseChance": "15D3",
     "gold": "5D5",
@@ -125,7 +125,7 @@
     "attack": "9",
     "attackChance": "34D3",
     "awareness": 13,
-    "color": "DbBrightWood",
+    "color": "DbSky",
     "defense": "2D3",
     "defenseChance": "18D4",
     "gold": "8D5",
@@ -135,14 +135,14 @@
     "symbol": "e",
     "numberAppearing": "4-2d3k1",
     "minLevel": 2,
-    "maxLevel": 9
+    "maxLevel": 10
   },
   {
     "kind": "corrupteddwarf",
     "attack": "11",
     "attackChance": "30D3",
     "awareness": 10,
-    "color": "DbBrightWood",
+    "color": "DbMetal",
     "defense": "3d4k2",
     "defenseChance": "13D4",
     "gold": "8D8",
@@ -152,12 +152,12 @@
     "symbol": "d",
     "numberAppearing": "4-2d3k1",
     "minLevel": 1,
-    "maxLevel": 10,
+    "maxLevel": 11,
     "rarity": 40
   },
   {
     "kind": "murdermoth",
-    "attack": "9",
+    "attack": "8",
     "attackChance": "20D4",
     "awareness": 10,
     "color": "DbGrass",
@@ -187,7 +187,7 @@
     "symbol": "W",
     "numberAppearing": "4 - 2d3k1",
     "minLevel": 3,
-    "maxLevel": 10
+    "maxLevel": 12
   },
   {
     "kind": "bonehemoth",
@@ -334,10 +334,10 @@
   {
     "kind": "spectralknight",
     "attack": "13",
-    "attackChance": "20D4",
+    "attackChance": "23D4",
     "awareness": 13,
     "color": "DbStone",
-    "defense": "2D3",
+    "defense": "2D4",
     "defenseChance": "6D10",
     "gold": "8d8",
     "maxHealth": "3d5",

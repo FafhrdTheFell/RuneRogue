@@ -220,10 +220,10 @@ namespace RuneRogue.Core
                 return;
             }
             Symbol = '@';
-            MaxHealth = Game.Player.MaxHealth / 3;
+            MaxHealth = 3 + Game.Player.MaxHealth / 3;
             Health = MaxHealth;
-            Attack = Convert.ToInt32((double)Game.Player.Attack * 0.8);
-            Defense = Convert.ToInt32((double)Game.Player.Defense * 0.8);
+            Attack = Convert.ToInt32((double)Game.Player.Attack * 0.9);
+            Defense = Convert.ToInt32((double)Game.Player.Defense * 0.9);
             Gold = Game.Player.Gold / 2;
             AttackSkill = Game.Player.AttackSkill - 2;
             DefenseSkill = Game.Player.DefenseSkill - 2;
