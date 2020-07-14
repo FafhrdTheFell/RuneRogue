@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+//using System.Drawing;
 using System.Linq;
 using RogueSharp;
 using RogueSharp.DiceNotation;
@@ -74,20 +75,12 @@ namespace RuneRogue.Systems
             // Iterate through each room that was generated
             for (int r = 0; r < _map.Rooms.Count; r++)
             {
-                // Don't do anything with the first room until last dungeon level
-                if (r == 0 && !FinalLevel())
+                // Don't do anything with the first room
+                if (r == 0)
                 {
                     continue;
                 }
-                else if (r == 0)
-                {
-                    //List<Monster> monsters = Game.MonsterGenerator.CreateEncounter(_mapLevel,"goblincaptain","1");
-                    List<Monster> monsters = Game.MonsterGenerator.CreateEncounter(_mapLevel,"corruptedtitan","2d4k1");
 
-                    CreateRoom(_map.Rooms[0]);
-                    AddMonstersToRoom(_map.Rooms[0], monsters);
-                    continue;
-                }
                 // For all remaing rooms get the center of the room and the previous room
                 int previousRoomCenterX = _map.Rooms[r - 1].Center.X;
                 int previousRoomCenterY = _map.Rooms[r - 1].Center.Y;
@@ -106,15 +99,7 @@ namespace RuneRogue.Systems
                     CreateHorizontalTunnel(previousRoomCenterX, currentRoomCenterX, currentRoomCenterY);
                 }
             }
-
-            // generate a shop in a random room every Game.ShopEveryNLevels, starting at level 1
-            if ((_mapLevel % Game.ShopEveryNLevels) == 1)
-            {
-                int shopRoom = Dice.Roll("1d" + _map.Rooms.Count) - 1;
-                CreateShop(_map.Rooms[shopRoom], 100);
-            }
             
-
             // Iterate through each room that we wanted placed
             // and dig out the room and create doors for it.
             foreach (Rectangle room in _map.Rooms)
@@ -124,17 +109,27 @@ namespace RuneRogue.Systems
                 CreateDoors(room);
             }
 
-            // uncomment next line to test shops
-            //CreateShop(_map.Rooms[0], 100);
+            // generate a shop in a random room every Game.ShopEveryNLevels, starting at level 1
+            if ((_mapLevel % Game.ShopEveryNLevels) == 1)
+            {
+                int shopRoom = Dice.Roll("1d" + _map.Rooms.Count) - 1;
+                Console.WriteLine(shopRoom.ToString());
+                CreateShop(_map.Rooms[shopRoom], 100);
+            }
 
             CreateStairs();
 
             PlacePlayer();
 
             // Final level monsters already placed
-            if (!FinalLevel())
+            if (!Game.FinalLevel())
             {
                 PlaceMonsters();
+            }
+            else
+            {
+                List<Monster> monsters = Game.MonsterGenerator.CreateEncounter(_mapLevel, "corruptedtitan", "2d4k1");
+                AddMonstersToRoom(_map.Rooms[0], monsters);
             }
 
             return _map;
@@ -199,7 +194,7 @@ namespace RuneRogue.Systems
             Array v = validPositions.ToArray();
             Cell shopCell = (Cell)v.GetValue(Game.Random.Next(v.Length - 1));
 
-            // Each room has a 3% chance of having a shop
+            // Each room has a 5% chance of having a shop
             if (Dice.Roll("1D100") <= shopChance)
             {
                 // 40/60 EquipmentShop or BookShop
@@ -344,14 +339,15 @@ namespace RuneRogue.Systems
 
             player.X = _map.Rooms[0].Center.X;
             player.Y = _map.Rooms[0].Center.Y;
+            if (Game.FinalLevel())
+            {
+                // do not place player on the throne
+                player.X += 2;
+            }
 
             _map.AddPlayer(player);
         }
 
-        private bool FinalLevel()
-        {
-            return (_mapLevel == Game.MaxDungeonLevel);
-        }
 
         private void CreateStairs()
         {
@@ -361,15 +357,12 @@ namespace RuneRogue.Systems
                 Y = _map.Rooms.First().Center.Y,
                 IsUp = true
             };
-            if (!FinalLevel())
+            _map.StairsDown = new Stairs
             {
-                _map.StairsDown = new Stairs
-                {
-                    X = _map.Rooms.Last().Center.X,
-                    Y = _map.Rooms.Last().Center.Y,
-                    IsUp = false
-                };
-            }
+                X = _map.Rooms.Last().Center.X,
+                Y = _map.Rooms.Last().Center.Y,
+                IsUp = false
+            };
         }
 
         private void PlaceMonsters()

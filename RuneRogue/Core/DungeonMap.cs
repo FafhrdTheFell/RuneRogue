@@ -142,6 +142,11 @@ namespace RuneRogue.Core
             }
         }
 
+        public int MonstersCount()
+        {
+            return _monsters.Count;
+        }
+
         // Called by MapGenerator after we generate a new map to add the player to the map
         public void AddPlayer(Player player)
         {
@@ -242,10 +247,7 @@ namespace RuneRogue.Core
             }
 
             StairsUp.Draw(mapConsole, this);
-            if (!(Game.mapLevel == Game.MaxDungeonLevel))
-            {
-                StairsDown.Draw(mapConsole, this);
-            }
+            StairsDown.Draw(mapConsole, this);
 
             // Keep an index so we know which position to draw monster stats at
             int i = 0;

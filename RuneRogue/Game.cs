@@ -152,6 +152,11 @@ namespace RuneRogue
             _rootConsole.Run();
         }
 
+        public static bool FinalLevel()
+        {
+            return MaxDungeonLevel == mapLevel;
+        }
+
         public static void QuitGame()
         {
             Game.MessageLog.Add($"Goodbye! Press any key to exit.");
@@ -243,7 +248,7 @@ namespace RuneRogue
                         }
                         else if (_inputSystem.DescendStairs(keyPress))
                         {
-                            if (DungeonMap.CanMoveDownToNextLevel())
+                            if (!FinalLevel() && DungeonMap.CanMoveDownToNextLevel())
                             {
                                 // MapGenerator treats Game.MaxDungeonLevel differently
                                 MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, ++mapLevel);
@@ -257,6 +262,21 @@ namespace RuneRogue
                                 CommandSystem = new CommandSystem();
                                 _rootConsole.Title = $"RuneRogue - Level {mapLevel}";
                                 didPlayerAct = true;
+                            }
+                            else if (FinalLevel() && DungeonMap.CanMoveDownToNextLevel())
+                            {
+                                if (DungeonMap.MonstersCount() > 0)
+                                {
+                                    MessageLog.Add("You must be sole challenger for the rune throne.");
+                                    didPlayerAct = true;
+                                }
+                                else
+                                {
+                                    MessageLog.Add($"You have won RuneRogue! Your final score is {Player.LifetimeGold}.");
+                                    QuitGame();
+                                    didPlayerAct = true;
+                                }
+                               
                             }
                         }
                         else if (_inputSystem.WaitKey(keyPress))
