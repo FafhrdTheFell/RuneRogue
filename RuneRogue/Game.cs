@@ -59,6 +59,16 @@ namespace RuneRogue
         public static SchedulingSystem SchedulingSystem { get; private set; }
         public static MonsterGenerator MonsterGenerator { get; private set; }
 
+        public static int MessageWidth
+        {
+            get { return _messageWidth; }
+        }
+
+        public static int MessageLines
+        {
+            get { return _messageHeight; }
+        }
+
         public static Shop CurrentShop { get; set; } 
 
         public static bool AcceleratePlayer;
@@ -267,7 +277,7 @@ namespace RuneRogue
                             {
                                 if (DungeonMap.MonstersCount() > 0)
                                 {
-                                    MessageLog.Add("You must be sole challenger for the rune throne.");
+                                    MessageLog.Add("You must be the sole challenger for the rune throne.");
                                     didPlayerAct = true;
                                 }
                                 else

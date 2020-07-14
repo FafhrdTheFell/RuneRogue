@@ -149,10 +149,16 @@ namespace RuneRogue.Systems
 
             ResolveDamage(attacker, defender, damage, attackMessage);
 
+            if (defender.Health <= 0)
+            {
+                ResolveDeath(attacker, defender, attackMessage);
+            }
+
             if (!string.IsNullOrWhiteSpace(attackMessage.ToString()))
             {
                 Game.MessageLog.Add(attackMessage.ToString());
             }
+
         }
 
         // The attacker rolls based on his stats to see if he gets any hits
@@ -165,12 +171,14 @@ namespace RuneRogue.Systems
                 (1 + Math.Exp(0.11 * Convert.ToDouble(diff)));
             double unadjustedChanceDouble = Math.Exp(0.11 * Convert.ToDouble(attacker.AttackSkill)) /
                 (1 + Math.Exp(0.11 * Convert.ToDouble(attacker.AttackSkill)));
-            int chanceInt = Convert.ToInt32(chanceDouble * 100 + 0.5);
-            int unadjustedChanceInt = Convert.ToInt32(unadjustedChanceDouble * 100 + 0.5);
+            // chances are 101 minus probability so that high rolls hit
+            int chanceInt = 101 - Convert.ToInt32(chanceDouble * 100 + 0.5);
+            int unadjustedChanceInt = 101 - Convert.ToInt32(unadjustedChanceDouble * 100 + 0.5);
             int roll = Dice.Roll("1D100");
-            if (roll > 101 - chanceInt)
+            if (roll >= chanceInt)
             {
-                attackMessage.AppendFormat("{0} attacks {1} and rolls {2}: {0} hits.", attacker.Name, defender.Name, roll);
+                attackMessage.AppendFormat("{0} hits {1} (roll {2} > {3}).", attacker.Name, 
+                    defender.Name, roll, chanceInt);
                 hits += 1;
                 if (attacker.SALifedrainOnHit)
                 {
@@ -187,11 +195,12 @@ namespace RuneRogue.Systems
                     {
                         Game.Player.XpHealth += 3;
                     }
-                    attackMessage.AppendFormat("{0} feels cold.", defender.Name);
+                    attackMessage.AppendFormat(" {0} feels cold.", defender.Name);
                 }
                 if (attacker.SADoppelganger)
                 {
                     attacker.DoppelgangTransform();
+                    attackMessage.AppendFormat(" {0} transforms into {1}.", attacker.Name, defender.Name);
                 }
                 // Player gets attack XP on hit
                 if (attacker == Game.Player && Game.XpOnAction)
@@ -200,13 +209,15 @@ namespace RuneRogue.Systems
                     Game.Player.XpHealth += 1;
                 }
             }
-            else if (roll > 101 - unadjustedChanceInt)
+            else if (roll >= unadjustedChanceInt)
             {
-                attackMessage.AppendFormat("{0} attacks {1} and rolls {2}: {1} dodges.", attacker.Name, defender.Name, roll);
+                attackMessage.AppendFormat("{1} dodges {0}'s attack (roll {2} < {3}).", attacker.Name, 
+                    defender.Name, roll, chanceInt);
             }
             else
             {
-                attackMessage.AppendFormat("{0} attacks {1} and rolls {2}: {0} misses.", attacker.Name, defender.Name, roll);
+                attackMessage.AppendFormat("{0} misses {1} (roll {2} < {3}).", attacker.Name,
+                    defender.Name, roll, chanceInt);
             }
             if (roll > 101 - unadjustedChanceInt && defender == Game.Player && Game.XpOnAction)
             {
@@ -233,15 +244,15 @@ namespace RuneRogue.Systems
             int attackResult = Dice.Roll(attackDice);
             if (attackResult <= defender.Defense && attackResult >= 4)
             {
-                attackMessage.AppendFormat(" {0}'s blow bounces off {1}.", attacker.Name, defender.Name);
+                attackMessage.AppendFormat(" The blow bounces off {1}'s armor.", attacker.Name, defender.Name);
             }
             else if (attackResult <= defender.Defense)
             {
-                attackMessage.AppendFormat(" {0}'s weak blow does no damage.", attacker.Name);
+                attackMessage.AppendFormat(" The weak blow does no damage.", attacker.Name);
             }
             else if (attackResult >= defender.Defense * 2)
             {
-                attackMessage.AppendFormat(" {0}'s blow lands hard!", attacker.Name);
+                attackMessage.AppendFormat(" The blow lands hard!", attacker.Name);
             }
 
             return Math.Max(attackResult - defender.Defense, 0);
@@ -273,29 +284,36 @@ namespace RuneRogue.Systems
                 }
                 if (defender.Health > 0)
                 {
-                    Game.MessageLog.Add($"  {defender.Name} takes {damage} damage");
+                    attackMessage.AppendFormat(" {0} takes {1} damage.", defender.Name, damage);
+                    //Game.MessageLog.Add($"  {defender.Name} takes {damage} damage");
                 }
                 if (defender.Health <= 0)
                 {
-                    Game.MessageLog.Add($"  {defender.Name} is killed");
-                    ResolveDeath(attacker, defender);
+                    attackMessage.AppendFormat(" {0} kills {1} ({2} damage).", attacker.Name, defender.Name, damage);
                 }
             }
         }
 
         // Remove the defender from the map and add some messages upon death.
-        private static void ResolveDeath(Actor attacker, Actor defender)
+        private static void ResolveDeath(Actor attacker, Actor defender, StringBuilder attackMessage)
         {
             if (defender is Player)
             {
-                Game.MessageLog.Add($"{defender.Name} has died. Game Over! Final score: {Game.Player.LifetimeGold}.");
-                
+                //Game.MessageLog.Add($"{defender.Name} has died. Game Over! Final score: {Game.Player.LifetimeGold}.");
+                attackMessage.AppendFormat(" {0} has died. Game over! Final score {1}.", defender.Name, Game.Player.LifetimeGold);
+
+
             }
             else if (defender is Monster)
             {
                 Game.DungeonMap.RemoveMonster((Monster)defender);
 
-                Game.MessageLog.Add($"  {defender.Name} dropped {defender.Gold} gold");
+                if (defender.Gold > 0)
+                {
+                    //Game.MessageLog.Add($"  {defender.Name} dropped {defender.Gold} gold.");
+                    attackMessage.AppendFormat(" {0} dropped {1} gold.", defender.Name, defender.Gold);
+                }
+                
 
                 if (attacker is Player)
                 {
