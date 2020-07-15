@@ -171,13 +171,12 @@ namespace RuneRogue.Systems
                 (1 + Math.Exp(0.11 * Convert.ToDouble(diff)));
             double unadjustedChanceDouble = Math.Exp(0.11 * Convert.ToDouble(attacker.AttackSkill)) /
                 (1 + Math.Exp(0.11 * Convert.ToDouble(attacker.AttackSkill)));
-            // chances are 101 minus probability so that high rolls hit
-            int chanceInt = 101 - Convert.ToInt32(chanceDouble * 100 + 0.5);
-            int unadjustedChanceInt = 101 - Convert.ToInt32(unadjustedChanceDouble * 100 + 0.5);
+            int chanceInt = Convert.ToInt32(chanceDouble * 100 + 0.5) + 1;
+            int unadjustedChanceInt = Convert.ToInt32(unadjustedChanceDouble * 100 + 0.5) + 1;
             int roll = Dice.Roll("1D100");
-            if (roll >= chanceInt)
+            if (roll < chanceInt)
             {
-                attackMessage.AppendFormat("{0} hits {1} (roll {2} > {3}).", attacker.Name, 
+                attackMessage.AppendFormat("{0} hits {1} (roll {2} < {3}).", attacker.Name, 
                     defender.Name, roll, chanceInt);
                 hits += 1;
                 if (attacker.SALifedrainOnHit)
@@ -209,7 +208,7 @@ namespace RuneRogue.Systems
                     Game.Player.XpHealth += 1;
                 }
             }
-            else if (roll >= unadjustedChanceInt)
+            else if (roll < unadjustedChanceInt)
             {
                 attackMessage.AppendFormat("{1} dodges {0}'s attack (roll {2} < {3}).", attacker.Name, 
                     defender.Name, roll, chanceInt);
@@ -219,7 +218,7 @@ namespace RuneRogue.Systems
                 attackMessage.AppendFormat("{0} misses {1} (roll {2} < {3}).", attacker.Name,
                     defender.Name, roll, chanceInt);
             }
-            if (roll > 101 - unadjustedChanceInt && defender == Game.Player && Game.XpOnAction)
+            if (roll < unadjustedChanceInt && defender == Game.Player && Game.XpOnAction)
             {
                 Game.Player.XpDefenseSkill += Math.Max(attacker.AttackSkill - defender.DefenseSkill, 1);
                 Game.Player.XpHealth += 1;

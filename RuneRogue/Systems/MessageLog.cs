@@ -73,6 +73,7 @@ namespace RuneRogue.Systems
                     actualLine.Append("   " + word + " ");
                     actualWidth = word.Length + 4;
                 }
+                else
                 {
                     actualLine.Append(word + " ");
                 }
