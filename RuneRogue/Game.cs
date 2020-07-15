@@ -22,7 +22,6 @@ namespace RuneRogue
         private static readonly int _mapWidth = 100;
         private static readonly int _mapHeight = 56;
         private static RLConsole _mapConsole;
-        private static RLConsole _secondaryConsole;
 
         // Below the map console is the message console which displays attack rolls and other information
         //private static readonly int _messageWidth = 80;
@@ -69,7 +68,17 @@ namespace RuneRogue
             get { return _messageHeight; }
         }
 
-        public static Shop CurrentShop { get; set; } 
+        public static int MapHeight
+        {
+            get { return _mapHeight; }
+        }
+
+        public static int MapWidth
+        {
+            get { return _mapWidth; }
+        }
+
+        public static Shop CurrentSecondary { get; set; } 
 
         public static bool AcceleratePlayer;
         public static bool SecondaryConsoleActive;
@@ -118,12 +127,12 @@ namespace RuneRogue
 
             // Initialize the sub consoles that we will Blit to the root console
             _mapConsole = new RLConsole(_mapWidth, _mapHeight);
-            _secondaryConsole = new RLConsole(_mapWidth, _mapHeight);
             _messageConsole = new RLConsole(_messageWidth, _messageHeight);
             _statConsole = new RLConsole(_statWidth, _statHeight);
             _inventoryConsole = new RLConsole(_inventoryWidth, _inventoryHeight);
 
-            CurrentShop = new Shop();
+            // current secondary console
+            //CurrentSecondary = new Shop();
 
             AcceleratePlayer = false;
             PrevKeyPress = null;
@@ -185,7 +194,7 @@ namespace RuneRogue
                 if (keyPress != null)
                 {
                     AcceleratePlayer = false;
-                    bool finished = CurrentShop.PurchaseChoice(keyPress);
+                    bool finished = CurrentSecondary.ProcessKeyInput(keyPress);
                     if (finished)
                     {
                         SecondaryConsoleActive = false;
@@ -330,8 +339,6 @@ namespace RuneRogue
                 _messageConsole.Clear();
                 _messageConsole.SetBackColor(0, 0, _messageWidth, _messageHeight, Swatch.DbDeepWater);
                 _statConsole.SetBackColor(0, 0, _statWidth, _statHeight, Swatch.DbOldStone);
-                //_inventoryConsole.SetBackColor(0, 0, _inventoryWidth, _inventoryHeight, Swatch.DbWood);
-                _secondaryConsole.SetBackColor(0, 0, _mapWidth, _mapHeight, Swatch.Compliment);
 
                 if (!SecondaryConsoleActive)
                 {
@@ -342,12 +349,11 @@ namespace RuneRogue
                 }
                 else
                 {
-                    _secondaryConsole.Clear();
                     // need to draw DungeonMap to get monster stats
                     DungeonMap.Draw(_mapConsole, _statConsole);
                     Player.DrawStats(_statConsole);
                     MessageLog.Draw(_messageConsole);
-                    CurrentShop.DrawConsole(_secondaryConsole);
+                    CurrentSecondary.DrawConsole();
                 }
 
                 // Blit the sub consoles to the root console in the correct locations
@@ -358,11 +364,10 @@ namespace RuneRogue
                 }
                 else
                 {
-                    RLConsole.Blit(_secondaryConsole, 0, 0, _mapWidth, _mapHeight, _rootConsole, 0, 0);
+                    RLConsole.Blit(CurrentSecondary.Console, 0, 0, _mapWidth, _mapHeight, _rootConsole, 0, 0);
                 }
                 RLConsole.Blit(_messageConsole, 0, 0, _messageWidth, _messageHeight, _rootConsole, 0, _screenHeight - _messageHeight);
                 RLConsole.Blit(_statConsole, 0, 0, _statWidth, _statHeight, _rootConsole, _mapWidth, 0);
-                //RLConsole.Blit(_inventoryConsole, 0, 0, _inventoryWidth, _inventoryHeight, _rootConsole, 0, 0);
 
                 // Tell RLNET to draw the console that we set
                 _rootConsole.Draw();

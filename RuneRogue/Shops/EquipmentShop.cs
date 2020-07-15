@@ -29,20 +29,15 @@ namespace RuneRogue.Shops
     public class EquipmentShop : Shop
     {
 
-        protected List<string> _target;
 
-        public List<string> Target
-        { 
-            get { return _target; }
-            set { _target = value;  }
-        }
+
 
         public EquipmentShop()
         {
             _storeDescription = "This market has stalls with various weapons and armor, as well as food.";
             _goods = new List<string>();
             _costs = new List<int>();
-            _target = new List<string>();
+            _targets = new List<string>();
 
             _goods.Add("Increase attack.");
             _goods.Add("Increase defense.");
@@ -52,9 +47,9 @@ namespace RuneRogue.Shops
             _costs.Add(10);
             _costs.Add(10);
 
-            _target.Add("Attack");
-            _target.Add("Defense");
-            _target.Add("Health");
+            _targets.Add("Attack");
+            _targets.Add("Defense");
+            _targets.Add("Health");
 
         }
 
@@ -80,42 +75,9 @@ namespace RuneRogue.Shops
         }
 
 
-        // return false if still shopping, true if finished
-        public override bool PurchaseChoice(RLKeyPress rLKeyPress)
+        public override void ReceivePurchase(int purchaseIndex)
         {
-            UpdateCosts();
-            int[] costs = _costs.ToArray();
-            if (rLKeyPress.Char == null)
-            {
-                return false;
-            }
-            if (rLKeyPress.Key == RLKey.X)
-            {
-                return true;
-            }
-            //int choice = System.Char.GetNumericValue((Char)rLKeyPress.Char);
-            int purchase = int.Parse(rLKeyPress.Char.ToString());
-            if (purchase == -1)
-            {
-                return false;
-            }
-            // menu starts at 1
-            if (Game.Player.Gold >= costs[purchase - 1])
-            {
-                Game.Player.Gold -= costs[purchase - 1];
-                ReceivePurchase(purchase);
-                return false;
-            }
-            else
-            {
-                Game.MessageLog.Add(Game.Player.Name + " cannot afford that.");
-                return false;
-            }
-        }
-
-        public override void ReceivePurchase(int purchase)
-        {
-            switch (_target[purchase-1])
+            switch (_targets[purchaseIndex])
             {
                 case "Attack":
                     Game.Player.Attack += 1;

@@ -6,12 +6,15 @@ using System.Collections.Generic;
 
 namespace RuneRogue.Core
 {
-    public class Shop : IDrawable
+    public class Shop : IDrawable, ISecondaryConsole
     {
 
         protected string _storeDescription;
         protected List<string> _goods;
         protected List<int> _costs;
+        protected List<string> _targets;
+
+        private RLConsole _shopConsole;
 
         // for shop prices display:
         private readonly int _verticalOffset = 4;
@@ -34,6 +37,11 @@ namespace RuneRogue.Core
             get { return _costs; }
             set { _costs = value; }
         }
+        public List<string> Targets
+        {
+            get { return _targets; }
+            set { _targets = value; }
+        }
 
         public Shop()
         {
@@ -51,6 +59,8 @@ namespace RuneRogue.Core
             _goods.Add("longer still");
 
             _costs.Add(0);
+
+            _shopConsole = new RLConsole(Game.MapWidth, Game.MapHeight);
         }
         public RLColor Color
         {
@@ -73,20 +83,31 @@ namespace RuneRogue.Core
             get; set;
         }
 
+        public RLConsole Console
+        {
+            get { return _shopConsole; }
+        }
+
+        public bool HasDescription()
+        {
+            return _storeDescription != "";
+        }
+
         public virtual void UpdateCosts()
         {
 
         }
 
         // return false if still shopping, true if finished
-        public virtual bool PurchaseChoice(RLKeyPress rLKeyPress)
+        public virtual bool ProcessKeyInput(RLKeyPress rLKeyPress)
         {
+            UpdateCosts();
             int[] costs = _costs.ToArray();
             if (rLKeyPress.Char == null)
             {
                 return false;
             }
-            if (rLKeyPress.Key == RLKey.X || rLKeyPress.Key == RLKey.Escape)
+            if (rLKeyPress.Key == RLKey.X)
             {
                 return true;
             }
@@ -97,10 +118,11 @@ namespace RuneRogue.Core
                 return false;
             }
             // menu starts at 1
-            if (Game.Player.Gold >= costs[purchase - 1])
+            int purchaseIndex = purchase - 1;
+            if (Game.Player.Gold >= costs[purchaseIndex])
             {
-                Game.Player.Gold -= costs[purchase - 1];
-                ReceivePurchase(purchase);
+                Game.Player.Gold -= costs[purchaseIndex];
+                ReceivePurchase(purchaseIndex);
                 return false;
             }
             else
@@ -110,11 +132,11 @@ namespace RuneRogue.Core
             }
         }
 
-        public virtual void ReceivePurchase(int purchase)
+        public virtual void ReceivePurchase(int purchaseIndex)
         {
-            switch (purchase)
+            switch (purchaseIndex)
             {
-                case 1:
+                case 0:
                     Game.Player.Attack += 1;
                     Game.MessageLog.Add(Game.Player.Name + " upgrades their weaponry.");
                     break;
@@ -148,18 +170,21 @@ namespace RuneRogue.Core
 
         // DrawConsole draws secondary console displaying shop
         // items and prices
-        public void DrawConsole(RLConsole console)
+        public void DrawConsole()
         {
             int displayNumber;
             string nameOfGood;
             string costString;
+
+            _shopConsole.Clear();
+            _shopConsole.SetBackColor(0, 0, Game.MapWidth, Game.MapHeight, Swatch.Compliment);
 
             UpdateCosts();
 
             int descriptionOffset = 0;
             if (HasDescription())
             {
-                console.Print(_horizontalOffset, _verticalOffset, StoreDescription, Colors.TextHeading);
+                _shopConsole.Print(_horizontalOffset, _verticalOffset, StoreDescription, Colors.TextHeading);
                 descriptionOffset += 4;
             }
             for (int i = 0; i < _goods.Count; i++)
@@ -168,13 +193,14 @@ namespace RuneRogue.Core
                 nameOfGood = Goods[i];
                 // trailing spaces so when costs drop from 10 to 1, the 0 gets overwritten
                 costString = Costs[i].ToString() + "   ";
-                console.Print(_horizontalOffset, descriptionOffset + _verticalOffset + 2 * i, 
+                _shopConsole.Print(_horizontalOffset, descriptionOffset + _verticalOffset + 2 * i, 
                     "(" + displayNumber.ToString() + ")", Colors.Text);
-                console.Print(_horizontalOffset + 4, descriptionOffset + _verticalOffset + 2 * i, nameOfGood, Colors.Text);
-                console.Print(_horizontalOffset + 64, descriptionOffset + _verticalOffset + 2 * i, costString, Colors.Text);
+                _shopConsole.Print(_horizontalOffset + 4, descriptionOffset + _verticalOffset + 2 * i, nameOfGood, Colors.Text);
+                _shopConsole.Print(_horizontalOffset + 72, descriptionOffset + _verticalOffset + 2 * i, costString, Colors.Text);
             }
-            console.Print(_horizontalOffset, descriptionOffset + 1 + _verticalOffset + 2 * _goods.Count,
+            _shopConsole.Print(_horizontalOffset, descriptionOffset + 1 + _verticalOffset + 2 * _goods.Count,
                 "( X ) Exit shop.", Colors.Text);
         }
+
     }
 }

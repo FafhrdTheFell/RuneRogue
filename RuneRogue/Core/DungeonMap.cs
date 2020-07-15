@@ -120,7 +120,7 @@ namespace RuneRogue.Core
             {
                 Game.SecondaryConsoleActive = true;
                 Game.AcceleratePlayer = false;
-                Game.CurrentShop = shop;
+                Game.CurrentSecondary = shop;
             }
         }
         // The actor opens the door located at the x,y position

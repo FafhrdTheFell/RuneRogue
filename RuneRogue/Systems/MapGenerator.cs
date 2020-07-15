@@ -197,8 +197,7 @@ namespace RuneRogue.Systems
             if (Dice.Roll("1D100") <= shopChance)
             {
                 // 40/60 EquipmentShop or BookShop
-                int roll = Dice.Roll("10");
-                if (roll < 5)
+                if (Dice.Roll("1D100") <= 40)
                 {
                     _map.Shops.Add(new EquipmentShop
                     {

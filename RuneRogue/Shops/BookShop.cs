@@ -14,7 +14,6 @@ namespace RuneRogue.Shops
     public class BookShop : Shop
     {
         // _target indicates which attribute good i increases
-        protected List<string> _targets;
 
         protected readonly string[] bookSynonym =
 {
@@ -25,7 +24,7 @@ namespace RuneRogue.Shops
                 "Pamphlet of secrets to increase ",
                 "Crazy diagrams about increasing ",
                 "Tattered scroll praising ",
-                "Hand-written letters describing "
+                "Hand-written letters describing the benefits of "
             };
 
         protected readonly string[] targetOptions =
@@ -34,12 +33,6 @@ namespace RuneRogue.Shops
                 "defense skill.",
                 "health."
             };
-
-        public List<string> Targets
-        { 
-            get { return _targets; }
-            set { _targets = value;  }
-        }
 
 
         public BookShop()
@@ -64,39 +57,6 @@ namespace RuneRogue.Shops
                 _costs.Add(levelBookCost);
             }
 
-        }
-
-        // return false if still shopping, true if finished
-        public override bool PurchaseChoice(RLKeyPress rLKeyPress)
-        {
-            int[] costs = _costs.ToArray();
-            if (rLKeyPress.Char == null)
-            {
-                return false;
-            }
-            if (rLKeyPress.Key == RLKey.X)
-            {
-                return true;
-            }
-            //int choice = System.Char.GetNumericValue((Char)rLKeyPress.Char);
-            int purchase = int.Parse(rLKeyPress.Char.ToString());
-            if (purchase == -1)
-            {
-                return false;
-            }
-            // menu starts at 1
-            int purchaseIndex = purchase - 1;
-            if (Game.Player.Gold >= costs[purchaseIndex])
-            {
-                Game.Player.Gold -= costs[purchaseIndex];
-                ReceivePurchase(purchaseIndex);
-                return false;
-            }
-            else
-            {
-                Game.MessageLog.Add(Game.Player.Name + " cannot afford that.");
-                return false;
-            }
         }
 
         public override void ReceivePurchase(int purchaseIndex)
