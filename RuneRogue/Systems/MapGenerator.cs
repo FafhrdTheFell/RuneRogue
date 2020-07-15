@@ -107,6 +107,7 @@ namespace RuneRogue.Systems
             {
                 CreateRoom(room);
                 CreateShop(room);
+                CreateItems(room);
                 CreateDoors(room);
             }
 
@@ -115,17 +116,6 @@ namespace RuneRogue.Systems
             {
                 int shopRoom = Dice.Roll("1d" + _map.Rooms.Count) - 1;
                 CreateShop(_map.Rooms[shopRoom], 100);
-            }
-
-            Gold gold = new Gold();
-            gold.Amount = 25;
-
-            Point randomRoomLocation = _map.GetRandomWalkableLocationInRoom(_map.Rooms[0]);
-            if (randomRoomLocation != null)
-            {
-                gold.X = randomRoomLocation.X;
-                gold.Y = randomRoomLocation.Y;
-                _map.AddItem(gold);
             }
 
                 CreateStairs();
@@ -338,8 +328,26 @@ namespace RuneRogue.Systems
             }
         }
 
-        // Find the center of the first room that we created and place the Player there
-        private void PlacePlayer()
+        public void CreateItems(Rectangle room)
+        {
+            // 2% chance of gold
+            if (Dice.Roll("1d100") <= 2)
+            {
+                Gold gold = new Gold();
+                gold.Amount = Dice.Roll("1d6+1d"+(_mapLevel*2).ToString());
+
+                Point randomRoomLocation = _map.GetRandomWalkableLocationInRoom(room);
+                if (randomRoomLocation != null)
+                {
+                    gold.X = randomRoomLocation.X;
+                    gold.Y = randomRoomLocation.Y;
+                    _map.AddItem(gold);
+                }
+            }
+        }
+
+    // Find the center of the first room that we created and place the Player there
+    private void PlacePlayer()
         {
             Player player = Game.Player;
             if (player == null)

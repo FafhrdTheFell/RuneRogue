@@ -4,6 +4,7 @@ using RogueSharp;
 using RogueSharp.DiceNotation;
 using RuneRogue.Core;
 using RuneRogue.Interfaces;
+using RuneRogue.Items;
 using System;
 using System.Runtime.ExceptionServices;
 using System.Security.Policy;
@@ -322,20 +323,32 @@ namespace RuneRogue.Systems
             }
             else if (defender is Monster)
             {
-                Game.DungeonMap.RemoveMonster((Monster)defender);
-
                 if (defender.Gold > 0)
                 {
-                    //Game.MessageLog.Add($"  {defender.Name} dropped {defender.Gold} gold.");
-                    attackMessage.AppendFormat(" {0} dropped {1} gold.", defender.Name, defender.Gold);
-                }
-                
+                    if (Game.DungeonMap.GetItemAt(defender.X, defender.Y) is Gold)
+                    {
+                        Gold onground = (Gold)Game.DungeonMap.GetItemAt(defender.X, defender.Y);
+                        onground.Amount += defender.Gold;
+                    }
+                    else
+                    {
+                        Gold gold = new Gold();
+                        gold.Amount = defender.Gold;
 
-                if (attacker is Player)
-                {
-                    attacker.Gold += defender.Gold;
+                        gold.X = defender.X;
+                        gold.Y = defender.Y;
+                        Game.DungeonMap.AddItem(gold);
+                    }
                 }
+                Game.DungeonMap.RemoveMonster((Monster)defender);
             }
+
+            if (defender.Gold > 0)
+            {
+                //Game.MessageLog.Add($"  {defender.Name} dropped {defender.Gold} gold.");
+                attackMessage.AppendFormat(" {0} dropped some gold.", defender.Name);
+            }
+
         }
     }
 }
