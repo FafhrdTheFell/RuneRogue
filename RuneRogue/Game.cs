@@ -266,6 +266,10 @@ namespace RuneRogue
                             QuitGame();
                             _renderRequired = true;
                         }
+                        else if (_inputSystem.PickupKeyPressed(keyPress))
+                        {
+                            didPlayerAct = CommandSystem.PickupItemPlayer();
+                        }
                         else if (_inputSystem.DescendStairs(keyPress))
                         {
                             if (!FinalLevel() && DungeonMap.CanMoveDownToNextLevel())

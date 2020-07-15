@@ -5,6 +5,7 @@ using System.Linq;
 using RogueSharp;
 using RogueSharp.DiceNotation;
 using RuneRogue.Core;
+using RuneRogue.Items;
 using RuneRogue.Shops;
 
 namespace RuneRogue.Systems
@@ -116,7 +117,18 @@ namespace RuneRogue.Systems
                 CreateShop(_map.Rooms[shopRoom], 100);
             }
 
-            CreateStairs();
+            Gold gold = new Gold();
+            gold.Amount = 25;
+
+            Point randomRoomLocation = _map.GetRandomWalkableLocationInRoom(_map.Rooms[0]);
+            if (randomRoomLocation != null)
+            {
+                gold.X = randomRoomLocation.X;
+                gold.Y = randomRoomLocation.Y;
+                _map.AddItem(gold);
+            }
+
+                CreateStairs();
 
             PlacePlayer();
 

@@ -3,8 +3,8 @@ using RuneRogue.Systems;
 
 namespace RuneRogue.Interfaces
 {
-    public interface IBehavior
+    public interface IItem
     {
-        bool Act(Monster monster, CommandSystem commandSystem);
+        bool Pickup(Actor actor);
     }
 }

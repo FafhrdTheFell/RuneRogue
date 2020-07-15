@@ -11,6 +11,7 @@ namespace RuneRogue.Core
     public class DungeonMap : Map
     {
         private readonly List<Monster> _monsters;
+        private readonly List<Item> _items;
 
         public List<Rectangle> Rooms { get; set; }
         public List<Door> Doors { get; set; }
@@ -27,6 +28,7 @@ namespace RuneRogue.Core
 
             // Initialize all the lists when we create a new DungeonMap
             _monsters = new List<Monster>();
+            _items = new List<Item>();
             Rooms = new List<Rectangle>();
             Doors = new List<Door>();
             Shops = new List<Shop>();
@@ -104,6 +106,10 @@ namespace RuneRogue.Core
         {
             return Doors.SingleOrDefault(d => d.X == x && d.Y == y);
         }
+        public Item GetItemAt(int x, int y)
+        {
+            return _items.SingleOrDefault(d => d.X == x && d.Y == y);
+        }
         public Shop GetShop(int x, int y)
         {
             return Shops.SingleOrDefault(d => d.X == x && d.Y == y);
@@ -165,6 +171,16 @@ namespace RuneRogue.Core
             // After removing the monster from the map, make sure the cell is walkable again
             SetIsWalkable(monster.X, monster.Y, true);
             Game.SchedulingSystem.Remove(monster);
+        }
+
+        public void AddItem(Item item)
+        {
+            _items.Add(item);
+        }
+
+        public void RemoveItem(Item item)
+        {
+            _items.Remove(item);
         }
 
         public Monster GetMonsterAt(int x, int y)
@@ -239,6 +255,11 @@ namespace RuneRogue.Core
             foreach (Shop shop in Shops)
             {
                 shop.Draw(mapConsole, this);
+            }
+
+            foreach (Item item in _items)
+            {
+                item.Draw(mapConsole, this);
             }
 
             StairsUp.Draw(mapConsole, this);

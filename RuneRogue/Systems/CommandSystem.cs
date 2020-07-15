@@ -7,6 +7,7 @@ using RuneRogue.Interfaces;
 using System;
 using System.Runtime.ExceptionServices;
 using System.Security.Policy;
+using System.Security.Cryptography.X509Certificates;
 
 namespace RuneRogue.Systems
 {
@@ -86,6 +87,22 @@ namespace RuneRogue.Systems
                 return true;
             }
 
+            return false;
+        }
+
+        public bool PickupItemPlayer()
+        {
+            Player player = Game.Player;
+            Item item = Game.DungeonMap.GetItemAt(player.X, player.Y);
+            if (item != null)
+            {
+                bool success = item.Pickup(player);
+                if (success)
+                {
+                    Game.DungeonMap.RemoveItem(item);
+                    return true;
+                }
+            }
             return false;
         }
 
