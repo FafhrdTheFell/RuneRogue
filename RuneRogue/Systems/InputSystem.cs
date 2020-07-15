@@ -22,7 +22,7 @@ namespace RuneRogue.Systems
         // Direction.None if no direction indicated.
         public Direction MoveDirection(RLNET.RLKeyPress keyPress)
         {
-            Direction direction = Direction.None;
+            Direction direction;
             if (keyPress == null)
             {
                 throw new ArgumentException("keypress is null", "keyPress");

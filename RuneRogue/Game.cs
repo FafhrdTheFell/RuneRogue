@@ -190,8 +190,9 @@ namespace RuneRogue
                     {
                         SecondaryConsoleActive = false;
                     }
-                    keyPress = null;
+                    //keyPress = null;
                     _renderRequired = true;
+                    return;
                 }
             }
 

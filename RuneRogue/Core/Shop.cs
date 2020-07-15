@@ -14,8 +14,8 @@ namespace RuneRogue.Core
         protected List<int> _costs;
 
         // for shop prices display:
-        private int _verticalOffset = 4;
-        private int _horizontalOffset = 4;
+        private readonly int _verticalOffset = 4;
+        private readonly int _horizontalOffset = 4;
 
         public string StoreDescription
         {
@@ -121,11 +121,6 @@ namespace RuneRogue.Core
                 default:
                     break;
             }
-        }
-
-        public bool HasDescription()
-        {
-            return (!(StoreDescription == ""));
         }
 
         // Draw is draw function for drawing Shop sprite / letter in
