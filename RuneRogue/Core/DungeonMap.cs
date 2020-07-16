@@ -82,8 +82,6 @@ namespace RuneRogue.Core
                 actor.Y = y;
                 // The new cell the actor is on is now not walkable
                 SetIsWalkable(actor.X, actor.Y, false);
-                // Enter shop if one exists here
-                EnterShop(actor, x, y);
                 // Try to open a door if one exists here
                 OpenDoor(actor, x, y);
                 // Don't forget to update the field of view if we just repositioned the player
@@ -110,7 +108,7 @@ namespace RuneRogue.Core
         {
             return _items.SingleOrDefault(d => d.X == x && d.Y == y);
         }
-        public Shop GetShop(int x, int y)
+        public Shop GetShopAt(int x, int y)
         {
             return Shops.SingleOrDefault(d => d.X == x && d.Y == y);
         }
@@ -119,16 +117,6 @@ namespace RuneRogue.Core
             return (StairsUp.X == x && StairsUp.Y == y);
         }
 
-        private void EnterShop(Actor actor, int x, int y)
-        {
-            Shop shop = GetShop(x, y);
-            if (shop != null && actor == Game.Player)
-            {
-                Game.SecondaryConsoleActive = true;
-                Game.AcceleratePlayer = false;
-                Game.CurrentSecondary = shop;
-            }
-        }
         // The actor opens the door located at the x,y position
         private void OpenDoor(Actor actor, int x, int y)
         {

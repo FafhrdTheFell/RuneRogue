@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 //using System.Drawing;
 using System.Linq;
+using System.Runtime.ExceptionServices;
 using RogueSharp;
 using RogueSharp.DiceNotation;
 using RuneRogue.Core;
@@ -206,7 +207,7 @@ namespace RuneRogue.Systems
                         X = shopCell.X,
                         Y = shopCell.Y
                     });
-                    _map.SetCellProperties(shopCell.X, shopCell.Y, true, true);
+                    _map.SetCellProperties(shopCell.X, shopCell.Y, false, false);
                 }
                 else
                 {
@@ -215,7 +216,7 @@ namespace RuneRogue.Systems
                         X = shopCell.X,
                         Y = shopCell.Y
                     });
-                    _map.SetCellProperties(shopCell.X, shopCell.Y, true, true);
+                    _map.SetCellProperties(shopCell.X, shopCell.Y, false, false);
                 }
             }
         }
@@ -330,8 +331,8 @@ namespace RuneRogue.Systems
 
         public void CreateItems(Rectangle room)
         {
-            // 2% chance of gold
-            if (Dice.Roll("1d100") <= 2)
+            // 4% chance of gold
+            if (Dice.Roll("1d100") <= 4)
             {
                 Gold gold = new Gold();
                 gold.Amount = Dice.Roll("1d6+1d"+(_mapLevel*2).ToString());
@@ -342,6 +343,19 @@ namespace RuneRogue.Systems
                     gold.X = randomRoomLocation.X;
                     gold.Y = randomRoomLocation.Y;
                     _map.AddItem(gold);
+                }
+            }
+            // 10% chance of valuables
+            if (Dice.Roll("1d100") <= 10)
+            {
+                Valuable bling = new Valuable();
+
+                Point randomRoomLocation = _map.GetRandomWalkableLocationInRoom(room);
+                if (randomRoomLocation != null)
+                {
+                    bling.X = randomRoomLocation.X;
+                    bling.Y = randomRoomLocation.Y;
+                    _map.AddItem(bling);
                 }
             }
         }

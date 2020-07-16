@@ -16,7 +16,7 @@ namespace RuneRogue.Shops
         // _target indicates which attribute good i increases
 
         protected readonly string[] bookSynonym =
-{
+            {
                 "Manual of increasing ",
                 "Treatise on increasing ",
                 "Scribbled notes about ",
@@ -28,7 +28,7 @@ namespace RuneRogue.Shops
             };
 
         protected readonly string[] targetOptions =
-        {
+            {
                 "attack skill.",
                 "defense skill.",
                 "health."

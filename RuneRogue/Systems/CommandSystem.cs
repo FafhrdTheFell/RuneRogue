@@ -87,8 +87,26 @@ namespace RuneRogue.Systems
                 Attack(Game.Player, monster);
                 return true;
             }
+ 
+            Shop shop = Game.DungeonMap.GetShopAt(x, y);
 
+            if (shop != null)
+            {
+                EnterShop(Game.Player, shop);
+                return true;
+            }
             return false;
+        }
+
+        private void EnterShop(Actor actor, Shop shop)
+        {
+            //Shop shop = GetShop(x, y);
+            if (shop != null && actor == Game.Player)
+            {
+                Game.SecondaryConsoleActive = true;
+                Game.AcceleratePlayer = false;
+                Game.CurrentSecondary = shop;
+            }
         }
 
         public bool PickupItemPlayer()
@@ -325,6 +343,8 @@ namespace RuneRogue.Systems
             {
                 if (defender.Gold > 0)
                 {
+                    attackMessage.AppendFormat(" {0} dropped some gold.", defender.Name);
+
                     if (Game.DungeonMap.GetItemAt(defender.X, defender.Y) is Gold)
                     {
                         Gold onground = (Gold)Game.DungeonMap.GetItemAt(defender.X, defender.Y);
@@ -343,11 +363,6 @@ namespace RuneRogue.Systems
                 Game.DungeonMap.RemoveMonster((Monster)defender);
             }
 
-            if (defender.Gold > 0)
-            {
-                //Game.MessageLog.Add($"  {defender.Name} dropped {defender.Gold} gold.");
-                attackMessage.AppendFormat(" {0} dropped some gold.", defender.Name);
-            }
 
         }
     }
