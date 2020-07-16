@@ -4,6 +4,7 @@ using OpenTK.Input;
 using RLNET;
 using RogueSharp.Random;
 using RuneRogue.Core;
+using RuneRogue.Effects;
 using RuneRogue.Systems;
 
 namespace RuneRogue
@@ -166,6 +167,12 @@ namespace RuneRogue
 
             //RLKeyPress keyPress = _rootConsole.Keyboard.GetKeyPress();
 
+            Poison poison = new Poison();
+            poison.Target = Player;
+            poison.Magnitude = 1;
+            poison.Duration = 4;
+            poison.Speed = 5;
+            SchedulingSystem.Add(poison);
 
             // Begin RLNET's game loop
             _rootConsole.Run();

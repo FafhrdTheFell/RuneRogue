@@ -85,6 +85,7 @@
   <ItemGroup>
     <Compile Include="Behaviors\StandardMoveAndAttack.cs" />
     <Compile Include="Core\Actor.cs" />
+    <Compile Include="Core\Effect.cs" />
     <Compile Include="Core\Shop.cs" />
     <Compile Include="Core\MonsterStats.cs" />
     <Compile Include="Core\Item.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="Core\Monster.cs" />
     <Compile Include="Core\Player.cs" />
     <Compile Include="Core\Swatch.cs" />
+    <Compile Include="Effects\Poison.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Interfaces\IActor.cs" />
     <Compile Include="Interfaces\IItem.cs" />

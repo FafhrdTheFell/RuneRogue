@@ -154,6 +154,19 @@ namespace RuneRogue.Systems
 
                 ActivateMonsters();
             }
+            else if (scheduleable is Effect)
+            {
+                Effect effect = scheduleable as Effect;
+
+                if (effect != null)
+                {
+                    effect.DoEffect();
+                    if (!effect.EffectFinished())
+                    {
+                        Game.SchedulingSystem.Add(effect);
+                    }
+                }
+            }
         }
 
         public void MoveMonster(Monster monster, Cell cell)
