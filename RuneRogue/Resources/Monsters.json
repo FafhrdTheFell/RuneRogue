@@ -31,7 +31,8 @@
     "symbol": "b",
     "numberAppearing": "5-2d4k1",
     "minLevel": 1,
-    "maxLevel": 8
+    "maxLevel": 8,
+    "isUndead": true
   },
   {
     "kind": "dragon",
@@ -118,7 +119,8 @@
     "symbol": "B",
     "numberAppearing": "5-2d4k1",
     "minLevel": 1,
-    "maxLevel": 8
+    "maxLevel": 8,
+    "isUndead": true
   },
   {
     "kind": "corruptedelf",
@@ -205,7 +207,8 @@
     "numberAppearing": "5-2d4k1",
     "minLevel": 3,
     "maxLevel": 11,
-    "saHighImpact": true
+    "saHighImpact": true,
+    "isUndead": true
   },
   {
     "kind": "giantwolfspider",
@@ -329,7 +332,8 @@
     "numberAppearing": "2d2-1",
     "minLevel": 3,
     "maxLevel": 12,
-    "saLifedrainOnDamage": true
+    "saLifedrainOnDamage": true,
+    "isUndead": true
   },
   {
     "kind": "spectralknight",
@@ -348,7 +352,8 @@
     "minLevel": 4,
     "maxLevel": 14,
     "saLifedrainOnDamage": true,
-    "saHighImpact": true
+    "saHighImpact": true,
+    "isUndead": true
   },
   {
     "kind": "mummifiedgoblin",
@@ -367,7 +372,8 @@
     "minLevel": 3,
     "maxLevel": 13,
     "rarity": 40,
-    "saVampiric": true
+    "saVampiric": true,
+    "isUndead": true
   },
   {
     "kind": "doppelganger",

@@ -59,10 +59,18 @@ namespace RuneRogue.Shops
             return Convert.ToInt32(number + 2.5 - rem);
         }
 
-        public override void UpdateCosts()
+        public override void UpdateInventory()
         {
-            Costs[0] = RoundFive(1.5 * Math.Pow(Convert.ToDouble(Game.Player.Attack + 1), 1.35));
-            Costs[1] = RoundFive(3.0 * Math.Pow(Convert.ToDouble(Game.Player.Defense + 1), 1.65));
+            // deactivate rune of iron bonuses when calculating cost
+            double newAttack = Convert.ToDouble(Game.Player.Attack + 1);
+            double newDefense = Convert.ToDouble(Game.Player.Defense + 1);
+            if (Game.RuneSystem.RuneActive("Iron"))
+            {
+                newAttack -= 7;
+                newDefense -= 4;
+            }
+            Costs[0] = RoundFive(1.5 * Math.Pow(newAttack, 1.35));
+            Costs[1] = RoundFive(3.0 * Math.Pow(newDefense, 1.65));
             if (Game.Player.Health == Game.Player.MaxHealth)
             {
                 Costs[2] = 10;

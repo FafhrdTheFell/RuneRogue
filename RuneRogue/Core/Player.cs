@@ -13,6 +13,8 @@ namespace RuneRogue.Core
         private int _xpTotalReceived;
         private int _lifetimeGold;
 
+        //private Runes _runesystem;
+
         public int LifetimeGold
         {
             get { return _lifetimeGold; }

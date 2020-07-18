@@ -211,7 +211,7 @@ namespace RuneRogue.Systems
         {
             List<Monster> encounterMonsters = new List<Monster>();
             string monsterType = "compiler complains if not set";
-            string numInRoomDice = "compiler complains if not set";
+            string numInRoomDice; // = "compiler complains if not set";
             Monster monster = new Monster();
 
             if (monsterToAdd == "GEN")

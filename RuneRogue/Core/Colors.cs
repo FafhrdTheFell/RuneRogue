@@ -30,6 +30,7 @@ namespace RuneRogue.Core
 
         public static RLColor TextHeading = RLColor.White;
         public static RLColor Text = Swatch.DbLight;
+        public static RLColor TextInactive = Swatch.AlternateLightest;
         public static RLColor Gold = Swatch.DbSun;
 
         public static RLColor Shop = Swatch.DWDullGold;

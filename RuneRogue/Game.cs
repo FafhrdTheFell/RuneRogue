@@ -58,6 +58,7 @@ namespace RuneRogue
         public static CommandSystem CommandSystem { get; private set; }
         public static SchedulingSystem SchedulingSystem { get; private set; }
         public static MonsterGenerator MonsterGenerator { get; private set; }
+        public static Runes RuneSystem { get; private set; }
 
         public static int MessageWidth
         {
@@ -79,7 +80,7 @@ namespace RuneRogue
             get { return _mapWidth; }
         }
 
-        public static Shop CurrentSecondary { get; set; } 
+        public static SecondaryConsole CurrentSecondary { get; set; } 
 
         public static bool AcceleratePlayer;
         public static bool SecondaryConsoleActive;
@@ -147,6 +148,10 @@ namespace RuneRogue
             MonsterGenerator = new MonsterGenerator();
             MonsterGenerator.ReadMonsterData("Resources/Monsters.json");
 
+            RuneSystem = new Runes();
+            CurrentSecondary = RuneSystem;
+            SecondaryConsoleActive = true;
+
             MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, mapLevel);
             DungeonMap = mapGenerator.CreateMap();
             DungeonMap.UpdatePlayerFieldOfView();
@@ -167,12 +172,13 @@ namespace RuneRogue
 
             //RLKeyPress keyPress = _rootConsole.Keyboard.GetKeyPress();
 
-            Poison poison = new Poison();
-            poison.Target = Player;
-            poison.Magnitude = 1;
-            poison.Duration = 4;
-            poison.Speed = 5;
-            SchedulingSystem.Add(poison);
+            //Poison poison = new Poison();
+            //poison.Target = Player;
+            //poison.Magnitude = 1;
+            //poison.Duration = 4;
+            //poison.Speed = 5;
+            //SchedulingSystem.Add(poison);
+
 
             // Begin RLNET's game loop
             _rootConsole.Run();
@@ -271,6 +277,13 @@ namespace RuneRogue
                         else if (_inputSystem.QuitKeyPressed(keyPress))
                         {
                             QuitGame();
+                            _renderRequired = true;
+                        }
+                        else if (_inputSystem.RuneKeyPressed(keyPress))
+                        {
+                            SecondaryConsoleActive = true;
+                            AcceleratePlayer = false;
+                            CurrentSecondary = RuneSystem;
                             _renderRequired = true;
                         }
                         else if (_inputSystem.PickupKeyPressed(keyPress))

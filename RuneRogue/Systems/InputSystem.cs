@@ -116,6 +116,11 @@ namespace RuneRogue.Systems
             return keyPress.Shift;
         }
  
+        public bool RuneKeyPressed(RLKeyPress keyPress)
+        {
+            return keyPress.Key == RLKey.R;
+        }
+
         public bool PickupKeyPressed(RLKeyPress keyPress)
         {
             return keyPress.Key == RLKey.G;

@@ -119,7 +119,9 @@ namespace RuneRogue.Systems
                 CreateShop(_map.Rooms[shopRoom], 100);
             }
 
-                CreateStairs();
+            CreateShop(_map.Rooms[0], 100);
+
+            CreateStairs();
 
             PlacePlayer();
 
@@ -168,7 +170,7 @@ namespace RuneRogue.Systems
             }
         }
 
-        private void CreateShop(Rectangle room, int shopChance=5)
+        private void CreateShop(Rectangle room, int shopChance=7)
         {
             // The the boundaries of the room
             int xMin = room.Left;
@@ -196,11 +198,21 @@ namespace RuneRogue.Systems
             Array v = validPositions.ToArray();
             Cell shopCell = (Cell)v.GetValue(Game.Random.Next(v.Length - 1));
 
-            // Each room has a 5% chance of having a shop
+            // Each room has a 7% chance of having a shop
             if (Dice.Roll("1D100") <= shopChance)
             {
-                // 40/60 EquipmentShop or BookShop
-                if (Dice.Roll("1D100") <= 40)
+                // 20/30/50 RuneForge, EquipmentShop, or BookShop
+                int rollShopType = Dice.Roll("1D100");
+                if (rollShopType <= 20)
+                {
+                    _map.Shops.Add(new RuneForge
+                    {
+                        X = shopCell.X,
+                        Y = shopCell.Y
+                    });
+                    _map.SetCellProperties(shopCell.X, shopCell.Y, false, false);
+                }
+                else if (rollShopType <= 50)
                 {
                     _map.Shops.Add(new EquipmentShop
                     {

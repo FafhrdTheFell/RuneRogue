@@ -11,6 +11,7 @@ namespace RuneRogue.Interfaces
     {
         void DrawConsole();
 
+        // process key press and return true iff finished with console
         bool ProcessKeyInput(RLKeyPress rLKeyPress);
 
         RLConsole Console { get;  }

@@ -28,6 +28,8 @@ namespace RuneRogue.Core
         private bool _vampiric;
         private bool _doppelganger;
         private bool _highImpactAttack;
+        private bool _senseThoughts;
+        private bool _undead;
 
 
 
@@ -174,7 +176,11 @@ namespace RuneRogue.Core
                 _speed = value;
             }
         }
-
+        public bool IsUndead
+        {
+            get { return _undead; }
+            set { _undead = value; }
+        }
         public bool SALifedrainOnHit
         {
             get { return _lifedrainOnHit; }
@@ -211,6 +217,11 @@ namespace RuneRogue.Core
             get { return _highImpactAttack; }
             set { _highImpactAttack = value; }
         }
+        public bool SASenseThoughts
+        {
+            get { return _senseThoughts; }
+            set { _senseThoughts = value; }
+        }
 
         public void DoppelgangTransform()
         {
@@ -237,6 +248,17 @@ namespace RuneRogue.Core
         public int Y { get; set; }
         public void Draw(RLConsole console, IMap map)
         {
+            // ESP radius 16
+            if(Game.Player.SASenseThoughts)
+            {
+                double dist = Math.Pow((Math.Pow((double)(Game.Player.X - X), 2.0) + Math.Pow((double)(Game.Player.X - X), 2.0)), 0.5);
+                if (dist <= 16.0)
+                {
+                    console.Set(X, Y, Color, Colors.FloorBackgroundFov, Symbol);
+                    return;
+                }
+            }
+
             // Don't draw actors in cells that haven't been explored
             if (!map.GetCell(X, Y).IsExplored)
             {

@@ -9,6 +9,7 @@ using System;
 using System.Runtime.ExceptionServices;
 using System.Security.Policy;
 using System.Security.Cryptography.X509Certificates;
+using System.Collections.Generic;
 
 namespace RuneRogue.Systems
 {
@@ -133,6 +134,28 @@ namespace RuneRogue.Systems
         public void ActivateMonsters()
         {
             IScheduleable scheduleable = Game.SchedulingSystem.Get();
+
+            // regeneration. player regens through rune only, which deactivates automatically.
+            if (scheduleable is Actor)
+            {
+                Actor actor = scheduleable as Actor;
+                if (actor.SARegeneration && actor.Health < actor.MaxHealth)
+                {
+                    int regained = Math.Min(Dice.Roll("4-2d3k1"), actor.MaxHealth - actor.Health);
+                    actor.Health += regained;
+                    if (actor is Player && actor.Health == actor.MaxHealth)
+                    {
+                        Game.RuneSystem.ToggleRune("Life");
+                    }
+                }
+            }
+
+            // rune decay
+            if (scheduleable is Player)
+            {
+                Game.RuneSystem.CheckDecay();
+            }
+
             if (scheduleable is Player)
             {
                 IsPlayerTurn = true;
@@ -146,10 +169,6 @@ namespace RuneRogue.Systems
                 {
                     monster.PerformAction(this);
                     Game.SchedulingSystem.Add(monster);
-                    if (monster.SARegeneration && monster.Health < monster.MaxHealth)
-                    {
-                        monster.Health += Dice.Roll("4-2d3k1");
-                    }
                 }
 
                 ActivateMonsters();
@@ -216,6 +235,14 @@ namespace RuneRogue.Systems
             int hits = 0;
 
             int diff = attacker.AttackSkill - defender.DefenseSkill;
+            if (attacker.SASenseThoughts && !defender.IsUndead)
+            {
+                diff += 5;
+            }
+            if (defender.SASenseThoughts && !attacker.IsUndead)
+            {
+                diff -= 5;
+            }
             double chanceDouble = Math.Exp(0.11 * Convert.ToDouble(diff)) /
                 (1 + Math.Exp(0.11 * Convert.ToDouble(diff)));
             double unadjustedChanceDouble = Math.Exp(0.11 * Convert.ToDouble(attacker.AttackSkill)) /
@@ -365,11 +392,12 @@ namespace RuneRogue.Systems
                     }
                     else
                     {
-                        Gold gold = new Gold();
-                        gold.Amount = defender.Gold;
-
-                        gold.X = defender.X;
-                        gold.Y = defender.Y;
+                        Gold gold = new Gold()
+                        {
+                            Amount = defender.Gold,
+                            X = defender.X,
+                            Y = defender.Y,
+                        };
                         Game.DungeonMap.AddItem(gold);
                     }
                 }

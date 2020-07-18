@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace RuneRogue.Core
 {
-    public class Shop : IDrawable, ISecondaryConsole
+    public class Shop : SecondaryConsole, IDrawable 
     {
 
         protected string _storeDescription;
@@ -50,6 +50,8 @@ namespace RuneRogue.Core
             Color = Colors.Door;
             BackgroundColor = Colors.Gold;
 
+            _shopConsole = Console;
+
             _storeDescription = "";
             _goods = new List<string>();
             _costs = new List<int>();
@@ -59,8 +61,6 @@ namespace RuneRogue.Core
             _goods.Add("longer still");
 
             _costs.Add(0);
-
-            _shopConsole = new RLConsole(Game.MapWidth, Game.MapHeight);
         }
         public RLColor Color
         {
@@ -83,25 +83,20 @@ namespace RuneRogue.Core
             get; set;
         }
 
-        public RLConsole Console
-        {
-            get { return _shopConsole; }
-        }
-
         public bool HasDescription()
         {
             return _storeDescription != "";
         }
 
-        public virtual void UpdateCosts()
+        public virtual void UpdateInventory()
         {
 
         }
 
         // return false if still shopping, true if finished
-        public virtual bool ProcessKeyInput(RLKeyPress rLKeyPress)
+        public override bool ProcessKeyInput(RLKeyPress rLKeyPress)
         {
-            UpdateCosts();
+            UpdateInventory();
             int[] costs = _costs.ToArray();
             if (rLKeyPress.Char == null)
             {
@@ -111,9 +106,9 @@ namespace RuneRogue.Core
             {
                 return true;
             }
-            //int choice = System.Char.GetNumericValue((Char)rLKeyPress.Char);
-            int purchase = int.Parse(rLKeyPress.Char.ToString());
-            if (purchase == -1)
+            int purchase;
+            bool isNumber = int.TryParse(rLKeyPress.Char.ToString(), out purchase);
+            if (!isNumber)
             {
                 return false;
             }
@@ -170,7 +165,7 @@ namespace RuneRogue.Core
 
         // DrawConsole draws secondary console displaying shop
         // items and prices
-        public void DrawConsole()
+        public override void DrawConsole()
         {
             int displayNumber;
             string nameOfGood;
@@ -179,7 +174,7 @@ namespace RuneRogue.Core
             _shopConsole.Clear();
             _shopConsole.SetBackColor(0, 0, Game.MapWidth, Game.MapHeight, Swatch.Compliment);
 
-            UpdateCosts();
+            UpdateInventory();
 
             int descriptionOffset = 0;
             if (HasDescription())
