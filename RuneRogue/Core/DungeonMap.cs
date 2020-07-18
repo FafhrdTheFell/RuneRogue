@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenTK.Graphics.ES11;
 using OpenTK.Graphics.OpenGL;
 using RLNET;
 using RogueSharp;
+using RogueSharp.DiceNotation;
+using RuneRogue.Items;
 
 namespace RuneRogue.Core
 {
@@ -163,7 +166,38 @@ namespace RuneRogue.Core
 
         public void AddItem(Item item)
         {
-            _items.Add(item);
+            Item currentitem = GetItemAt(item.X, item.Y);
+            // limit one item per space, generate random adjacent location if necessary
+            int placementTries = 0;
+            if ((currentitem != null) && !(currentitem is Gold && item is Gold))
+            {
+                int x = item.X;
+                int y = item.Y;
+                while ((GetItemAt(x, y) != null || !GetCell(x, y).IsWalkable) && placementTries < 20)
+                {
+                    if (placementTries < 10)
+                    {
+                        x = item.X + Dice.Roll("1d3-2");
+                        y = item.Y + Dice.Roll("1d3-2");
+                    }
+                    else
+                    {
+                        x = item.X + Dice.Roll("1d5-3");
+                        y = item.Y + Dice.Roll("1d5-3");
+                    }
+                    placementTries += 1;
+                }
+                item.X = x;
+                item.Y = y;
+            }
+            if (placementTries < 20)
+            {
+                _items.Add(item);
+            }
+            else
+            {
+                Game.MessageLog.Add("could not add item");
+            }
         }
 
         public void RemoveItem(Item item)

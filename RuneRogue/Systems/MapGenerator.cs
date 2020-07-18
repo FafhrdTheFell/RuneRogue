@@ -3,6 +3,7 @@ using System.Collections.Generic;
 //using System.Drawing;
 using System.Linq;
 using System.Runtime.ExceptionServices;
+using System.Runtime.Remoting.Messaging;
 using RogueSharp;
 using RogueSharp.DiceNotation;
 using RuneRogue.Core;
@@ -118,8 +119,6 @@ namespace RuneRogue.Systems
                 int shopRoom = Dice.Roll("1d" + _map.Rooms.Count) - 1;
                 CreateShop(_map.Rooms[shopRoom], 100);
             }
-
-            CreateShop(_map.Rooms[0], 100);
 
             CreateStairs();
 

@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "RogueSharpV3Tutorial" )]
+[assembly: AssemblyTitle( "RuneRogueV1.0" )]
 [assembly: AssemblyDescription( "" )]
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "" )]
-[assembly: AssemblyProduct( "RogueSharpV3Tutorial" )]
-[assembly: AssemblyCopyright( "Copyright © Faron Bracy 2016" )]
+[assembly: AssemblyProduct( "RuneRogueV1.0" )]
+[assembly: AssemblyCopyright( "Copyright © Daniel Wood 2020" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
 
