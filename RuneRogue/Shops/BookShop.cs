@@ -44,7 +44,8 @@ namespace RuneRogue.Shops
 
             int numBooks = Dice.Roll("1+2d3k1");
 
-            int levelBookCost = 25 + 25 * (Game.mapLevel / 4);
+            //int levelBookCost = 25 + 25 * (Game.mapLevel / 4);
+            int levelBookCost = RoundFive(25.0 * DungeonLevelFactor(Game.mapLevel));
             _storeDescription = "This bookstore has a few how-to books for sale.";
 
             for (int i = 0; i < numBooks; i++)

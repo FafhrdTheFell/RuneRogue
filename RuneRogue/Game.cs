@@ -2,6 +2,7 @@
 using OpenTK.Graphics.ES20;
 using OpenTK.Input;
 using RLNET;
+using RogueSharp;
 using RogueSharp.Random;
 using RuneRogue.Core;
 using RuneRogue.Effects;
@@ -51,6 +52,7 @@ namespace RuneRogue
         public const int MaxDungeonLevel = 14;
         public const bool XpOnAction = false;
         public const int ShopEveryNLevels = 3;
+        public const int RuneForgeEveryNLevels = 4;
 
         public static Player Player { get; set; }
         public static DungeonMap DungeonMap { get; private set; }
@@ -82,7 +84,14 @@ namespace RuneRogue
 
         public static SecondaryConsole CurrentSecondary { get; set; } 
 
+        // accelerate player continues move in straight line automatically
+        // automoveplayer moves to selected point using pathfinding
         public static bool AcceleratePlayer;
+        public static bool AutoMovePlayer;
+        private static int AutoMoveXTarget;
+        private static int AutoMoveYTarget;
+        private static Monster AutoMoveMonsterTarget;
+
         public static bool SecondaryConsoleActive;
 
         private static RLKeyPress PrevKeyPress;
@@ -136,6 +145,7 @@ namespace RuneRogue
             // current secondary console
             //CurrentSecondary = new Shop();
 
+            AutoMovePlayer = false;
             AcceleratePlayer = false;
             PrevKeyPress = null;
             SecondaryConsoleActive = false;
@@ -150,7 +160,7 @@ namespace RuneRogue
 
             RuneSystem = new Runes();
             CurrentSecondary = RuneSystem;
-            SecondaryConsoleActive = true;
+            SecondaryConsoleActive = false;
 
             MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, mapLevel);
             DungeonMap = mapGenerator.CreateMap();
@@ -200,6 +210,9 @@ namespace RuneRogue
         {
             bool didPlayerAct = false;
             RLKeyPress keyPress;
+            RLMouse rLMouse = _rootConsole.Mouse;
+
+
 
             if (SecondaryConsoleActive)
             {
@@ -215,6 +228,35 @@ namespace RuneRogue
                     //keyPress = null;
                     _renderRequired = true;
                     return;
+                }
+            }
+
+            if (AutoMovePlayer)
+            {
+                if (AutoMoveMonsterTarget != null)
+                {
+                    AutoMoveXTarget = AutoMoveMonsterTarget.X;
+                    AutoMoveYTarget = AutoMoveMonsterTarget.Y;
+                }
+                didPlayerAct = CommandSystem.AutoMovePlayer(AutoMoveXTarget, AutoMoveYTarget);
+                if (!didPlayerAct)
+                {
+                    if (Player.X == AutoMoveXTarget && Player.Y == AutoMoveYTarget && 
+                        DungeonMap.GetItemAt(AutoMoveXTarget, AutoMoveYTarget) != null)
+                    {
+                        didPlayerAct = CommandSystem.PickupItemPlayer();
+                    }
+                    AutoMovePlayer = false;
+                }
+                if (DungeonMap.GetShopAt(Player.X, Player.Y) != null)
+                {
+                    Console.WriteLine("boink");
+                    AutoMovePlayer = false;
+                }
+                keyPress = _rootConsole.Keyboard.GetKeyPress();
+                if (rLMouse.GetLeftClick() || keyPress != null)
+                {
+                    AutoMovePlayer = false;
                 }
             }
 
@@ -252,6 +294,23 @@ namespace RuneRogue
 
             if (CommandSystem.IsPlayerTurn || _quittingGame)
             {
+                if (rLMouse.GetLeftClick())
+                {
+                    if (DungeonMap.GetCell(rLMouse.X, rLMouse.Y).IsExplored)
+                    {
+                        AutoMovePlayer = true;
+                        AutoMoveXTarget = rLMouse.X;
+                        AutoMoveYTarget = rLMouse.Y;
+                        if (DungeonMap.GetMonsterAt(rLMouse.X, rLMouse.Y) != null)
+                        {
+                            AutoMoveMonsterTarget = DungeonMap.GetMonsterAt(rLMouse.X, rLMouse.Y);
+                        }
+                        else
+                        {
+                            AutoMoveMonsterTarget = null;
+                        }
+                    }
+                }
                 if (keyPress != null)
                 {
                     if (_quittingGame)

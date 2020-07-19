@@ -83,6 +83,18 @@ namespace RuneRogue.Core
             get; set;
         }
 
+        // 1 at lvl 1, 5 at lvl 13
+        public double DungeonLevelFactor(int level)
+        {
+            return 1.0 + 4.0 * ((double)level - 1.0) / 12.0;
+        }
+
+        public int RoundFive(double number)
+        {
+            double rem = (number + 2.5) % 5;
+            return Convert.ToInt32(number + 2.5 - rem);
+        }
+
         public bool HasDescription()
         {
             return _storeDescription != "";

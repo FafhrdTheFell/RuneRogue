@@ -120,6 +120,18 @@ namespace RuneRogue.Systems
                 CreateShop(_map.Rooms[shopRoom], 100);
             }
 
+            if ((_mapLevel % Game.ShopEveryNLevels) == 1)
+            {
+                int shopRoom = Dice.Roll("1d" + _map.Rooms.Count) - 1;
+                CreateShop(_map.Rooms[shopRoom], 100);
+            }
+
+            if ((_mapLevel % Game.RuneForgeEveryNLevels) == 0)
+            {
+                int shopRoom = Dice.Roll("1d" + _map.Rooms.Count) - 1;
+                CreateShop(_map.Rooms[shopRoom], 100, "RuneForge");
+            }
+
             CreateStairs();
 
             PlacePlayer();
@@ -169,7 +181,7 @@ namespace RuneRogue.Systems
             }
         }
 
-        private void CreateShop(Rectangle room, int shopChance=7)
+        private void CreateShop(Rectangle room, int shopChance=5, string shopType="random")
         {
             // The the boundaries of the room
             int xMin = room.Left;
@@ -202,6 +214,23 @@ namespace RuneRogue.Systems
             {
                 // 20/30/50 RuneForge, EquipmentShop, or BookShop
                 int rollShopType = Dice.Roll("1D100");
+                switch (shopType)
+                {
+                    case "RuneForge":
+                        rollShopType = 10;
+                        break;
+                    case "EquipmentShop":
+                        rollShopType = 40;
+                        break;
+                    case "BookShop":
+                        rollShopType = 70;
+                        break;
+                    case "random":
+                        break;
+                    default:
+                        throw new ArgumentException($"shopType {shopType} not valid.");
+                }
+
                 if (rollShopType <= 20)
                 {
                     _map.Shops.Add(new RuneForge
@@ -346,7 +375,7 @@ namespace RuneRogue.Systems
             if (Dice.Roll("1d100") <= 4)
             {
                 Gold gold = new Gold();
-                gold.Amount = Dice.Roll("1d6+1d"+(_mapLevel*2).ToString());
+                gold.Amount = Dice.Roll("1d6+2d"+(_mapLevel*2).ToString());
 
                 Point randomRoomLocation = _map.GetRandomWalkableLocationInRoom(room);
                 if (randomRoomLocation != null)

@@ -53,11 +53,6 @@ namespace RuneRogue.Shops
 
         }
 
-        private int RoundFive(double number)
-        {
-            double rem = (number + 2.5) % 5;
-            return Convert.ToInt32(number + 2.5 - rem);
-        }
 
         public override void UpdateInventory()
         {
@@ -69,15 +64,15 @@ namespace RuneRogue.Shops
                 newAttack -= 7;
                 newDefense -= 4;
             }
-            Costs[0] = RoundFive(1.5 * Math.Pow(newAttack, 1.35));
-            Costs[1] = RoundFive(3.0 * Math.Pow(newDefense, 1.65));
+            Costs[0] = RoundFive(1.5 * Math.Pow(newAttack, 1.35) * DungeonLevelFactor(Game.mapLevel));
+            Costs[1] = RoundFive(3.0 * Math.Pow(newDefense, 1.65) * DungeonLevelFactor(Game.mapLevel));
             if (Game.Player.Health == Game.Player.MaxHealth)
             {
-                Costs[2] = 10;
+                Costs[2] = Convert.ToInt32(5.0 * DungeonLevelFactor(Game.mapLevel));
             }
             else
             {
-                Costs[2] = 1;
+                Costs[2] = Convert.ToInt32(DungeonLevelFactor(Game.mapLevel));
             }
 
         }

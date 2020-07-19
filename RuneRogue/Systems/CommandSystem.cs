@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Hosting;
+using System.Linq;
 using System.Text;
 using RogueSharp;
 using RogueSharp.DiceNotation;
@@ -10,6 +11,7 @@ using System.Runtime.ExceptionServices;
 using System.Security.Policy;
 using System.Security.Cryptography.X509Certificates;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace RuneRogue.Systems
 {
@@ -95,6 +97,96 @@ namespace RuneRogue.Systems
             {
                 EnterShop(Game.Player, shop);
                 return true;
+            }
+            return false;
+        }
+
+        public bool AutoMovePlayer(int targetX, int targetY)
+        {
+            DungeonMap dungeonMap = Game.DungeonMap;
+            Player player = Game.Player;
+            if (targetX == player.X && targetY == player.Y)
+            {
+                return false;
+            }
+            // Before we find a path, make sure to make the valid destination and player Cells walkable
+            dungeonMap.SetIsWalkable(player.X, player.Y, true);
+            bool resetTargetWalkable = (dungeonMap.GetShopAt(targetX, targetY) != null || 
+                dungeonMap.GetMonsterAt(targetX, targetY) != null);
+            if (resetTargetWalkable)
+            {
+                dungeonMap.SetIsWalkable(targetX, targetY, true);
+            }
+
+            PathFinder pathFinder = new PathFinder(dungeonMap);
+            Path path = null;
+
+            try
+            {
+                path = pathFinder.ShortestPath(
+                   dungeonMap.GetCell(player.X, player.Y),
+                   dungeonMap.GetCell(targetX, targetY));
+            }
+            catch (PathNotFoundException)
+            {
+                // The monster can see the player, but cannot find a path to him
+                // This could be due to other monsters blocking the way
+                // Add a message to the message log that the monster is waiting
+                Game.MessageLog.Add($"{player.Name} cannot find a way there.");
+            }
+
+            // Don't forget to set the walkable status back to false
+            dungeonMap.SetIsWalkable(player.X, player.Y, false);
+            if (resetTargetWalkable)
+            {
+                dungeonMap.SetIsWalkable(targetX, targetY, false);
+            }
+
+            // In the case that there was a path, tell the CommandSystem to move the monster
+            if (path != null)
+            {
+                Cell firststep;
+                int x = -1;
+                int y = -1;
+                try
+                {
+                    // TODO: This should be path.StepForward() but there is a bug in RogueSharp V3
+                    // The bug is that a path returned from the pathfinder does not include the source Cell
+                    firststep = path.Steps.First();
+                    x = firststep.X;
+                    y = firststep.Y;
+                }
+                catch (NoMoreStepsException)
+                {
+                    Game.MessageLog.Add($"{player.Name} growls in frustration");
+                }
+                if (x == -1 || y == -1)
+                {
+                    return false;
+                }
+                if (Game.DungeonMap.SetActorPosition(player, x, y))
+                {
+                    return true;
+                }
+
+                Monster monster = Game.DungeonMap.GetMonsterAt(x, y);
+
+                if (monster != null)
+                {
+                    Attack(Game.Player, monster);
+                    return true;
+                }
+
+                Shop shop = Game.DungeonMap.GetShopAt(x, y);
+
+                if (shop != null)
+                {
+                    EnterShop(Game.Player, shop);
+                    Game.AutoMovePlayer = false;
+                    return true;
+                }
+                return false;
+
             }
             return false;
         }
@@ -203,13 +295,18 @@ namespace RuneRogue.Systems
         {
             StringBuilder attackMessage = new StringBuilder();
 
+            if  (defender is Player)
+            {
+                Game.AutoMovePlayer = false;
+            }
+
             int hits = ResolveAttack(attacker, defender, attackMessage);
 
             int damage = 0;
             if (hits > 0)
             {
                 damage = ResolveArmor(defender, attacker, attackMessage);
-                if (defender == Game.Player)
+                if (defender == Game.Player && Game.XpOnAction)
                 {
                     Game.Player.XpHealth += damage;
                 }
@@ -286,12 +383,12 @@ namespace RuneRogue.Systems
             }
             else if (roll < unadjustedChanceInt)
             {
-                attackMessage.AppendFormat("{1} dodges {0}'s attack (roll {2} < {3}).", attacker.Name, 
+                attackMessage.AppendFormat("{1} dodges {0}'s attack (roll {2} > {3}).", attacker.Name, 
                     defender.Name, roll, chanceInt);
             }
             else
             {
-                attackMessage.AppendFormat("{0} misses {1} (roll {2} < {3}).", attacker.Name,
+                attackMessage.AppendFormat("{0} misses {1} (roll {2} > {3}).", attacker.Name,
                     defender.Name, roll, chanceInt);
             }
             if (roll < unadjustedChanceInt && defender == Game.Player && Game.XpOnAction)
@@ -352,7 +449,7 @@ namespace RuneRogue.Systems
                     int drain = Math.Max(damage / 2, 1);
                     defender.MaxHealth -= drain;
                     attackMessage.AppendFormat(" {0} feels cold.", defender.Name);
-                    if (defender == Game.Player)
+                    if (defender == Game.Player && Game.XpOnAction)
                     {
                         Game.Player.XpHealth += drain * 3;
                     }

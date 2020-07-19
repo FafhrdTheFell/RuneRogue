@@ -64,9 +64,9 @@ namespace RuneRogue.Core
                 _decayProbability.Add(_runeNames[i], _runeDecayProbabilities[i]);
             }    
 
-            AddRuneAbility("Life");
-            AddRuneAbility("Thought");
-            AddRuneAbility("Iron");
+            //AddRuneAbility("Life");
+            //AddRuneAbility("Thought");
+            //AddRuneAbility("Iron");
         }
 
 

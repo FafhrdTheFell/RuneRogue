@@ -93,7 +93,7 @@ namespace RuneRogue.Core
                     UpdatePlayerFieldOfView();
                 }
                 // stop acceleration on stairs
-                if (CheckStairs(actor.X, actor.Y) && actor == Game.Player)
+                if (CheckStairs(actor.X, actor.Y) && actor is Player)
                 {
                     Game.AcceleratePlayer = false;
                 }

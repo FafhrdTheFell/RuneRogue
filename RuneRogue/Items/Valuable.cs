@@ -71,8 +71,8 @@ namespace RuneRogue.Items
 
         public int RandomValue()
         {
-            string diesize = (1 + 3 * Game.mapLevel).ToString();
-            return Dice.Roll("10d" + diesize);
+            string diesize = (1 + 2 * Game.mapLevel).ToString();
+            return Dice.Roll("8d" + diesize);
 
         }
 
