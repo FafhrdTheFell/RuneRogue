@@ -120,13 +120,7 @@ namespace RuneRogue.Systems
                 CreateShop(_map.Rooms[shopRoom], 100);
             }
 
-            if ((_mapLevel % Game.ShopEveryNLevels) == 1)
-            {
-                int shopRoom = Dice.Roll("1d" + _map.Rooms.Count) - 1;
-                CreateShop(_map.Rooms[shopRoom], 100);
-            }
-
-            if ((_mapLevel % Game.RuneForgeEveryNLevels) == 1)
+            if ((_mapLevel % Game.RuneForgeEveryNLevels) == 0)
             {
                 int shopRoom = Dice.Roll("1d" + _map.Rooms.Count) - 1;
                 CreateShop(_map.Rooms[shopRoom], 100, "RuneForge");
