@@ -43,6 +43,8 @@ namespace RuneRogue.Shops
                 _costs.Add(_runeCost);
                 _targets.Add(runeList[i]);
             }
+
+            _numOptions = runeList.Count;
         }
 
         public override void ReceivePurchase(int purchaseIndex)
@@ -51,6 +53,7 @@ namespace RuneRogue.Shops
             _goods.RemoveAt(purchaseIndex);
             _costs.RemoveAt(purchaseIndex);
             _targets.RemoveAt(purchaseIndex);
+            _numOptions -= 1;
         }
     }
 }

@@ -90,11 +90,12 @@ namespace RuneRogue
         public static bool AutoMovePlayer;
         private static int AutoMoveXTarget;
         private static int AutoMoveYTarget;
-        private static Monster AutoMoveMonsterTarget;
+        public static Monster AutoMoveMonsterTarget;
 
         public static bool SecondaryConsoleActive;
 
-        private static RLKeyPress PrevKeyPress;
+        //private static RLKeyPress PrevKeyPress;
+        private static Direction AccelerateDirection;
 
         // We can use this instance of IRandom throughout our game when generating random number
         public static IRandom Random { get; private set; }
@@ -142,14 +143,13 @@ namespace RuneRogue
             _statConsole = new RLConsole(_statWidth, _statHeight);
             _inventoryConsole = new RLConsole(_inventoryWidth, _inventoryHeight);
 
-            // current secondary console
-            //CurrentSecondary = new Shop();
-
             AutoMovePlayer = false;
             AcceleratePlayer = false;
-            PrevKeyPress = null;
+
             SecondaryConsoleActive = false;
+            
             _inputSystem = new InputSystem();
+            
             _quittingGame = false;
             _triggerQuit = false;
 
@@ -212,15 +212,13 @@ namespace RuneRogue
             RLKeyPress keyPress;
             RLMouse rLMouse = _rootConsole.Mouse;
 
-
-
             if (SecondaryConsoleActive)
             {
                 keyPress = _rootConsole.Keyboard.GetKeyPress();
-                if (keyPress != null)
+                //if (keyPress != null || rLMouse.GetLeftClick())
                 {
                     AcceleratePlayer = false;
-                    bool finished = CurrentSecondary.ProcessKeyInput(keyPress);
+                    bool finished = CurrentSecondary.ProcessInput(keyPress, rLMouse);
                     if (finished)
                     {
                         SecondaryConsoleActive = false;
@@ -272,14 +270,24 @@ namespace RuneRogue
             if (AcceleratePlayer)
             {
                 keyPress = _rootConsole.Keyboard.GetKeyPress();
-                if (keyPress != null)
+                if (rLMouse.GetLeftClick() || keyPress != null)
                 {
                     AcceleratePlayer = false;
-                    keyPress = null;
                 }
                 else
                 {
-                    keyPress = PrevKeyPress;
+                    Direction direction = AccelerateDirection;
+                    if (direction != Direction.None)
+                    {
+                        // the acceleration system is ugly. AcceleratePlayer sometimes
+                        // gets set in the Command System, so need to check shift before
+                        // carrying out move.
+                        didPlayerAct = CommandSystem.MovePlayer(direction);
+                    }
+                    if (!didPlayerAct)
+                    {
+                        AcceleratePlayer = false;
+                    }
                 }
             }
             else
@@ -331,6 +339,7 @@ namespace RuneRogue
                             // gets set in the Command System, so need to check shift before
                             // carrying out move.
                             AcceleratePlayer = _inputSystem.ShiftDown(keyPress);
+                            AccelerateDirection = direction;
                             didPlayerAct = CommandSystem.MovePlayer(direction);
                         }
                         else if (_inputSystem.QuitKeyPressed(keyPress))
@@ -387,7 +396,7 @@ namespace RuneRogue
                             didPlayerAct = true;
                         }
                     }
-                    PrevKeyPress = keyPress;
+                    //PrevKeyPress = keyPress;
                 }
 
                 if (didPlayerAct)

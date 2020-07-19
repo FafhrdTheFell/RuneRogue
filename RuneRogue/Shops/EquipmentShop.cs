@@ -51,6 +51,8 @@ namespace RuneRogue.Shops
             _targets.Add("Defense");
             _targets.Add("Health");
 
+            _numOptions = 3;
+
         }
 
 

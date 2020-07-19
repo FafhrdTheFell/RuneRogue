@@ -58,6 +58,8 @@ namespace RuneRogue.Shops
                 _costs.Add(levelBookCost);
             }
 
+            _numOptions = numBooks;
+
         }
 
         public override void ReceivePurchase(int purchaseIndex)
@@ -81,6 +83,7 @@ namespace RuneRogue.Shops
             _goods.RemoveAt(purchaseIndex);
             _costs.RemoveAt(purchaseIndex);
             _targets.RemoveAt(purchaseIndex);
+            _numOptions = _goods.Count;
         }
     }
 }

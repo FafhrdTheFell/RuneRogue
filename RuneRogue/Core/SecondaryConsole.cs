@@ -10,6 +10,16 @@ namespace RuneRogue.Core
     public class SecondaryConsole
     {
         protected RLConsole _console;
+        protected int _numOptions;
+
+        protected readonly int _verticalOffset = 4;
+        protected readonly int _horizontalOffset = 4;
+
+        public int NumOptions
+        {
+            get { return _numOptions; }
+            private set { _numOptions = value; }
+        }
 
         public SecondaryConsole()
         {
@@ -22,20 +32,63 @@ namespace RuneRogue.Core
         }
 
         // process key press and return true iff finished with console
-        public virtual bool ProcessKeyInput(RLKeyPress rLKeyPress)
+        public virtual bool ProcessInput(RLKeyPress rLKeyPress, RLMouse rLMouse)
         {
-            if (rLKeyPress.Char == null)
+            int choiceNum = -1;
+            if (rLMouse.GetLeftClick())
             {
-                return false;
+                if (rLMouse.X >= _horizontalOffset && rLMouse.X <= 80)
+                {
+                    System.Console.WriteLine(rLMouse.Y.ToString());
+                    if (rLMouse.Y - 4 - _verticalOffset + 2 - NumOptions * 2 == 3)
+                    {
+                        // exit row pressed
+                        return true;
+                    }
+                    if ((rLMouse.Y - 4 - _verticalOffset) % 2 == 0)
+                    {
+                        choiceNum = 1 + (rLMouse.Y - 4 - _verticalOffset) / 2;
+                        if (choiceNum > NumOptions || choiceNum < 1)
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    System.Console.WriteLine(choiceNum.ToString());
+
+                }
             }
-            if (rLKeyPress.Key == RLKey.X)
+            else if (rLKeyPress != null)
             {
-                return true;
+                if (rLKeyPress.Char == null)
+                {
+                    return false;
+                }
+                if (rLKeyPress.Key == RLKey.X || rLKeyPress.Key == RLKey.R)
+                {
+                    return true;
+                }
+                //int choiceNum;
+                bool isNumber = int.TryParse(rLKeyPress.Char.ToString(), out choiceNum);
+                if (!isNumber || choiceNum > NumOptions || choiceNum < 1)
+                {
+                    return false;
+                }
             }
             else
             {
                 return false;
             }
+            bool success = ProcessChoice(choiceNum - 1);
+            return success;
+        }
+
+        public virtual bool ProcessChoice(int choiceIndex)
+        {
+            return false;
         }
 
         public RLConsole Console

@@ -300,10 +300,10 @@ namespace RuneRogue.Systems
                 Game.AutoMovePlayer = false;
             }
 
-            int hits = ResolveAttack(attacker, defender, attackMessage);
+            bool attackHit = ResolveAttack(attacker, defender, attackMessage);
 
             int damage = 0;
-            if (hits > 0)
+            if (attackHit)
             {
                 damage = ResolveArmor(defender, attacker, attackMessage);
                 if (defender == Game.Player && Game.XpOnAction)
@@ -316,6 +316,11 @@ namespace RuneRogue.Systems
 
             if (defender.Health <= 0)
             {
+                if (Game.AutoMoveMonsterTarget == defender)
+                {
+                    Game.AutoMoveMonsterTarget = null;
+                    Game.AutoMovePlayer = false;
+                }
                 ResolveDeath(attacker, defender, attackMessage);
             }
 
@@ -327,10 +332,9 @@ namespace RuneRogue.Systems
         }
 
         // The attacker rolls based on his stats to see if he gets any hits
-        private static int ResolveAttack(Actor attacker, Actor defender, StringBuilder attackMessage)
+        private static bool ResolveAttack(Actor attacker, Actor defender, StringBuilder attackMessage)
         {
-            int hits = 0;
-
+            bool attackHit = false;
             int diff = attacker.AttackSkill - defender.DefenseSkill;
             if (attacker.SASenseThoughts && !defender.IsUndead)
             {
@@ -351,7 +355,7 @@ namespace RuneRogue.Systems
             {
                 attackMessage.AppendFormat("{0} hits {1} (roll {2} < {3}).", attacker.Name, 
                     defender.Name, roll, chanceInt);
-                hits += 1;
+                attackHit = true;
                 if (attacker.SALifedrainOnHit)
                 {
                     if (defender.Health == defender.MaxHealth)
@@ -397,9 +401,7 @@ namespace RuneRogue.Systems
                 Game.Player.XpHealth += 1;
 
             }
-
-            return hits;
-
+            return attackHit;
         }
 
         private static int ResolveArmor(Actor defender, Actor attacker, StringBuilder attackMessage)

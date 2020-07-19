@@ -42,7 +42,7 @@ namespace RuneRogue.Core
             400
         };
 
-        public const int BonusToAttackIron = 7;
+        public const int BonusToAttackIron = 6;
         public const int BonusToDefenseIron = 4;
         public const int BonusToSpeedMagic = 4;
 
@@ -50,11 +50,9 @@ namespace RuneRogue.Core
         private List<string> _runesOwned;
         private List<string> _runesActive;
 
-        private readonly int _verticalOffset = 4;
-        private readonly int _horizontalOffset = 4;
-
         public Runes()
         {
+            _numOptions = _runeNames.Length;
             _runesOwned = new List<string>();
             _runesActive = new List<string>();
             
@@ -264,26 +262,69 @@ namespace RuneRogue.Core
                 "( X ) Cancel.", Colors.Text);
         }
 
-        public override bool ProcessKeyInput(RLKeyPress rLKeyPress)
+        //public override bool ProcessKeyInput(RLKeyPress rLKeyPress, RLMouse rLMouse)
+        //{
+        //    int choiceNum = -1;
+        //    System.Console.WriteLine(rLMouse.X.ToString());
+        //    if (rLMouse.GetLeftClick())
+        //    {
+        //        if (rLMouse.X >= _horizontalOffset && rLMouse.X <= 80)
+        //        {
+        //            System.Console.WriteLine(rLMouse.Y.ToString());
+        //            if (rLMouse.Y - 4 - _verticalOffset- (_runeNames.Length - 1) * 2 - 3 == 0)
+        //            {
+        //                // exit pressed
+        //                return true;
+        //            }
+        //            if ((rLMouse.Y - 4 - _verticalOffset) % 2 == 0)
+        //            {
+        //                choiceNum = 1 + (rLMouse.Y - 4 - _verticalOffset) / 2;
+        //                if (choiceNum > _runeNames.Length || choiceNum < 1)
+        //                {
+        //                    return false;
+        //                }
+        //            }
+        //            else
+        //            {
+        //                return false;
+        //            }
+        //            System.Console.WriteLine(choiceNum.ToString());
+                     
+        //        }
+        //    }
+        //    else if (rLKeyPress != null)
+        //    {
+        //        if (rLKeyPress.Char == null)
+        //        {
+        //            return false;
+        //        }
+        //        if (rLKeyPress.Key == RLKey.X || rLKeyPress.Key == RLKey.R)
+        //        {
+        //            return true;
+        //        }
+        //        //int choiceNum;
+        //        bool isNumber = int.TryParse(rLKeyPress.Char.ToString(), out choiceNum);
+        //        if (!isNumber)
+        //        {
+        //            return false;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return false;
+        //    }
+        //    string choice = _runeNames[choiceNum - 1];
+        //    bool success = ToggleRune(choice);
+        //    return success;
+        //}
+
+        public override bool ProcessChoice(int choiceIndex)
         {
-            if (rLKeyPress.Char == null)
-            {
-                return false;
-            }
-            if (rLKeyPress.Key == RLKey.X || rLKeyPress.Key == RLKey.R)
-            {
-                return true;
-            }
-            //int choiceNum;
-            bool isNumber = int.TryParse(rLKeyPress.Char.ToString(), out int choiceNum);
-            if (!isNumber)
-            {
-                return false;
-            }
-            string choice = _runeNames[choiceNum - 1];
+            System.Console.WriteLine(choiceIndex.ToString());
+            string choice = _runeNames[choiceIndex];
             bool success = ToggleRune(choice);
             return success;
         }
-    }
+}
 
 }
