@@ -416,7 +416,15 @@ namespace RuneRogue.Systems
                 attackDice = "2d" + attacker.Attack.ToString() + "k1";
             }
             int attackResult = Dice.Roll(attackDice);
-            int defenseResult = Dice.Roll("3d" + defender.Defense.ToString() + "k1");
+            int defenseResult;
+            if (defender.Defense > 0)
+            {
+                defenseResult = Dice.Roll("3d" + defender.Defense.ToString() + "k1");
+            }
+            else
+            {
+                defenseResult = 0;
+            }
             if (attackResult <= defenseResult && attackResult >= 4)
             {
                 attackMessage.AppendFormat(" The blow bounces off {1}'s armor.", attacker.Name, defender.Name);

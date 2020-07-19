@@ -102,30 +102,58 @@ namespace RuneRogue.Core
             Symbol = '@';
         }
 
-        public void CheckAdvancement()
+        public void CheckAdvancementXP()
         {
-            int factor = 12;
-            int factorHealth = 3;
+            int factor = 8;
+            int factorHealth = 2;
             if (XpAttackSkill >= AttackSkill * factor)
             {
-                XpAttackSkill -= AttackSkill * factor;
-                AttackSkill += 1;
-                Game.MessageLog.Add($"{Name} has learned more about attacking.");
+                CheckAdvancement("attack", 1);
             }
             if (XpDefenseSkill >= DefenseSkill * factor)
             {
-                XpDefenseSkill -= DefenseSkill * factor;
-                DefenseSkill += 1;
-                Game.MessageLog.Add($"{Name} has learned more about defending.");
+                CheckAdvancement("defense", 1);
             }
             if (XpHealth >= MaxHealth * factorHealth)
             {
-                XpHealth -= MaxHealth * factorHealth;
-                MaxHealth += Dice.Roll("2d3k1");
-                Health = MaxHealth;
-                Game.MessageLog.Add($"{Name} has gotten tougher.");
+                CheckAdvancement("health", 1);
             }
         }
+
+        public void CheckAdvancement(string skill, int checks)
+        {
+            for (int i = 0; i < checks; i++)
+            {
+                switch (skill)
+                {
+                    case "attack":
+                        if (Dice.Roll("1d20") >= AttackSkill)
+                        {
+                            AttackSkill += 1;
+                            Game.MessageLog.Add($"{Name} has learned more about attacking.");
+                        }
+                        break;
+                    case "defense":
+                        if (Dice.Roll("1d20") >= DefenseSkill)
+                        {
+                            DefenseSkill += 1;
+                            Game.MessageLog.Add($"{Name} has learned more about defending.");
+                        }
+                        break;
+                    case "health":
+                        if (Dice.Roll("1d60") >= MaxHealth)
+                        {
+                            MaxHealth += Dice.Roll("1d2");
+                            Health = MaxHealth;
+                            Game.MessageLog.Add($"{Name} has gotten tougher.");
+                        }
+                        break;
+                    default:
+                        throw new ArgumentException($"Invalid skill {skill}.");
+                }
+            }
+        }
+
         public void DrawStats(RLConsole statConsole)
         {
             statConsole.Print(1,  1, $"Name:", Colors.Text);

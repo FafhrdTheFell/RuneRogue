@@ -295,9 +295,9 @@ namespace RuneRogue
                 keyPress = _rootConsole.Keyboard.GetKeyPress();
             }
             
-            if (CommandSystem.IsPlayerTurn && keyPress != null)
+            if (CommandSystem.IsPlayerTurn && keyPress != null && Game.XpOnAction)
             {
-                Player.CheckAdvancement();
+                Player.CheckAdvancementXP();
             }
 
             if (CommandSystem.IsPlayerTurn || _quittingGame)

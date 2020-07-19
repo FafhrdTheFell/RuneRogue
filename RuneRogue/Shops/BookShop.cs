@@ -34,7 +34,6 @@ namespace RuneRogue.Shops
                 "health."
             };
 
-
         public BookShop()
         {
             Symbol = 'B';
@@ -54,7 +53,8 @@ namespace RuneRogue.Shops
                 string prefixString = (string)Game.RandomArrayValue(bookSynonym);
                 string target = (string)Game.RandomArrayValue(targetOptions);
                 _goods.Add(prefixString + target);
-                _targets.Add(target);
+                string[] split = target.Split(new Char[] { ' ', ',', '.', ':', '\t' });
+                _targets.Add(split[0]);
                 _costs.Add(levelBookCost);
             }
 
@@ -64,22 +64,7 @@ namespace RuneRogue.Shops
 
         public override void ReceivePurchase(int purchaseIndex)
         {
-            switch (_targets[purchaseIndex])
-            {
-                case "attack skill.":
-                    Game.Player.AttackSkill += Dice.Roll("1d2+1");
-                    Game.MessageLog.Add(Game.Player.Name + " learns to attack aggressively.");
-                    break;
-                case "defense skill.":
-                    Game.Player.DefenseSkill += Dice.Roll("1d2+1");
-                    Game.MessageLog.Add(Game.Player.Name + " learns to dodge and block.");
-                    break;
-                case "health.":
-                    Game.Player.MaxHealth += Dice.Roll("2d3");
-                    Game.Player.Health = Game.Player.MaxHealth;
-                    Game.MessageLog.Add(Game.Player.Name + " toughens up.");
-                    break;
-            }
+            Game.Player.CheckAdvancement(_targets[purchaseIndex], 3);
             _goods.RemoveAt(purchaseIndex);
             _costs.RemoveAt(purchaseIndex);
             _targets.RemoveAt(purchaseIndex);
