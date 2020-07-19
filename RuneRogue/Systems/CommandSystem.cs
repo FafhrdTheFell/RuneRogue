@@ -416,11 +416,12 @@ namespace RuneRogue.Systems
                 attackDice = "2d" + attacker.Attack.ToString() + "k1";
             }
             int attackResult = Dice.Roll(attackDice);
-            if (attackResult <= defender.Defense && attackResult >= 4)
+            int defenseResult = Dice.Roll("3d" + defender.Defense.ToString() + "k1");
+            if (attackResult <= defenseResult && attackResult >= 4)
             {
                 attackMessage.AppendFormat(" The blow bounces off {1}'s armor.", attacker.Name, defender.Name);
             }
-            else if (attackResult <= defender.Defense)
+            else if (attackResult <= defenseResult)
             {
                 attackMessage.AppendFormat(" The weak blow does no damage.", attacker.Name);
             }
@@ -429,7 +430,7 @@ namespace RuneRogue.Systems
                 attackMessage.AppendFormat(" The blow lands hard!", attacker.Name);
             }
 
-            return Math.Max(attackResult - defender.Defense, 0);
+            return Math.Max(attackResult - defenseResult, 0);
 
         }
 
