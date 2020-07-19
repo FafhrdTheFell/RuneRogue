@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using RogueSharp;
+using RogueSharp.DiceNotation;
 using RuneRogue.Core;
 using RuneRogue.Interfaces;
 using RuneRogue.Systems;
@@ -23,7 +25,7 @@ namespace RuneRogue.Behaviors
             monsterFov.ComputeFov( monster.X, monster.Y, monster.Awareness, true );
             if ( monsterFov.IsInFov( player.X, player.Y ) )
             {
-               Game.MessageLog.Add( $"{monster.Name} is eager to fight {player.Name}" );
+               // Game.MessageLog.Add( $"{monster.Name} is eager to fight {player.Name}" );
                monster.TurnsAlerted = 1;
             }
          }
@@ -48,7 +50,7 @@ namespace RuneRogue.Behaviors
                // The monster can see the player, but cannot find a path to him
                // This could be due to other monsters blocking the way
                // Add a message to the message log that the monster is waiting
-               Game.MessageLog.Add( $"{monster.Name} waits for a turn" );
+               //Game.MessageLog.Add( $"{monster.Name} waits for a turn" );
             }
 
             // Don't forget to set the walkable status back to false
@@ -69,6 +71,32 @@ namespace RuneRogue.Behaviors
                   Game.MessageLog.Add( $"{monster.Name} growls in frustration" );
                }
             }
+            else
+            {
+                    // move monster towards player if there is space
+                    int dx = 1 * Convert.ToInt32(player.X > monster.X) - 1 * Convert.ToInt32(monster.X > player.X);
+                    int dy = 1 * Convert.ToInt32(player.Y > monster.Y) - 1 * Convert.ToInt32(monster.Y > player.Y);
+                    if (!(dx == 0) && !(dy == 0))
+                    {
+                        // pick random direction
+                        if (Dice.Roll("1d2") == 1)
+                        {
+                            dx = 0;
+                        }
+                        else
+                        {
+                            dy = 0;
+                        }
+                    }
+                    if (dx == 0)
+                    {
+                        commandSystem.MoveMonster(monster, dungeonMap.GetCell(monster.X, monster.Y + dy));
+                    }
+                    else if (dy == 0)
+                    {
+                        commandSystem.MoveMonster(monster, dungeonMap.GetCell(monster.X + dx, monster.Y));
+                    }
+                }
 
             monster.TurnsAlerted++;
 
