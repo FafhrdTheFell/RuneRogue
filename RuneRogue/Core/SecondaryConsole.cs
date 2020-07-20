@@ -39,7 +39,6 @@ namespace RuneRogue.Core
             {
                 if (rLMouse.X >= _horizontalOffset && rLMouse.X <= 80)
                 {
-                    System.Console.WriteLine(rLMouse.Y.ToString());
                     if (rLMouse.Y - 4 - _verticalOffset + 2 - NumOptions * 2 == 3)
                     {
                         // exit row pressed
@@ -57,7 +56,6 @@ namespace RuneRogue.Core
                     {
                         return false;
                     }
-                    System.Console.WriteLine(choiceNum.ToString());
 
                 }
             }
