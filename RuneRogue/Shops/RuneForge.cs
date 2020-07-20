@@ -49,7 +49,7 @@ namespace RuneRogue.Shops
 
         public override void ReceivePurchase(int purchaseIndex)
         {
-            Game.RuneSystem.AddRuneAbility(_targets[purchaseIndex]);
+            Game.RuneSystem.AcquireRune(_targets[purchaseIndex]);
             _goods.RemoveAt(purchaseIndex);
             _costs.RemoveAt(purchaseIndex);
             _targets.RemoveAt(purchaseIndex);

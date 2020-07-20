@@ -206,6 +206,11 @@ namespace RuneRogue.Core
             }
         }
 
+        public bool AllRunesOwned
+        {
+            get { return (RunesNotOwned().Count == 0; }
+        }
+
         public bool RuneActive(string rune)
         {
             return _runesActive.Contains(rune);

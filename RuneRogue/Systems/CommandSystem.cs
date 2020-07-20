@@ -470,7 +470,7 @@ namespace RuneRogue.Systems
                     attackMessage.AppendFormat(" {0} takes {1} damage.", defender.Name, damage);
                     //Game.MessageLog.Add($"  {defender.Name} takes {damage} damage");
                 }
-                if (defender.Health <= 0)
+                if (defender.Health <= 0 && defender.Health + damage > 0)
                 {
                     attackMessage.AppendFormat(" {0} kills {1} ({2} damage).", attacker.Name, defender.Name, damage);
                 }

@@ -319,16 +319,18 @@ namespace RuneRogue
                         }
                     }
                 }
-                if (keyPress != null)
+                if (keyPress != null || (Game.Player.Health <= 0 && !_quittingGame))
                 {
                     if (_quittingGame)
                     {
                         _rootConsole.Close();
                     }
-                    else if (Game.Player.Health <= 0)
+                    else if (Game.Player.Health <= 0 && !_quittingGame)
                     {
                         QuitGame();
                         _renderRequired = true;
+                        AcceleratePlayer = false;
+                        AutoMovePlayer = false;
                     }
                     else
                     {
@@ -382,9 +384,14 @@ namespace RuneRogue
                                     MessageLog.Add("You must be the sole challenger for the rune throne.");
                                     didPlayerAct = true;
                                 }
+                                else if (!Game.RuneSystem.AllRunesOwned)
+                                {
+                                    MessageLog.Add("You must be possess every rune to ascendc the rune throne.");
+                                    didPlayerAct = true;
+                                }
                                 else
                                 {
-                                    MessageLog.Add($"You have won RuneRogue! Your final score is {Player.LifetimeGold * 5}.");
+                                    MessageLog.Add($"You have won RuneRogue! Your final score is {Player.LifetimeGold * 3}.");
                                     QuitGame();
                                     didPlayerAct = true;
                                 }
