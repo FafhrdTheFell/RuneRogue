@@ -68,7 +68,7 @@ namespace RuneRogue.Core
         }
 
 
-        public void AddRuneAbility(string rune)
+        public void AcquireRune(string rune)
         {
             List<string> existingRunes = new List<string>(_runeNames);
             if (existingRunes.Contains(rune) && !_runesOwned.Contains(rune))
@@ -208,7 +208,7 @@ namespace RuneRogue.Core
 
         public bool AllRunesOwned
         {
-            get { return (RunesNotOwned().Count == 0; }
+            get { return (RunesNotOwned().Count == 0); }
         }
 
         public bool RuneActive(string rune)

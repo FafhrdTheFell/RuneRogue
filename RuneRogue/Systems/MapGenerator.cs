@@ -120,7 +120,7 @@ namespace RuneRogue.Systems
                 CreateShop(_map.Rooms[shopRoom], 100);
             }
 
-            if ((_mapLevel % Game.RuneForgeEveryNLevels) == 0)
+            if ((_mapLevel % Game.RuneForgeEveryNLevels) == 0 || Game.FinalLevel())
             {
                 int shopRoom = Dice.Roll("1d" + _map.Rooms.Count) - 1;
                 CreateShop(_map.Rooms[shopRoom], 100, "RuneForge");
@@ -203,7 +203,7 @@ namespace RuneRogue.Systems
             Array v = validPositions.ToArray();
             Cell shopCell = (Cell)v.GetValue(Game.Random.Next(v.Length - 1));
 
-            // Each room has a 7% chance of having a shop
+            // Each room has a 5% chance of having a shop
             if (Dice.Roll("1D100") <= shopChance)
             {
                 // 20/30/50 RuneForge, EquipmentShop, or BookShop

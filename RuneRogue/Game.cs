@@ -209,27 +209,31 @@ namespace RuneRogue
         private static void OnRootConsoleUpdate(object sender, UpdateEventArgs e)
         {
             bool didPlayerAct = false;
-            RLKeyPress keyPress;
+            RLKeyPress keyPress = _rootConsole.Keyboard.GetKeyPress();
             RLMouse rLMouse = _rootConsole.Mouse;
 
-            if (SecondaryConsoleActive)
+            if (_quittingGame)
             {
-                keyPress = _rootConsole.Keyboard.GetKeyPress();
-                //if (keyPress != null || rLMouse.GetLeftClick())
+                if (keyPress != null)
                 {
-                    AcceleratePlayer = false;
-                    bool finished = CurrentSecondary.ProcessInput(keyPress, rLMouse);
-                    if (finished)
-                    {
-                        SecondaryConsoleActive = false;
-                    }
-                    //keyPress = null;
-                    _renderRequired = true;
-                    return;
+                    _rootConsole.Close();
                 }
             }
 
-            if (AutoMovePlayer)
+            if (SecondaryConsoleActive)
+            {
+                AcceleratePlayer = false;
+                bool finished = CurrentSecondary.ProcessInput(keyPress, rLMouse);
+                if (finished)
+                {
+                    SecondaryConsoleActive = false;
+                }
+                _renderRequired = true;
+                return;
+
+            }
+
+            if (AutoMovePlayer && CommandSystem.IsPlayerTurn)
             {
                 if (AutoMoveMonsterTarget != null)
                 {
@@ -248,10 +252,8 @@ namespace RuneRogue
                 }
                 if (DungeonMap.GetShopAt(Player.X, Player.Y) != null)
                 {
-                    Console.WriteLine("boink");
                     AutoMovePlayer = false;
                 }
-                keyPress = _rootConsole.Keyboard.GetKeyPress();
                 if (rLMouse.GetLeftClick() || keyPress != null)
                 {
                     AutoMovePlayer = false;
@@ -265,23 +267,20 @@ namespace RuneRogue
 
 
 
-            // if player requested acceleration, use the previous keypress,
+            // if player requested acceleration, use the previous direction,
             // but turn off acceleration if a key is pressed to stop it.
-            if (AcceleratePlayer)
+            if (AcceleratePlayer && CommandSystem.IsPlayerTurn)
             {
-                keyPress = _rootConsole.Keyboard.GetKeyPress();
                 if (rLMouse.GetLeftClick() || keyPress != null)
                 {
                     AcceleratePlayer = false;
+                    return;
                 }
                 else
                 {
                     Direction direction = AccelerateDirection;
                     if (direction != Direction.None)
                     {
-                        // the acceleration system is ugly. AcceleratePlayer sometimes
-                        // gets set in the Command System, so need to check shift before
-                        // carrying out move.
                         didPlayerAct = CommandSystem.MovePlayer(direction);
                     }
                     if (!didPlayerAct)
@@ -290,17 +289,9 @@ namespace RuneRogue
                     }
                 }
             }
-            else
-            {
-                keyPress = _rootConsole.Keyboard.GetKeyPress();
-            }
             
-            if (CommandSystem.IsPlayerTurn && keyPress != null && Game.XpOnAction)
-            {
-                Player.CheckAdvancementXP();
-            }
 
-            if (CommandSystem.IsPlayerTurn || _quittingGame)
+            if (CommandSystem.IsPlayerTurn)
             {
                 if (rLMouse.GetLeftClick())
                 {
@@ -319,18 +310,11 @@ namespace RuneRogue
                         }
                     }
                 }
-                if (keyPress != null || (Game.Player.Health <= 0 && !_quittingGame))
+                if (keyPress != null)
                 {
                     if (_quittingGame)
                     {
                         _rootConsole.Close();
-                    }
-                    else if (Game.Player.Health <= 0 && !_quittingGame)
-                    {
-                        QuitGame();
-                        _renderRequired = true;
-                        AcceleratePlayer = false;
-                        AutoMovePlayer = false;
                     }
                     else
                     {
@@ -403,7 +387,11 @@ namespace RuneRogue
                             didPlayerAct = true;
                         }
                     }
-                    //PrevKeyPress = keyPress;
+                }
+
+                if (CommandSystem.IsPlayerTurn && didPlayerAct && Game.XpOnAction)
+                {
+                    Player.CheckAdvancementXP();
                 }
 
                 if (didPlayerAct)
@@ -418,12 +406,19 @@ namespace RuneRogue
                     AcceleratePlayer = false;
                 }
 
-                _quittingGame = _triggerQuit;
             }
             else
             {
                 CommandSystem.ActivateMonsters();
                 _renderRequired = true;
+            }
+            if (Game.Player.Health <= 0 && !_quittingGame)
+            {
+                QuitGame();
+                _renderRequired = true;
+                AcceleratePlayer = false;
+                AutoMovePlayer = false;
+                _quittingGame = true;
             }
         }
 
