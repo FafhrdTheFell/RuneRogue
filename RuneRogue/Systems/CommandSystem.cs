@@ -245,7 +245,7 @@ namespace RuneRogue.Systems
             // rune decay
             if (scheduleable is Player)
             {
-                Game.RuneSystem.CheckDecay();
+                Game.RuneSystem.CheckDecayAllRunes();
             }
 
             if (scheduleable is Player)
@@ -321,7 +321,7 @@ namespace RuneRogue.Systems
                     Game.AutoMoveMonsterTarget = null;
                     Game.AutoMovePlayer = false;
                 }
-                ResolveDeath(attacker, defender, attackMessage);
+                ResolveDeath(defender, attackMessage);
             }
 
             if (!string.IsNullOrWhiteSpace(attackMessage.ToString()))
@@ -478,12 +478,12 @@ namespace RuneRogue.Systems
         }
 
         // Remove the defender from the map and add some messages upon death.
-        private static void ResolveDeath(Actor attacker, Actor defender, StringBuilder attackMessage)
+        public static void ResolveDeath(Actor defender, StringBuilder attackMessage)
         {
             if (defender is Player)
             {
                 //Game.MessageLog.Add($"{defender.Name} has died. Game Over! Final score: {Game.Player.LifetimeGold}.");
-                attackMessage.AppendFormat(" {0} has died. Game over! Final score {1}.", defender.Name, Game.Player.LifetimeGold);
+                
 
 
             }
@@ -491,7 +491,7 @@ namespace RuneRogue.Systems
             {
                 if (defender.Gold > 0)
                 {
-                    attackMessage.AppendFormat(" {0} dropped some gold.", defender.Name);
+                    attackMessage.AppendFormat(" {0} dropped some gold. ", defender.Name);
 
                     if (Game.DungeonMap.GetItemAt(defender.X, defender.Y) is Gold)
                     {

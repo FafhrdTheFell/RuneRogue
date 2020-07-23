@@ -141,6 +141,10 @@ namespace RuneRogue.Systems
                 AddMonstersToRoom(_map.Rooms[0], monsters);
             }
 
+            List<Monster> monsters2 = Game.MonsterGenerator.CreateEncounter(_mapLevel);
+            AddMonstersToRoom(_map.Rooms[0], monsters2);
+       
+
             return _map;
         }
 

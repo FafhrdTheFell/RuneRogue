@@ -12,6 +12,7 @@ namespace RuneRogue.Core
         private int _xpHealth;
         private int _xpTotalReceived;
         private int _lifetimeGold;
+        private int _stealth;
 
         //private Runes _runesystem;
 
@@ -33,6 +34,12 @@ namespace RuneRogue.Core
                 LifetimeGold += increase;
                 _gold = value;
             }
+        }
+
+        public int Stealth
+        {
+            get { return _stealth; }
+            set { _stealth = value; }
         }
 
         public int XpAttackSkill

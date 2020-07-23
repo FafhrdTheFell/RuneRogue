@@ -7,6 +7,7 @@ using RogueSharp.Random;
 using RuneRogue.Core;
 using RuneRogue.Effects;
 using RuneRogue.Systems;
+using RuneRogue.Interfaces;
 
 namespace RuneRogue
 {
@@ -44,7 +45,6 @@ namespace RuneRogue
 
         private static InputSystem _inputSystem;
         private static bool _quittingGame;
-        private static bool _triggerQuit;
 
         public static int mapLevel = 1;
         private static bool _renderRequired = true;
@@ -61,6 +61,9 @@ namespace RuneRogue
         public static SchedulingSystem SchedulingSystem { get; private set; }
         public static MonsterGenerator MonsterGenerator { get; private set; }
         public static Runes RuneSystem { get; private set; }
+        public static SecondaryConsole CurrentSecondary { get; set; }
+
+        public static TargetingSystem TargetingSystem { get; set; }
 
         public static int MessageWidth
         {
@@ -82,7 +85,6 @@ namespace RuneRogue
             get { return _mapWidth; }
         }
 
-        public static SecondaryConsole CurrentSecondary { get; set; } 
 
         // accelerate player continues move in straight line automatically
         // automoveplayer moves to selected point using pathfinding
@@ -145,13 +147,10 @@ namespace RuneRogue
 
             AutoMovePlayer = false;
             AcceleratePlayer = false;
-
-            SecondaryConsoleActive = false;
             
             _inputSystem = new InputSystem();
             
             _quittingGame = false;
-            _triggerQuit = false;
 
             SchedulingSystem = new SchedulingSystem();
 
@@ -160,13 +159,18 @@ namespace RuneRogue
 
             RuneSystem = new Runes();
             CurrentSecondary = RuneSystem;
-            SecondaryConsoleActive = false;
+            SecondaryConsoleActive = true;
 
             MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, mapLevel);
             DungeonMap = mapGenerator.CreateMap();
             DungeonMap.UpdatePlayerFieldOfView();
 
             CommandSystem = new CommandSystem();
+
+            TargetingSystem = new TargetingSystem();
+            CurrentSecondary = RuneSystem;
+            _renderRequired = true;
+
 
             // Set up a handler for RLNET's Update event
             _rootConsole.Update += OnRootConsoleUpdate;
@@ -202,7 +206,7 @@ namespace RuneRogue
         public static void QuitGame()
         {
             Game.MessageLog.Add($"Goodbye! Press any key to exit.");
-            _triggerQuit = true;
+            _quittingGame = true;
         }
 
         // Event handler for RLNET's Update event
@@ -214,11 +218,13 @@ namespace RuneRogue
 
             if (_quittingGame)
             {
-                if (keyPress != null)
+                if (keyPress != null || rLMouse.GetLeftClick() || rLMouse.GetRightClick())
                 {
                     _rootConsole.Close();
                 }
+                
             }
+            
 
             if (SecondaryConsoleActive)
             {
@@ -227,13 +233,16 @@ namespace RuneRogue
                 if (finished)
                 {
                     SecondaryConsoleActive = false;
+                    //if (CurrentSecondary is TargetingSystem)
+                    //{
+                    //    TargetingSystem ts = CurrentSecondary as TargetingSystem;
+                    //    ts.TargetCells();
+                    //}
                 }
                 _renderRequired = true;
-                return;
 
             }
-
-            if (CommandSystem.IsPlayerTurn)
+            else if (CommandSystem.IsPlayerTurn)
             {
                 if (AutoMovePlayer)
                 {
@@ -419,6 +428,7 @@ namespace RuneRogue
             if (Game.Player.Health <= 0 && !_quittingGame)
             {
                 QuitGame();
+                MessageLog.Add($"{Player.Name} has died. Game over! Final score {Player.LifetimeGold}.");
                 _renderRequired = true;
                 AcceleratePlayer = false;
                 AutoMovePlayer = false;
@@ -449,6 +459,7 @@ namespace RuneRogue
                 {
                     // need to draw DungeonMap to get monster stats
                     DungeonMap.Draw(_mapConsole, _statConsole);
+                    Player.Draw(_mapConsole, DungeonMap);
                     Player.DrawStats(_statConsole);
                     MessageLog.Draw(_messageConsole);
                     CurrentSecondary.DrawConsole();

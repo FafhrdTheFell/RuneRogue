@@ -100,40 +100,6 @@ namespace RuneRogue.Core
 
         }
 
-        // return false if still shopping, true if finished
-        //public override bool ProcessKeyInput(RLKeyPress rLKeyPress, RLMouse rLMouse)
-        //{
-        //    UpdateInventory();
-        //    int[] costs = _costs.ToArray();
-        //    if (rLKeyPress.Char == null)
-        //    {
-        //        return false;
-        //    }
-        //    if (rLKeyPress.Key == RLKey.X)
-        //    {
-        //        return true;
-        //    }
-        //    int purchase;
-        //    bool isNumber = int.TryParse(rLKeyPress.Char.ToString(), out purchase);
-        //    if (!isNumber)
-        //    {
-        //        return false;
-        //    }
-        //    // menu starts at 1
-        //    int purchaseIndex = purchase - 1;
-        //    if (Game.Player.Gold >= costs[purchaseIndex])
-        //    {
-        //        Game.Player.Gold -= costs[purchaseIndex];
-        //        ReceivePurchase(purchaseIndex);
-        //        return false;
-        //    }
-        //    else
-        //    {
-        //        Game.MessageLog.Add(Game.Player.Name + " cannot afford that.");
-        //        return false;
-        //    }
-        //}
-
         public override bool ProcessChoice(int choiceIndex)
         {
             UpdateInventory();

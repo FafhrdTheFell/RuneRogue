@@ -17,6 +17,8 @@ namespace RuneRogue.Core
         public static RLColor Floor = Swatch.AlternateDarkest;
         public static RLColor FloorBackgroundFov = Swatch.DbDark;
         public static RLColor FloorFov = Swatch.Alternate;
+        public static RLColor FloorHighlight = Swatch.AlternateLightest;
+        public static RLColor FloorTarget = Swatch.DWLighterRed;
 
         public static RLColor WallBackground = Swatch.SecondaryDarkest;
         public static RLColor Wall = Swatch.Secondary;

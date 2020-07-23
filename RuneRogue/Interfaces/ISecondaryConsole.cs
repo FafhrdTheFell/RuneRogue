@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace RuneRogue.Interfaces
 {
-    interface ISecondaryConsole
+    public interface ISecondaryConsole
     {
         void DrawConsole();
 
         // process key press and return true iff finished with console
-        bool ProcessKeyInput(RLKeyPress rLKeyPress);
+        bool ProcessInput(RLKeyPress rLKeyPress, RLMouse rLMouse);
 
         RLConsole Console { get;  }
     }

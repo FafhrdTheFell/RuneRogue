@@ -129,6 +129,7 @@
     <Compile Include="Shops\RuneForge.cs" />
     <Compile Include="Shops\BookShop.cs" />
     <Compile Include="Shops\EquipmentShop.cs" />
+    <Compile Include="Systems\TargetingSystem.cs" />
     <Compile Include="Systems\InputSystem.cs" />
     <Compile Include="Systems\MonsterGenerator.cs" />
     <Compile Include="Systems\CommandSystem.cs" />

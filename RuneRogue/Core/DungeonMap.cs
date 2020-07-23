@@ -54,14 +54,20 @@ namespace RuneRogue.Core
                     // check for peril, plus, keypadplus
                 }
             }
-            PlayerPeril = false;
+            PlayerPeril = (MonstersInFOV().Count > 0);
+        }
+
+        public List<Monster> MonstersInFOV()
+        {
+            List<Monster> monsters = new List<Monster>();
             foreach (Monster m in _monsters)
             {
                 if (IsInFov(m.X, m.Y))
                 {
-                    PlayerPeril = true;
+                    monsters.Add(m);
                 }
             }
+            return monsters;
         }
 
         // Returns true when able to place the Actor on the cell or false otherwise
@@ -259,7 +265,7 @@ namespace RuneRogue.Core
             }
             return false;
         }
-
+        
         // The Draw method will be called each time the map is updated
         // It will render all of the symbols/colors for each cell to the map sub console
         public void Draw(RLConsole mapConsole, RLConsole statConsole)

@@ -1,4 +1,5 @@
 ﻿using RuneRogue.Core;
+using RuneRogue.Systems;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,8 @@ namespace RuneRogue.Effects
 
         public override void PerformEffectOn(Actor target)
         {
+            Player player = Game.Player;
+            Game.DungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
             target.Health -= Magnitude;
             if (target == Game.Player)
             {
@@ -27,7 +30,21 @@ namespace RuneRogue.Effects
             }
             else
             {
-                Game.MessageLog.Add($"{target.Name} looks ill.");
+                if (target.Health > 0 && Game.DungeonMap.IsInFov(target.X, target.Y))
+                {
+                    Game.MessageLog.Add($"{target.Name} looks ill.");
+                }
+                else
+                {
+                    StringBuilder attackMessage = new StringBuilder();
+                    attackMessage.AppendFormat("{0} dies from poisoning.", target.Name);
+                    CommandSystem.ResolveDeath(target, attackMessage);
+                    if (!string.IsNullOrWhiteSpace(attackMessage.ToString()) && Game.DungeonMap.IsInFov(target.X, target.Y))
+                    {
+                        Game.MessageLog.Add(attackMessage.ToString());
+                    }
+                    FinishEffect();
+                }
             }
 
         }

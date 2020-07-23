@@ -62,6 +62,12 @@ namespace RuneRogue.Core
 
         }
 
+        public virtual void FinishEffect()
+        {
+            TimesActivated = Duration;
+            Game.SchedulingSystem.Remove(this);
+        }
+
         public virtual bool EffectFinished()
         {
             return (TimesActivated >= Duration);

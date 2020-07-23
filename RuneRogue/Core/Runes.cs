@@ -21,11 +21,10 @@ namespace RuneRogue.Core
             "Death",
             "Elements",
             "Thought",
+            "Time",
             "Magic",
             "Iron",
-            "Darkness",
-            "Law",
-            "Chaos"
+            "Darkness"
         };
 
         // x out of 1000
@@ -36,15 +35,14 @@ namespace RuneRogue.Core
             400,
             10,
             10,
+            600,
             10,
-            10,
-            30,
-            400
+            30
         };
 
         public const int BonusToAttackIron = 6;
         public const int BonusToDefenseIron = 4;
-        public const int BonusToSpeedMagic = 4;
+        public const int BonusToSpeedTime = 4;
 
         private Dictionary<string, int> _decayProbability;
         private List<string> _runesOwned;
@@ -62,9 +60,8 @@ namespace RuneRogue.Core
                 _decayProbability.Add(_runeNames[i], _runeDecayProbabilities[i]);
             }    
 
-            //AddRuneAbility("Life");
-            //AddRuneAbility("Thought");
-            //AddRuneAbility("Iron");
+            AcquireRune("Elements");
+            AcquireRune("Death");
         }
 
 
@@ -81,7 +78,18 @@ namespace RuneRogue.Core
             }
         }
 
-        public void CheckDecay()
+        // checks decay of a non-continuous use, discrete use rune
+        public void CheckDecay(string rune)
+        {
+            if (Dice.Roll("1d1000") < _decayProbability[rune])
+            {
+                Game.MessageLog.Add($"{Game.Player.Name}'s Rune of {rune} turns to dust.");
+                _runesOwned.Remove(rune);
+            }
+        }
+
+        // check decay of all active runes
+        public void CheckDecayAllRunes()
         {
             List<string> deactivate = new List<string>();
             foreach (string rune in _runesActive)
@@ -106,8 +114,29 @@ namespace RuneRogue.Core
             {
                 Game.MessageLog.Add($"{Game.Player.Name} channels Rune of {rune}.");
 
+                if (rune == "Elements")
+                {
+                    CheckDecay(rune);
+                    Game.SecondaryConsoleActive = true;
+                    Game.AcceleratePlayer = false;
+                    Game.CurrentSecondary = Game.TargetingSystem;
+                    Game.TargetingSystem.InitializeNewTarget("line", "Elements", 8);
+                    Game.MessageLog.Add("Select your target.");
+                    return false;
+                }
+                else if (rune == "Death")
+                {
+                    CheckDecay(rune);
+                    Game.SecondaryConsoleActive = true;
+                    Game.AcceleratePlayer = false;
+                    Game.CurrentSecondary = Game.TargetingSystem;
+                    Game.TargetingSystem.InitializeNewTarget("ball", "Death", 8, 5);
+                    Game.MessageLog.Add("Select your target.");
+                    return false;
+                }
+
                 StartRune(rune);
-                
+
                 return true;
             }
             else if (_runesOwned.Contains(rune) && _runesActive.Contains(rune))
@@ -135,19 +164,13 @@ namespace RuneRogue.Core
                     Game.MessageLog.Add($"{Game.Player.Name} begins to regenerate.");
                     Game.Player.SARegeneration = true;
                     break;
-                case "Death":
-                    Game.MessageLog.Add("not implemented");
-                    break;
-                case "Elements":
-                    Game.MessageLog.Add("not implemented");
-                    break;
                 case "Thought":
                     Game.MessageLog.Add($"{Game.Player.Name} begins to sense nearby thoughts.");
                     Game.Player.SASenseThoughts = true;
                     break;
-                case "Magic":
+                case "Time":
                     Game.MessageLog.Add($"{Game.Player.Name} begins to move faster.");
-                    Game.Player.Speed -= BonusToSpeedMagic;
+                    Game.Player.Speed -= BonusToSpeedTime;
                     break;
                 case "Iron":
                     Game.MessageLog.Add($"{Game.Player.Name}'s equipment transforms into adamant.");
@@ -157,12 +180,14 @@ namespace RuneRogue.Core
                 case "Darkness":
                     Game.MessageLog.Add("not implemented");
                     break;
-                case "Law":
-                    Game.MessageLog.Add("not implemented");
-                    break;
-                case "Chaos":
-                    Game.MessageLog.Add("not implemented");
-                    break;
+                //case "Law":
+                //    Game.MessageLog.Add("not implemented");
+                //    break;
+                //case "Chaos":
+                //    Game.MessageLog.Add("not implemented");
+                //    break;
+                default:
+                    throw new ArgumentException($"Rune {rune} start does not exist.");
             }
         }
 
@@ -175,19 +200,13 @@ namespace RuneRogue.Core
                     Game.MessageLog.Add($"{Game.Player.Name} is not longer regenerating.");
                     Game.Player.SARegeneration = false;
                     break;
-                case "Death":
-                    Game.MessageLog.Add("not implemented");
-                    break;
-                case "Elements":
-                    Game.MessageLog.Add("not implemented");
-                    break;
                 case "Thought":
                     Game.MessageLog.Add($"{Game.Player.Name} no longer senses thoughts.");
                     Game.Player.SASenseThoughts = false;
                     break;
-                case "Magic":
+                case "Time":
                     Game.MessageLog.Add($"{Game.Player.Name} no longer moves quickly.");
-                    Game.Player.Speed += BonusToSpeedMagic;
+                    Game.Player.Speed += BonusToSpeedTime;
                     break;
                 case "Iron":
                     Game.MessageLog.Add($"{Game.Player.Name}'s equipment transforms back to normal.");
@@ -197,12 +216,8 @@ namespace RuneRogue.Core
                 case "Darkness":
                     Game.MessageLog.Add("not implemented");
                     break;
-                case "Law":
-                    Game.MessageLog.Add("not implemented");
-                    break;
-                case "Chaos":
-                    Game.MessageLog.Add("not implemented");
-                    break;
+                default:
+                    throw new ArgumentException($"Rune {rune} stop does not exist.");
             }
         }
 
@@ -253,10 +268,6 @@ namespace RuneRogue.Core
                     {
                         _console.Print(_horizontalOffset + 72, descriptionOffset + _verticalOffset + 2 * i, "ACTIVE", Colors.TextHeading);
                     }
-                    else
-                    {
-                        //_console.Print(_horizontalOffset + 72, descriptionOffset + _verticalOffset + 2 * i, "INACTIVE", Colors.DoorBackground);
-                    }
                 }
                 else
                 {
@@ -267,65 +278,8 @@ namespace RuneRogue.Core
                 "( X ) Cancel.", Colors.Text);
         }
 
-        //public override bool ProcessKeyInput(RLKeyPress rLKeyPress, RLMouse rLMouse)
-        //{
-        //    int choiceNum = -1;
-        //    System.Console.WriteLine(rLMouse.X.ToString());
-        //    if (rLMouse.GetLeftClick())
-        //    {
-        //        if (rLMouse.X >= _horizontalOffset && rLMouse.X <= 80)
-        //        {
-        //            System.Console.WriteLine(rLMouse.Y.ToString());
-        //            if (rLMouse.Y - 4 - _verticalOffset- (_runeNames.Length - 1) * 2 - 3 == 0)
-        //            {
-        //                // exit pressed
-        //                return true;
-        //            }
-        //            if ((rLMouse.Y - 4 - _verticalOffset) % 2 == 0)
-        //            {
-        //                choiceNum = 1 + (rLMouse.Y - 4 - _verticalOffset) / 2;
-        //                if (choiceNum > _runeNames.Length || choiceNum < 1)
-        //                {
-        //                    return false;
-        //                }
-        //            }
-        //            else
-        //            {
-        //                return false;
-        //            }
-        //            System.Console.WriteLine(choiceNum.ToString());
-                     
-        //        }
-        //    }
-        //    else if (rLKeyPress != null)
-        //    {
-        //        if (rLKeyPress.Char == null)
-        //        {
-        //            return false;
-        //        }
-        //        if (rLKeyPress.Key == RLKey.X || rLKeyPress.Key == RLKey.R)
-        //        {
-        //            return true;
-        //        }
-        //        //int choiceNum;
-        //        bool isNumber = int.TryParse(rLKeyPress.Char.ToString(), out choiceNum);
-        //        if (!isNumber)
-        //        {
-        //            return false;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        return false;
-        //    }
-        //    string choice = _runeNames[choiceNum - 1];
-        //    bool success = ToggleRune(choice);
-        //    return success;
-        //}
-
         public override bool ProcessChoice(int choiceIndex)
         {
-            System.Console.WriteLine(choiceIndex.ToString());
             string choice = _runeNames[choiceIndex];
             bool success = ToggleRune(choice);
             return success;
