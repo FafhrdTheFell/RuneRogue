@@ -30,13 +30,13 @@ namespace RuneRogue.Core
         // x out of 1000
         private readonly int[] _runeDecayProbabilities =
         {
+            20,
+            500,
+            500,
+            12,
             15,
-            400,
-            400,
-            10,
-            10,
-            600,
-            10,
+            500,
+            15,
             30
         };
 
@@ -62,6 +62,7 @@ namespace RuneRogue.Core
 
             AcquireRune("Elements");
             AcquireRune("Death");
+            AcquireRune("Magic");
         }
 
 
@@ -78,14 +79,27 @@ namespace RuneRogue.Core
             }
         }
 
-        // checks decay of a non-continuous use, discrete use rune
-        public void CheckDecay(string rune)
+        // checks decay of a non-continuous use, discrete use rune.
+        // returns true if decay happened.
+        public bool CheckDecay(string rune)
         {
             if (Dice.Roll("1d1000") < _decayProbability[rune])
             {
-                Game.MessageLog.Add($"{Game.Player.Name}'s Rune of {rune} turns to dust.");
-                _runesOwned.Remove(rune);
+                if (_runesOwned.Contains("Magic"))
+                {
+                    Game.MessageLog.Add($"{Game.Player.Name}'s Rune of {rune} trembles.");
+                    Game.MessageLog.Add($"{Game.Player.Name}'s Rune of Magic turns to dust.");
+                    _runesOwned.Remove("Magic");
+                    return false;
+                }
+                else
+                {
+                    Game.MessageLog.Add($"{Game.Player.Name}'s Rune of {rune} turns to dust.");
+                    _runesOwned.Remove(rune);
+                    return true;
+                }
             }
+            return false;
         }
 
         // check decay of all active runes
@@ -94,9 +108,8 @@ namespace RuneRogue.Core
             List<string> deactivate = new List<string>();
             foreach (string rune in _runesActive)
             {
-                if (Dice.Roll("1d1000") < _decayProbability[rune])
+                if (CheckDecay(rune))
                 {
-                    Game.MessageLog.Add($"{Game.Player.Name}'s Rune of {rune} turns to dust.");
                     deactivate.Add(rune);
                 }
             }
@@ -132,6 +145,11 @@ namespace RuneRogue.Core
                     Game.CurrentSecondary = Game.TargetingSystem;
                     Game.TargetingSystem.InitializeNewTarget("ball", "Death", 8, 5);
                     Game.MessageLog.Add("Select your target.");
+                    return false;
+                }
+                else if (rune == "Magic")
+                {
+                    Game.MessageLog.Add("The Rune of Magic cannot be activated.");
                     return false;
                 }
 

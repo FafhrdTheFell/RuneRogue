@@ -92,7 +92,7 @@ namespace RuneRogue.Behaviors
                     {
                         commandSystem.MoveMonster(monster, dungeonMap.GetCell(monster.X, monster.Y + dy));
                     }
-                    else if (dy == 0)
+                    else
                     {
                         commandSystem.MoveMonster(monster, dungeonMap.GetCell(monster.X + dx, monster.Y));
                     }

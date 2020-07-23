@@ -145,15 +145,18 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Cheepicus_14x14.png">
+    <Content Include="Resources\Cheepicus_14x14.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Cheepicus_16x16.png">
+    <Content Include="Resources\Cheepicus_16x16.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="Resources\Monsters.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Content Include="Resources\Talryth_square_15x15.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="terminal8x8.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -30,6 +30,7 @@ namespace RuneRogue.Core
         private bool _highImpactAttack;
         private bool _senseThoughts;
         private bool _undead;
+        private bool _invisible;
 
 
 
@@ -175,6 +176,11 @@ namespace RuneRogue.Core
             {
                 _speed = value;
             }
+        }
+        public bool IsInvisible
+        {
+            get { return _invisible; }
+            set { _invisible = value; }
         }
         public bool IsUndead
         {

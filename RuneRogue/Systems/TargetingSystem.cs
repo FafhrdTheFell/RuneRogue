@@ -63,16 +63,10 @@ namespace RuneRogue.Systems
 
         public override void DrawConsole()
         {
-            _console.Clear();
             DungeonMap dungeonMap = Game.DungeonMap;
-            
             Player player = Game.Player;
-            player.Symbol = '@';
 
-
-            // all of this logic -- except monster visibility -- should have been in TargetCells()
-            // can you target a wall?
-
+            _console.Clear();
             dungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
             dungeonMap.Draw(_console, _nullConsole);
             player.Draw(_console, dungeonMap);
@@ -195,7 +189,7 @@ namespace RuneRogue.Systems
                 {
                     _console.Clear();
                     DungeonMap dungeonMap = Game.DungeonMap;
-                    dungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
+                    //dungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
                     dungeonMap.Draw(_console, _nullConsole);
                     DoEffectOnTarget();
                     return true;
@@ -241,8 +235,6 @@ namespace RuneRogue.Systems
 
             List<Cell> cellsTargeted = new List<Cell>();
 
-            dungeonMap.ComputeFov(_currentTarget.X, _currentTarget.Y, _radius + 1, true);
-
             if (_projectileType == "line")
             {
                 cellsTargeted = dungeonMap.GetCellsAlongLine(_playerPosition.X, _playerPosition.Y,
@@ -253,10 +245,12 @@ namespace RuneRogue.Systems
             }
             else if (_projectileType == "ball")
             {
-                
+                FieldOfView targetFOV = new FieldOfView(dungeonMap);
+                targetFOV.ComputeFov(_currentTarget.X, _currentTarget.Y, _radius + 1, true);
+
                 foreach (Cell cell in dungeonMap.GetCellsInRadius(_currentTarget.X, _currentTarget.Y, _radius))
                 {
-                    if (dungeonMap.IsInFov(cell.X, cell.Y))
+                    if (targetFOV.IsInFov(cell.X, cell.Y))
                     {
                         cellsTargeted.Add(cell);
                     }
@@ -270,7 +264,7 @@ namespace RuneRogue.Systems
             {
                 throw new ArgumentException("projectiletype TargetCells not implemented.");
             }
-            dungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
+            //dungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
             
             return cellsTargeted;
 
@@ -329,6 +323,11 @@ namespace RuneRogue.Systems
             {
                 foreach (Actor target in TargetActors())
                 {
+                    if (target.IsUndead)
+                    {
+                        attackMessage.AppendFormat("{0} is immune to the poisonous vapors. ", target.Name);
+                        continue;
+                    }
                     Poison poison = new Poison();
                     poison.Target = target;
                     int totalDamage = Dice.Roll("4d10");

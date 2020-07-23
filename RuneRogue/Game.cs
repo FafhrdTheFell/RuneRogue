@@ -15,33 +15,28 @@ namespace RuneRogue
     {
         // The screen height and width are in number of tiles
         //private static readonly int _screenWidth = 100;
-        private static readonly int _screenWidth = 120;
-        private static readonly int _screenHeight = 70;
+        private static int _screenWidth = 120;
+        private static int _screenHeight = 70;
         private static RLRootConsole _rootConsole;
 
         // The map console takes up most of the screen and is where the map will be drawn
         //private static readonly int _mapWidth = 80;
         //private static readonly int _mapHeight = 48;
-        private static readonly int _mapWidth = 100;
-        private static readonly int _mapHeight = 56;
+        private static int _mapWidth = 100;
+        private static int _mapHeight = 56;
         private static RLConsole _mapConsole;
 
         // Below the map console is the message console which displays attack rolls and other information
         //private static readonly int _messageWidth = 80;
         //private static readonly int _messageHeight = 11;
-        private static readonly int _messageWidth = 100;
-        private static readonly int _messageHeight = 14;
+        private static int _messageWidth = 100;
+        private static int _messageHeight = 14;
         private static RLConsole _messageConsole;
 
         // The stat console is to the right of the map and display player and monster stats
-        private static readonly int _statWidth = 20;
-        private static readonly int _statHeight = 70;
+        private static int _statWidth = 22;
+        private static int _statHeight = 70;
         private static RLConsole _statConsole;
-
-        // Above the map is the inventory console which shows the players equipment, abilities, and items
-        private static readonly int _inventoryWidth = 80;
-        private static readonly int _inventoryHeight = 11;
-        private static RLConsole _inventoryConsole;
 
         private static InputSystem _inputSystem;
         private static bool _quittingGame;
@@ -121,9 +116,12 @@ namespace RuneRogue
 
             // This must be the exact name of the bitmap font file we are using or it will error.
             // string fontFileName = "terminal8x8.png";
-            string fontFileName = "Cheepicus_14x14.png";
-            int fontHeight = 14;
-            int fontWidth = 14;
+            //string fontFileName = "Cheepicus_14x14.png";
+            //int fontHeight = 14;
+            //int fontWidth = 14;
+            string fontFileName = "Resources/Talryth_square_15x15.png";
+            int fontHeight = 15;
+            int fontWidth = 15;
 
 
             // The title will appear at the top of the console window along with the seed used to generate the level
@@ -136,14 +134,32 @@ namespace RuneRogue
 
             // Tell RLNet to use the bitmap font that we specified and that each tile is 8 x 8 pixels
             // _rootConsole = new RLRootConsole(fontFileName, _screenWidth, _screenHeight, 8, 8, 1f, consoleTitle);
-            _rootConsole = new RLRootConsole(fontFileName, _screenWidth, _screenHeight, fontHeight, fontWidth, 1f, consoleTitle);
-            _rootConsole.SetWindowState(RLWindowState.Maximized);
+            RLSettings rLSettings = new RLSettings
+            {
+                StartWindowState = RLWindowState.Fullscreen,
+                Height = _screenHeight,
+                Width = _screenWidth,
+                CharHeight = fontHeight,
+                CharWidth = fontWidth,
+                ResizeType = RLResizeType.ResizeCells,
+                Title = consoleTitle,
+                BitmapFile = fontFileName
+            };
+            //_rootConsole = new RLRootConsole(fontFileName, _screenWidth, _screenHeight, fontHeight, fontWidth, 1f, consoleTitle);
+            _rootConsole = new RLRootConsole(rLSettings);
+            //_rootConsole.SetWindowState(RLWindowState.Fullscreen);
+
+            _screenWidth = _rootConsole.Width;
+            _screenHeight = _rootConsole.Height;
+            _mapHeight = _rootConsole.Height - _messageHeight;
+            _mapWidth = _rootConsole.Width - _statWidth;
+            _messageWidth = _screenWidth;
+            _statHeight = _rootConsole.Height;
 
             // Initialize the sub consoles that we will Blit to the root console
             _mapConsole = new RLConsole(_mapWidth, _mapHeight);
             _messageConsole = new RLConsole(_messageWidth, _messageHeight);
             _statConsole = new RLConsole(_statWidth, _statHeight);
-            _inventoryConsole = new RLConsole(_inventoryWidth, _inventoryHeight);
 
             AutoMovePlayer = false;
             AcceleratePlayer = false;
@@ -179,8 +195,6 @@ namespace RuneRogue
             _rootConsole.Render += OnRootConsoleRender;
 
             // Set background color and text for each console so that we can verify they are in the correct positions
-            _inventoryConsole.SetBackColor(0, 0, _inventoryWidth, _inventoryHeight, Swatch.DbWood);
-            _inventoryConsole.Print(1, 1, "Inventory", Colors.TextHeading);
             _messageConsole.SetBackColor(0, 0, _messageWidth, _messageHeight, Swatch.DbDeepWater);
             _messageConsole.Print(1, 1, "Messages", Colors.TextHeading);
 
