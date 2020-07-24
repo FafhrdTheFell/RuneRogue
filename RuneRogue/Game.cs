@@ -80,6 +80,10 @@ namespace RuneRogue
             get { return _mapWidth; }
         }
 
+        public static int StatWidth
+        {
+            get { return _statWidth; }
+        }
 
         // accelerate player continues move in straight line automatically
         // automoveplayer moves to selected point using pathfinding
@@ -175,7 +179,7 @@ namespace RuneRogue
 
             RuneSystem = new Runes();
             CurrentSecondary = RuneSystem;
-            SecondaryConsoleActive = true;
+            SecondaryConsoleActive = false;
 
             MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, mapLevel);
             DungeonMap = mapGenerator.CreateMap();
@@ -184,8 +188,6 @@ namespace RuneRogue
             CommandSystem = new CommandSystem();
 
             TargetingSystem = new TargetingSystem();
-            CurrentSecondary = RuneSystem;
-            _renderRequired = true;
 
 
             // Set up a handler for RLNET's Update event

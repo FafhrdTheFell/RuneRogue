@@ -193,14 +193,14 @@
   },
   {
     "kind": "bonehemoth",
-    "attack": "19",
+    "attack": "20",
     "attackChance": "25D4",
     "awareness": 10,
     "color": "DbOldStone",
-    "defense": "4D4k3",
+    "defense": "5D5k3",
     "defenseChance": "12D3",
     "gold": "8D5",
-    "maxHealth": "3D5k2",
+    "maxHealth": "3D6k2",
     "name": "Bonehemoth",
     "speed": 14,
     "symbol": "H",
@@ -301,7 +301,7 @@
   {
     "kind": "willowisp",
     "attack": "6",
-    "attackChance": "25D2",
+    "attackChance": "25D4",
     "awareness": 10,
     "color": "DbLight",
     "defense": "1D2",
@@ -314,12 +314,13 @@
     "numberAppearing": "2d3-1",
     "minLevel": 2,
     "maxLevel": 14,
-    "saLifedrainOnHit": true
+    "saLifedrainOnHit": true,
+    "isUndead": true
   },
   {
     "kind": "spectralhound",
     "attack": "10",
-    "attackChance": "20D4",
+    "attackChance": "27D4",
     "awareness": 10,
     "color": "DbGrass",
     "defense": "2D2",
@@ -333,6 +334,7 @@
     "minLevel": 3,
     "maxLevel": 12,
     "saLifedrainOnDamage": true,
+    "saLifedrainOnHit": true,
     "isUndead": true
   },
   {

@@ -58,11 +58,12 @@ namespace RuneRogue.Core
             for (int i = 0; i < _runeNames.Length; i++)
             {
                 _decayProbability.Add(_runeNames[i], _runeDecayProbabilities[i]);
-            }    
+            }
 
-            AcquireRune("Elements");
-            AcquireRune("Death");
-            AcquireRune("Magic");
+            //AcquireRune("Elements");
+            //AcquireRune("Death");
+            //AcquireRune("Iron");
+            //AcquireRune("Magic");
         }
 
 
