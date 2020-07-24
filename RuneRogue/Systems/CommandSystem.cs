@@ -26,57 +26,64 @@ namespace RuneRogue.Systems
             int x = Game.Player.X;
             int y = Game.Player.Y;
 
-            switch (direction)
+            // ideally would use Point code
+            x += DirectionToCoordinates(direction)[0];
+            y += DirectionToCoordinates(direction)[1];
+            if (x == Game.Player.X && y == Game.Player.Y)
             {
-                case Direction.Up:
-                    {
-                        y = Game.Player.Y - 1;
-                        break;
-                    }
-                case Direction.Down:
-                    {
-                        y = Game.Player.Y + 1;
-                        break;
-                    }
-                case Direction.Left:
-                    {
-                        x = Game.Player.X - 1;
-                        break;
-                    }
-                case Direction.Right:
-                    {
-                        x = Game.Player.X + 1;
-                        break;
-                    }
-                case Direction.UpLeft:
-                    {
-                        x = Game.Player.X - 1;
-                        y = Game.Player.Y - 1;
-                        break;
-                    }
-                case Direction.UpRight:
-                    {
-                        x = Game.Player.X + 1;
-                        y = Game.Player.Y - 1;
-                        break;
-                    }
-                case Direction.DownLeft:
-                    {
-                        x = Game.Player.X - 1;
-                        y = Game.Player.Y + 1;
-                        break;
-                    }
-                case Direction.DownRight:
-                    {
-                        x = Game.Player.X + 1;
-                        y = Game.Player.Y + 1;
-                        break;
-                    }
-                default:
-                    {
-                        return false;
-                    }
+                return false;
             }
+            //switch (direction)
+            //{
+            //    case Direction.Up:
+            //        {
+            //            y = Game.Player.Y - 1;
+            //            break;
+            //        }
+            //    case Direction.Down:
+            //        {
+            //            y = Game.Player.Y + 1;
+            //            break;
+            //        }
+            //    case Direction.Left:
+            //        {
+            //            x = Game.Player.X - 1;
+            //            break;
+            //        }
+            //    case Direction.Right:
+            //        {
+            //            x = Game.Player.X + 1;
+            //            break;
+            //        }
+            //    case Direction.UpLeft:
+            //        {
+            //            x = Game.Player.X - 1;
+            //            y = Game.Player.Y - 1;
+            //            break;
+            //        }
+            //    case Direction.UpRight:
+            //        {
+            //            x = Game.Player.X + 1;
+            //            y = Game.Player.Y - 1;
+            //            break;
+            //        }
+            //    case Direction.DownLeft:
+            //        {
+            //            x = Game.Player.X - 1;
+            //            y = Game.Player.Y + 1;
+            //            break;
+            //        }
+            //    case Direction.DownRight:
+            //        {
+            //            x = Game.Player.X + 1;
+            //            y = Game.Player.Y + 1;
+            //            break;
+            //        }
+            //    default:
+            //        {
+            //            return false;
+            //        }
+            //}
 
             if (Game.DungeonMap.SetActorPosition(Game.Player, x, y))
             {
@@ -101,7 +108,67 @@ namespace RuneRogue.Systems
             return false;
         }
 
-        public bool AutoMovePlayer(int targetX, int targetY)
+        public int[] DirectionToCoordinates(Direction direction)
+        {
+            int dx = 0;
+            int dy = 0;
+
+            switch (direction)
+            {
+                case Direction.Up:
+                    {
+                        dy -= 1;
+                        break;
+                    }
+                case Direction.Down:
+                    {
+                        dy += 1;
+                        break;
+                    }
+                case Direction.Left:
+                    {
+                        dx -= 1;
+                        break;
+                    }
+                case Direction.Right:
+                    {
+                        dx += 1;
+                        break;
+                    }
+                case Direction.UpLeft:
+                    {
+                        dx -= 1;
+                        dy -= 1;
+                        break;
+                    }
+                case Direction.UpRight:
+                    {
+                        dx += 1;
+                        dy -= 1;
+                        break;
+                    }
+                case Direction.DownLeft:
+                    {
+                        dx -= 1;
+                        dy += 1;
+                        break;
+                    }
+                case Direction.DownRight:
+                    {
+                        dx += 1;
+                        dy += 1;
+                        break;
+                    }
+            }
+            return new int[]
+            {
+                dx,
+                dy
+            };
+        }
+
+
+            public bool AutoMovePlayer(int targetX, int targetY)
         {
             DungeonMap dungeonMap = Game.DungeonMap;
             Player player = Game.Player;

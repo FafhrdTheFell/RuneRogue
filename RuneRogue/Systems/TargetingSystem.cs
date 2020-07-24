@@ -1,4 +1,5 @@
 ﻿using Microsoft.SqlServer.Server;
+using OpenTK.Input;
 using RLNET;
 using RogueSharp;
 using RogueSharp.DiceNotation;
@@ -7,6 +8,7 @@ using RuneRogue.Effects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization.Formatters;
 using System.Text;
 
 namespace RuneRogue.Systems
@@ -74,23 +76,72 @@ namespace RuneRogue.Systems
             {
                 return;
             }
-            
+            DrawOnTargetedCells("targeting");
+        }
+
+        public void DrawOnTargetedCells(string colorPattern)
+        {
+            if (colorPattern != "targeting" &&
+                colorPattern != "Elements" &&
+                colorPattern != "Death")
+            {
+                throw new ArgumentException($"Invalid colorPattern {colorPattern}.");
+            }
+            DungeonMap dungeonMap = Game.DungeonMap;
+            Player player = Game.Player;
+
             List<Monster> monstersSeen = dungeonMap.MonstersInFOV();
 
-            RLColor highlightColor;
+            RLColor highlightColor = Colors.Gold;
             foreach (Cell point in TargetCells())
             {
                 if (!dungeonMap.IsInFov(point.X, point.Y))
                 {
                     continue;
                 }
-                if (point.X == _currentTarget.X && point.Y == _currentTarget.Y)
+                if (colorPattern == "targeting")
                 {
-                    highlightColor = Colors.FloorTarget;
+                    if (point.X == _currentTarget.X && point.Y == _currentTarget.Y)
+                    {
+                        highlightColor = Colors.FloorTarget;
+                    }
+                    else
+                    {
+                        highlightColor = Colors.FloorHighlight;
+                    }
                 }
-                else
+                else if (colorPattern == "Death")
                 {
-                    highlightColor = Colors.FloorHighlight;
+                    switch (Dice.Roll("1d3"))
+                    {
+                        case 1:
+                            highlightColor = Colors.Poisoncloud1;
+                            break;
+                        case 2:
+                            highlightColor = Colors.Poisoncloud2;
+                            break;
+                        case 3:
+                            highlightColor = Colors.Poisoncloud3;
+                            break;
+                    }   
+                }
+                else if (colorPattern == "Elements")
+                {
+                    switch (Dice.Roll("1d4"))
+                    {
+                        case 1:
+                            highlightColor = Swatch.DbDeepWater;
+                            break;
+                        case 2:
+                            highlightColor = Colors.Gold;
+                            break;
+                        case 3:
+                            highlightColor = Swatch.DbSky;
+                            break;
+                        case 4:
+                            highlightColor = Swatch.DbBlood;
+                            break;
+                    }
                 }
                 if (point.X == player.X && point.Y == player.Y)
                 {
@@ -220,6 +271,25 @@ namespace RuneRogue.Systems
                 }
                 return false;
             }
+            if (rLKeyPress != null)
+            {
+                InputSystem _inputSystem = new InputSystem();
+                Direction direction = _inputSystem.MoveDirection(rLKeyPress);
+                if (direction != Direction.None)
+                {
+                    _currentTarget.X += Game.CommandSystem.DirectionToCoordinates(direction)[0];
+                    _currentTarget.Y += Game.CommandSystem.DirectionToCoordinates(direction)[1];
+                }
+                if (rLKeyPress.Key == RLKey.Enter)
+                {
+                    _console.Clear();
+                    DungeonMap dungeonMap = Game.DungeonMap;
+                    //dungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
+                    dungeonMap.Draw(_console, _nullConsole);
+                    DoEffectOnTarget();
+                    return true;
+                }
+            }
             return false;
         }
 
@@ -231,7 +301,6 @@ namespace RuneRogue.Systems
         public List<Cell> TargetCells()
         {
             DungeonMap dungeonMap = Game.DungeonMap;
-            Player player = Game.Player;
 
             List<Cell> cellsTargeted = new List<Cell>();
 
@@ -264,11 +333,8 @@ namespace RuneRogue.Systems
             {
                 throw new ArgumentException("projectiletype TargetCells not implemented.");
             }
-            //dungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
             
             return cellsTargeted;
-
-
         }
 
         public List<Actor> TargetActors()
@@ -299,30 +365,53 @@ namespace RuneRogue.Systems
             StringBuilder attackMessage = new StringBuilder();
             if (_effect == "Elements")
             {
-                int damage = 0;
+                for (int i = 0; i < 8; i++)
+                {
+                    DrawOnTargetedCells(_effect);
+                    for (int j = 0; j < 10; j++)
+                    {
+                        Game.DrawRoot();
+                    }
+                }
+
+                int damage;
                 foreach (Actor target in TargetActors())
                 {
-                    damage = Dice.Roll("2d20");
-                    string element = (string)Game.RandomArrayValue(_elements);
-                    target.Health -= damage;
-
-                    attackMessage.AppendFormat("{0} is blasted by {1}.", target.Name, element);
-                    if (target.Health > 0)
+                    for (int i = 0; i < 4; i++)
                     {
-                        attackMessage.AppendFormat(" {0} takes {1} damage. ", target.Name, damage);
-                    }
-                    else
-                    {
-                        attackMessage.AppendFormat(" {0} takes {1} damage, killing it. ", target.Name, damage);
-                        CommandSystem.ResolveDeath(target, attackMessage);
+                        damage = Dice.Roll("1d10");
+                        string element = (string)Game.RandomArrayValue(_elements);
+                        target.Health -= damage;
 
+                        attackMessage.AppendFormat("{0} is blasted by {1}.", target.Name, element);
+                        if (target.Health > 0)
+                        {
+                            attackMessage.AppendFormat(" {0} takes {1} damage. ", target.Name, damage);
+                        }
+                        else
+                        {
+                            attackMessage.AppendFormat(" {0} takes {1} damage, killing it. ", target.Name, damage);
+                            CommandSystem.ResolveDeath(target, attackMessage);
+                            break;
+                        }
                     }
                 }
             }
             if (_effect == "Death")
             {
+                // not sure how to do the graphics timing better than these loops
+                for (int i = 0; i < 8; i++)
+                {
+                    DrawOnTargetedCells(_effect);
+                    for (int j = 0; j < 10; j++)
+                    {
+                        Game.DrawRoot();
+                    }
+                }
+                
                 foreach (Actor target in TargetActors())
                 {
+                    
                     if (target.IsUndead)
                     {
                         attackMessage.AppendFormat("{0} is immune to the poisonous vapors. ", target.Name);

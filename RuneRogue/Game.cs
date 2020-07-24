@@ -450,6 +450,12 @@ namespace RuneRogue
             }
         }
 
+        public static void DrawRoot()
+        {
+            RLConsole.Blit(CurrentSecondary.Console, 0, 0, _mapWidth, _mapHeight, _rootConsole, 0, 0);
+            _rootConsole.Draw();
+        }
+
         // Event handler for RLNET's Render event
         private static void OnRootConsoleRender(object sender, UpdateEventArgs e)
         {

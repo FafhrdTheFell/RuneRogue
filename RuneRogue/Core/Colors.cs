@@ -44,6 +44,10 @@ namespace RuneRogue.Core
         public static RLColor DragonColor = Swatch.DbBlood;
         public static RLColor BoneClawsColor = Swatch.DbOldStone;
 
+        public static RLColor Poisoncloud1 = Swatch.DbVegetation;
+        public static RLColor Poisoncloud2 = Swatch.DbGrass;
+        public static RLColor Poisoncloud3 = Swatch.DbDark;
+
         public static RLColor ColorLookup(string color)
         {
             switch (color)

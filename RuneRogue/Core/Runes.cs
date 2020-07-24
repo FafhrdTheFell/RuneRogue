@@ -125,6 +125,12 @@ namespace RuneRogue.Core
         {
             if (_runesOwned.Contains(rune) && !(_runesActive.Contains(rune)))
             {
+                if (rune == "Magic")
+                {
+                    Game.MessageLog.Add("The Rune of Magic cannot be activated.");
+                    return false;
+                }
+
                 Game.MessageLog.Add($"{Game.Player.Name} channels Rune of {rune}.");
 
                 if (rune == "Elements")
@@ -145,11 +151,6 @@ namespace RuneRogue.Core
                     Game.CurrentSecondary = Game.TargetingSystem;
                     Game.TargetingSystem.InitializeNewTarget("ball", "Death", 8, 5);
                     Game.MessageLog.Add("Select your target.");
-                    return false;
-                }
-                else if (rune == "Magic")
-                {
-                    Game.MessageLog.Add("The Rune of Magic cannot be activated.");
                     return false;
                 }
 
