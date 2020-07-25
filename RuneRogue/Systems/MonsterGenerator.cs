@@ -299,12 +299,14 @@ namespace RuneRogue.Systems
             monster.NumberAppearing = _monsterManual[page].NumberAppearing;
             monster.MinLevel = _monsterManual[page].MinLevel;
             monster.MaxLevel = _monsterManual[page].MaxLevel;
+            monster.SAFerocious = _monsterManual[page].SAFerocious;
             monster.SALifedrainOnHit = _monsterManual[page].SALifedrainOnHit;
             monster.SALifedrainOnDamage = _monsterManual[page].SALifedrainOnDamage; 
             monster.SARegeneration = _monsterManual[page].SARegeneration;
             monster.SAVampiric = _monsterManual[page].SAVampiric;
             monster.SADoppelganger = _monsterManual[page].SADoppelganger;
             monster.SAHighImpact = _monsterManual[page].SAHighImpact;
+            monster.IsUndead = _monsterManual[page].IsUndead;
             monster.FollowerKinds = _monsterManual[page].FollowerKinds;
             monster.FollowerNumberAppearing = _monsterManual[page].FollowerNumberAppearing;
             monster.FollowerProbability = _monsterManual[page].FollowerProbability;

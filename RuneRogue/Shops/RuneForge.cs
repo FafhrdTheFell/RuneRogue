@@ -23,7 +23,7 @@ namespace RuneRogue.Shops
             _costs = new List<int>();
             _targets = new List<string>();
 
-            _runeCost = RoundFive(40.0 * DungeonLevelFactor(Game.mapLevel));
+            _runeCost = RoundFive(55.0 * DungeonLevelFactor(Game.mapLevel));
             _storeDescription = "This forge will let you work a rune, but you will have to pay for the orichalcum bars yourself.";
 
             UpdateInventory();

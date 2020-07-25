@@ -67,10 +67,10 @@ namespace RuneRogue.Shops
                 newDefense -= 4;
             }
             Costs[0] = RoundFive(1.5 * Math.Pow(newAttack, 1.35) * DungeonLevelFactor(Game.mapLevel));
-            Costs[1] = RoundFive(3.0 * Math.Pow(newDefense, 1.65) * DungeonLevelFactor(Game.mapLevel));
+            Costs[1] = RoundFive(2.5 * Math.Pow(newDefense, 1.55) * DungeonLevelFactor(Game.mapLevel));
             if (Game.Player.Health == Game.Player.MaxHealth)
             {
-                Costs[2] = Convert.ToInt32(5.0 * DungeonLevelFactor(Game.mapLevel));
+                Costs[2] = Convert.ToInt32(8.0 * DungeonLevelFactor(Game.mapLevel));
             }
             else
             {

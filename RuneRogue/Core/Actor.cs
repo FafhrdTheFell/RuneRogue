@@ -1,5 +1,6 @@
 ﻿using RLNET;
 using RogueSharp;
+using RogueSharp.DiceNotation;
 using RuneRogue.Interfaces;
 using System;
 using System.ComponentModel;
@@ -31,6 +32,7 @@ namespace RuneRogue.Core
         private bool _senseThoughts;
         private bool _undead;
         private bool _invisible;
+        private bool _ferocious;
 
 
 
@@ -187,6 +189,11 @@ namespace RuneRogue.Core
             get { return _undead; }
             set { _undead = value; }
         }
+        public bool SAFerocious
+        {
+            get { return _ferocious; }
+            set { _ferocious = value; }
+        }
         public bool SALifedrainOnHit
         {
             get { return _lifedrainOnHit; }
@@ -288,6 +295,14 @@ namespace RuneRogue.Core
         {
             get
             {
+                if (SAFerocious)
+                    switch (Dice.Roll("1d2"))
+                    {
+                        case 1:
+                            return Speed;
+                        case 2:
+                            return Speed / 3;
+                    }
                 return Speed;
             }
         }

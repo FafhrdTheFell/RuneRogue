@@ -228,48 +228,20 @@ namespace RuneRogue.Systems
         public override bool ProcessInput(RLKeyPress rLKeyPress, RLMouse rLMouse)
         {
             Player player = Game.Player;
-            if (rLMouse.GetLeftClick())
+            Point _newTarget = new Point
             {
-                Point _newTarget = new Point
+                X = _currentTarget.X,
+                Y = _currentTarget.Y
+            };
+            bool leftClick = rLMouse.GetLeftClick();
+            bool enterPressed = false;
+            if (leftClick)
+            {
+                _newTarget = new Point
                 {
                     X = rLMouse.X,
                     Y = rLMouse.Y
                 };
-                bool playerTargeted = (_newTarget.X == player.X && _newTarget.Y == player.Y);
-                if (_newTarget == _currentTarget && !playerTargeted)
-                {
-                    _console.Clear();
-                    DungeonMap dungeonMap = Game.DungeonMap;
-                    //dungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
-                    dungeonMap.Draw(_console, _nullConsole);
-                    DoEffectOnTarget();
-                    return true;
-                }
-                if (Distance(_playerPosition, _newTarget) > _range)
-                {
-                    Game.MessageLog.Add("That target is too far away.");
-                    _currentTarget = _playerPosition;
-                    return false;
-                }
-                Game.DungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
-                if (!Game.DungeonMap.IsInFov(_newTarget.X, _newTarget.Y) || 
-                    !Game.DungeonMap.IsTransparent(_newTarget.X, _newTarget.Y))
-                {
-                    Game.MessageLog.Add("You cannot see that target.");
-                    _currentTarget = _playerPosition;
-                    return false;
-                }
-                if (playerTargeted)
-                {
-                    Game.MessageLog.Add("You cannot target yourself.");
-                    _currentTarget = _playerPosition;
-                }
-                else
-                {
-                    _currentTarget = _newTarget;
-                    Game.MessageLog.Add("Target selected. Click again to finalize.");
-                }
-                return false;
             }
             if (rLKeyPress != null)
             {
@@ -277,18 +249,50 @@ namespace RuneRogue.Systems
                 Direction direction = _inputSystem.MoveDirection(rLKeyPress);
                 if (direction != Direction.None)
                 {
-                    _currentTarget.X += Game.CommandSystem.DirectionToCoordinates(direction)[0];
-                    _currentTarget.Y += Game.CommandSystem.DirectionToCoordinates(direction)[1];
+                    _newTarget.X += Game.CommandSystem.DirectionToCoordinates(direction)[0];
+                    _newTarget.Y += Game.CommandSystem.DirectionToCoordinates(direction)[1];
                 }
                 if (rLKeyPress.Key == RLKey.Enter)
                 {
-                    _console.Clear();
-                    DungeonMap dungeonMap = Game.DungeonMap;
-                    //dungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
-                    dungeonMap.Draw(_console, _nullConsole);
-                    DoEffectOnTarget();
-                    return true;
+                    enterPressed = true;
                 }
+            }
+            bool playerTargeted = (_newTarget.X == player.X && _newTarget.Y == player.Y);
+            if (_newTarget == _currentTarget && !playerTargeted &&
+                (leftClick || enterPressed))
+            {
+                _console.Clear();
+                DungeonMap dungeonMap = Game.DungeonMap;
+                //dungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
+                dungeonMap.Draw(_console, _nullConsole);
+                DoEffectOnTarget();
+                return true;
+            }
+            else if (_newTarget == _currentTarget && playerTargeted &&
+                (leftClick || enterPressed))
+            {
+                Game.MessageLog.Add("You cannot target yourself.");
+            }
+            if (_newTarget.X < 1 || _newTarget.X > Game.MapWidth ||
+                _newTarget.Y < 1 || _newTarget.Y > Game.MapHeight)
+            {
+                return false;
+            }
+            if (Distance(_playerPosition, _newTarget) > _range)
+            {
+                Game.MessageLog.Add("That target would be too far away.");
+                return false;
+            }
+            Game.DungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
+            if (!Game.DungeonMap.IsInFov(_newTarget.X, _newTarget.Y) ||
+                !Game.DungeonMap.IsTransparent(_newTarget.X, _newTarget.Y))
+            {
+                Game.MessageLog.Add("You would not be able to see that target.");
+                return false;
+            }
+            else
+            {
+                _currentTarget = _newTarget;
             }
             return false;
         }
@@ -411,21 +415,22 @@ namespace RuneRogue.Systems
                 
                 foreach (Actor target in TargetActors())
                 {
-                    
+                    attackMessage.AppendFormat("{0} is immersed in poisonous vapors. ", target.Name);
+
                     if (target.IsUndead)
                     {
                         attackMessage.AppendFormat("{0} is immune to the poisonous vapors. ", target.Name);
-                        continue;
                     }
-                    Poison poison = new Poison();
-                    poison.Target = target;
-                    int totalDamage = Dice.Roll("4d10");
-                    poison.Magnitude = Dice.Roll("1d3"); // damage
-                    poison.Speed = poison.Magnitude * 2 + Dice.Roll("2d4"); // speed of activation
-                    poison.Duration = totalDamage / poison.Magnitude; // # of activations
-                    Game.SchedulingSystem.Add(poison);
-
-                    attackMessage.AppendFormat("{0} is immersed in poisonous vapors. ", target.Name);
+                    else
+                    {
+                        Poison poison = new Poison();
+                        poison.Target = target;
+                        int totalDamage = Dice.Roll("4d10");
+                        poison.Magnitude = Dice.Roll("1d3"); // damage
+                        poison.Speed = poison.Magnitude * 2 + Dice.Roll("2d4"); // speed of activation
+                        poison.Duration = totalDamage / poison.Magnitude; // # of activations
+                        Game.SchedulingSystem.Add(poison);
+                    }
                 }
             }
             if (!string.IsNullOrWhiteSpace(attackMessage.ToString()))
