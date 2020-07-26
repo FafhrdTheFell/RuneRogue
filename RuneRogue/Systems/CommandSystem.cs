@@ -33,60 +33,14 @@ namespace RuneRogue.Systems
             {
                 return false;
             }
-            //switch (direction)
-            //{
-            //    case Direction.Up:
-            //        {
-            //            y = Game.Player.Y - 1;
-            //            break;
-            //        }
-            //    case Direction.Down:
-            //        {
-            //            y = Game.Player.Y + 1;
-            //            break;
-            //        }
-            //    case Direction.Left:
-            //        {
-            //            x = Game.Player.X - 1;
-            //            break;
-            //        }
-            //    case Direction.Right:
-            //        {
-            //            x = Game.Player.X + 1;
-            //            break;
-            //        }
-            //    case Direction.UpLeft:
-            //        {
-            //            x = Game.Player.X - 1;
-            //            y = Game.Player.Y - 1;
-            //            break;
-            //        }
-            //    case Direction.UpRight:
-            //        {
-            //            x = Game.Player.X + 1;
-            //            y = Game.Player.Y - 1;
-            //            break;
-            //        }
-            //    case Direction.DownLeft:
-            //        {
-            //            x = Game.Player.X - 1;
-            //            y = Game.Player.Y + 1;
-            //            break;
-            //        }
-            //    case Direction.DownRight:
-            //        {
-            //            x = Game.Player.X + 1;
-            //            y = Game.Player.Y + 1;
-            //            break;
-            //        }
-            //    default:
-            //        {
-            //            return false;
-            //        }
-            //}
 
             if (Game.DungeonMap.SetActorPosition(Game.Player, x, y))
             {
+                // autopickup
+                if (Game.DungeonMap.GetItemAt(x, y) != null)
+                {
+                    PickupItemPlayer();
+                }
                 return true;
             }
 
