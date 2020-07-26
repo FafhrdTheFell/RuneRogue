@@ -301,7 +301,7 @@ namespace RuneRogue.Core
                         case 1:
                             return Speed;
                         case 2:
-                            return Speed / 3;
+                            return Speed / 2;
                     }
                 return Speed;
             }
