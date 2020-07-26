@@ -33,6 +33,7 @@ namespace RuneRogue.Core
         private bool _undead;
         private bool _invisible;
         private bool _ferocious;
+        private bool _venomous;
 
 
 
@@ -216,7 +217,11 @@ namespace RuneRogue.Core
             get { return _vampiric; }
             set { _vampiric = value; }
         }
-
+        public bool SAVenomous
+        {
+            get { return _venomous; }
+            set { _venomous = value; }
+        }
         public bool SADoppelganger
         {
             get { return _doppelganger; }

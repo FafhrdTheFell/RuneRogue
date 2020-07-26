@@ -197,11 +197,14 @@ namespace RuneRogue.Systems
                 }
             }
             bool isUnique = monsterKinds.Distinct().Count() == monsterKinds.Count();
-            if (!isUnique)
+            if (isUnique)
             {
-                throw new MonsterDataFormatInvalid($"Monster kinds values not unique: {monsterKinds.ToArray().ToString()}.");
+                _monsterKinds = monsterKinds.ToArray();
             }
-            _monsterKinds = monsterKinds.ToArray();
+            else
+            {
+                throw new MonsterDataFormatInvalid($"Monster kinds values not unique: {monsterKinds.ToArray()}.");
+            }
         }
 
         // if monster = GEN, generate a level-appropriate monster list, else if
@@ -304,6 +307,7 @@ namespace RuneRogue.Systems
             monster.SALifedrainOnDamage = _monsterManual[page].SALifedrainOnDamage; 
             monster.SARegeneration = _monsterManual[page].SARegeneration;
             monster.SAVampiric = _monsterManual[page].SAVampiric;
+            monster.SAVenomous = _monsterManual[page].SAVenomous;
             monster.SADoppelganger = _monsterManual[page].SADoppelganger;
             monster.SAHighImpact = _monsterManual[page].SAHighImpact;
             monster.IsUndead = _monsterManual[page].IsUndead;

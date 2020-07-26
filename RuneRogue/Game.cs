@@ -260,6 +260,11 @@ namespace RuneRogue
             }
             else if (CommandSystem.IsPlayerTurn)
             {
+                // autopickup
+                if (DungeonMap.GetItemAt(Player.X, Player.Y) != null && DungeonMap.MonstersInFOV().Count == 0)
+                {
+                    didPlayerAct = CommandSystem.PickupItemPlayer();
+                }
                 if (AutoMovePlayer)
                 {
                     if (AutoMoveMonsterTarget != null)

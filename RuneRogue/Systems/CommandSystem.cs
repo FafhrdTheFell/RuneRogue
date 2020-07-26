@@ -36,11 +36,6 @@ namespace RuneRogue.Systems
 
             if (Game.DungeonMap.SetActorPosition(Game.Player, x, y))
             {
-                // autopickup
-                if (Game.DungeonMap.GetItemAt(x, y) != null)
-                {
-                    PickupItemPlayer();
-                }
                 return true;
             }
 
@@ -321,7 +316,7 @@ namespace RuneRogue.Systems
                 Game.AutoMovePlayer = false;
             }
 
-            bool isCritical = false;
+            bool isCritical;
             bool attackHit = ResolveAttack(attacker, defender, attackMessage, out isCritical);
 
             int damage = 0;
