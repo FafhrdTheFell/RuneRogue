@@ -71,3 +71,7 @@ RogueSharp.Docs/Help/
 
 #Necessary Dlls
 !Dlls/*
+
+# Publishing
+*.pfx
+publish/
