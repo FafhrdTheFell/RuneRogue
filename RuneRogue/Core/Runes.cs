@@ -37,7 +37,7 @@ namespace RuneRogue.Core
             15,
             500,
             15,
-            30
+            10
         };
 
         public const int BonusToAttackIron = 6;
@@ -64,6 +64,7 @@ namespace RuneRogue.Core
             //AcquireRune("Death");
             //AcquireRune("Iron");
             AcquireRune("Magic");
+            AcquireRune("Darkness");
         }
 
 
@@ -198,7 +199,8 @@ namespace RuneRogue.Core
                     Game.Player.Defense += BonusToDefenseIron;
                     break;
                 case "Darkness":
-                    Game.MessageLog.Add("not implemented");
+                    Game.MessageLog.Add($"{Game.Player.Name} fades into the shadows.");
+                    Game.Player.IsInvisible = true;
                     break;
                 //case "Law":
                 //    Game.MessageLog.Add("not implemented");
@@ -234,7 +236,8 @@ namespace RuneRogue.Core
                     Game.Player.Defense -= BonusToDefenseIron;
                     break;
                 case "Darkness":
-                    Game.MessageLog.Add("not implemented");
+                    Game.MessageLog.Add($"{Game.Player.Name} is no longer hidden by darkness.");
+                    Game.Player.IsInvisible = false;
                     break;
                 default:
                     throw new ArgumentException($"Rune {rune} stop does not exist.");

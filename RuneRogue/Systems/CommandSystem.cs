@@ -367,12 +367,14 @@ namespace RuneRogue.Systems
                 Game.AutoMovePlayer = false;
             }
 
-            bool attackHit = ResolveAttack(attacker, defender, attackMessage);
+            bool isCritical = false;
+            bool attackHit = ResolveAttack(attacker, defender, attackMessage, out isCritical);
 
             int damage = 0;
             if (attackHit)
             {
-                damage = ResolveArmor(defender, attacker, attackMessage);
+                int damageBonus = attacker.Attack * Convert.ToInt32(isCritical) / 2;
+                damage = ResolveArmor(defender, attacker, damageBonus, attackMessage);
                 if (defender == Game.Player && Game.XpOnAction)
                 {
                     Game.Player.XpHealth += damage;
@@ -399,18 +401,30 @@ namespace RuneRogue.Systems
         }
 
         // The attacker rolls based on his stats to see if he gets any hits
-        private static bool ResolveAttack(Actor attacker, Actor defender, StringBuilder attackMessage)
+        private static bool ResolveAttack(Actor attacker, Actor defender, StringBuilder attackMessage, out bool critical)
         {
             bool attackHit = false;
+            // criticals only on backstab
+            critical = false;
             int diff = attacker.AttackSkill - defender.DefenseSkill;
             if (attacker.SASenseThoughts && !defender.IsUndead)
             {
-                diff += 5;
+                diff += 4;
             }
             if (defender.SASenseThoughts && !attacker.IsUndead)
             {
-                diff -= 5;
+                diff -= 4;
             }
+            if (attacker.IsInvisible && defender is Monster)
+            {
+                Monster monster = defender as Monster;
+                if (monster.TurnsAlerted == null)
+                {
+                    attackMessage.AppendFormat("{0} looks bewildered .", monster.Name);
+                    diff += 6;
+                    critical = true;
+                }
+            }    
             double chanceDouble = Math.Exp(0.11 * Convert.ToDouble(diff)) /
                 (1 + Math.Exp(0.11 * Convert.ToDouble(diff)));
             double unadjustedChanceDouble = Math.Exp(0.11 * Convert.ToDouble(attacker.AttackSkill)) /
@@ -471,16 +485,16 @@ namespace RuneRogue.Systems
             return attackHit;
         }
 
-        private static int ResolveArmor(Actor defender, Actor attacker, StringBuilder attackMessage)
+        private static int ResolveArmor(Actor defender, Actor attacker, int damageBonus, StringBuilder attackMessage)
         {
             string attackDice;
             if (!attacker.SAHighImpact)
             {
-                attackDice = "1d" + attacker.Attack.ToString();
+                attackDice = "1d" + (attacker.Attack + damageBonus).ToString();
             }
             else
             {
-                attackDice = "2d" + attacker.Attack.ToString() + "k1";
+                attackDice = "2d" + (attacker.Attack + damageBonus).ToString() + "k1";
             }
             int attackResult = Dice.Roll(attackDice);
             int defenseResult;
