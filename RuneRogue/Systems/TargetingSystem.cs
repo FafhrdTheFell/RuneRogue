@@ -423,12 +423,10 @@ namespace RuneRogue.Systems
                     }
                     else
                     {
-                        Poison poison = new Poison();
-                        poison.Target = target;
                         int totalDamage = Dice.Roll("4d10");
-                        poison.Magnitude = Dice.Roll("1d3"); // damage
-                        poison.Speed = poison.Magnitude * 2 + Dice.Roll("2d4"); // speed of activation
-                        poison.Duration = totalDamage / poison.Magnitude; // # of activations
+                        int activationDamage = Dice.Roll("1d4"); // damage
+                        int poisonSpeed = activationDamage * 2 + Dice.Roll("2d4"); // speed of activation
+                        Poison poison = new Poison(target, totalDamage, poisonSpeed, activationDamage);
                         Game.SchedulingSystem.Add(poison);
                     }
                 }

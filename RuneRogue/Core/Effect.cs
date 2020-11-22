@@ -13,8 +13,8 @@ namespace RuneRogue.Core
     {
         Actor _target;
         int _speed;
+        int _starttime;
         int _duration;
-        int _timesactivated;
 
         public Actor Target
         {
@@ -22,9 +22,10 @@ namespace RuneRogue.Core
             set { _target = value; }
         }
 
-        public int Time
+        public int StartTime
         {
-            get { return _speed; }
+            get { return _starttime; }
+            set { _starttime = value; }
         }
 
         public int Speed
@@ -32,45 +33,55 @@ namespace RuneRogue.Core
             get { return _speed; }
             set { _speed = value; }
         }
-        
+
         public int Duration
         {
             get { return _duration; }
             set { _duration = value; }
         }
 
-        public int TimesActivated
+        public virtual int Time
         {
-            get { return _timesactivated; }
-            set { _timesactivated = value; }
+            get { return Speed; }
         }
 
-        public Effect()
+        public Effect(Actor effected)
         {
-            _timesactivated = 0;
+            _target = effected;
+            _starttime = Game.SchedulingSystem.GetTime();
+            StartEffect();
         }
 
-        public virtual void PerformEffectOn(Actor target)
+        public virtual void StartEffect()
         {
-
-        }
-
-        public virtual void DoEffect()
-        {
-            TimesActivated++;
-            PerformEffectOn(_target);
 
         }
 
         public virtual void FinishEffect()
         {
-            TimesActivated = Duration;
-            Game.SchedulingSystem.Remove(this);
+
+        }
+
+
+        public virtual void DoEffect()
+        {
+            if (_starttime + _duration >= Game.SchedulingSystem.GetTime())
+            {
+                FinishEffect();
+            }
+        }
+
+        public virtual void PerformEffectOn(Actor actor)
+        {
+
         }
 
         public virtual bool EffectFinished()
         {
-            return (TimesActivated >= Duration);
+            return _starttime + _duration >= Game.SchedulingSystem.GetTime();
         }
+
+
     }
+
 }

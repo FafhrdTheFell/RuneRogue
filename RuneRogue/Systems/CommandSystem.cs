@@ -5,6 +5,7 @@ using RogueSharp;
 using RogueSharp.DiceNotation;
 using RuneRogue.Core;
 using RuneRogue.Interfaces;
+using RuneRogue.Effects;
 using RuneRogue.Items;
 using System;
 using System.Runtime.ExceptionServices;
@@ -479,6 +480,14 @@ namespace RuneRogue.Systems
             if (damage > 0)
             {
                 defender.Health -= damage;
+                if (attacker.SAVenomous)
+                {
+                    int totalDamage = Dice.Roll("2d" + attacker.Attack.ToString());
+                    int activationDamage = Dice.Roll("1d" + (attacker.Attack / 2).ToString()); // damage each activation
+                    int poisonSpeed = activationDamage * 2 + Dice.Roll("2d3"); // clock ticks per activation
+                    Poison poison = new Poison(defender, totalDamage, poisonSpeed, activationDamage);
+                    //Game.SchedulingSystem.Add(poison);
+                }
                 if (attacker.SAVampiric)
                 {
                     int gain = damage;

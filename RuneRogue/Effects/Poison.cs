@@ -10,6 +10,7 @@ namespace RuneRogue.Effects
 {
     class Poison : Effect
     {
+        // damage each activation
         int _magnitude;
 
         public int Magnitude
@@ -18,11 +19,16 @@ namespace RuneRogue.Effects
             set { _magnitude = value; }
         }
 
+        public Poison(Actor poisoned, int totalDamage, int speed, int activationDamage) : base(poisoned)
+        {
+            Magnitude = activationDamage; 
+            Speed = speed;
+            Duration = totalDamage / speed; // # of activations
+        }
 
         public override void PerformEffectOn(Actor target)
         {
             Player player = Game.Player;
-            Game.DungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
             target.Health -= Magnitude;
             if (target == Game.Player)
             {
@@ -30,6 +36,7 @@ namespace RuneRogue.Effects
             }
             else
             {
+                Game.DungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
                 if (target.Health > 0 && Game.DungeonMap.IsInFov(target.X, target.Y))
                 {
                     Game.MessageLog.Add($"{target.Name} looks ill.");
