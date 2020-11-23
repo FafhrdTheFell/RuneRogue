@@ -34,6 +34,7 @@ namespace RuneRogue.Core
             set { _speed = value; }
         }
 
+        // number of clock ticks until effect stops
         public int Duration
         {
             get { return _duration; }
@@ -45,27 +46,31 @@ namespace RuneRogue.Core
             get { return Speed; }
         }
 
-        public Effect(Actor effected)
+        public Effect(Actor effected, int speed, int duration)
         {
             _target = effected;
+            Speed = speed;
+            Duration = duration;
             _starttime = Game.SchedulingSystem.GetTime();
             StartEffect();
         }
 
         public virtual void StartEffect()
         {
-
+            Game.SchedulingSystem.Add(this);
         }
 
         public virtual void FinishEffect()
         {
-
+            Console.WriteLine("stop");
+            Game.SchedulingSystem.Remove(this);
         }
 
 
         public virtual void DoEffect()
         {
-            if (_starttime + _duration >= Game.SchedulingSystem.GetTime())
+            PerformEffectOn(Target);
+            if (Game.SchedulingSystem.GetTime() - StartTime >= Duration)
             {
                 FinishEffect();
             }
@@ -74,11 +79,6 @@ namespace RuneRogue.Core
         public virtual void PerformEffectOn(Actor actor)
         {
 
-        }
-
-        public virtual bool EffectFinished()
-        {
-            return _starttime + _duration >= Game.SchedulingSystem.GetTime();
         }
 
 

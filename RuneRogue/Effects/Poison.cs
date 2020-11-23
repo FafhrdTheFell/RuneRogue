@@ -11,28 +11,32 @@ namespace RuneRogue.Effects
     class Poison : Effect
     {
         // damage each activation
-        int _magnitude;
+        int _activationDamage;
 
-        public int Magnitude
+        public int ActivationDamage
         {
-            get { return _magnitude; }
-            set { _magnitude = value; }
+            get { return _activationDamage; }
+            set { _activationDamage = value; }
         }
 
-        public Poison(Actor poisoned, int totalDamage, int speed, int activationDamage) : base(poisoned)
+        // if totalDamage is not evenly divisible by activationDamage, round up to a
+        // multiple of activationDamage. Then
+        // duration is = # activations * speed = (totalDamage / activationDamage) * speed
+        // e.g. 35 total, 8 act, 6 speed => 30 => 5 activations, 8 damage each
+        public Poison(Actor poisoned, int totalDamage, int speed, int activationDamage) 
+            : base(poisoned, speed, 
+                  speed * (totalDamage / activationDamage + 1 * Convert.ToInt32(totalDamage % activationDamage > 0)))
         {
-            Magnitude = activationDamage; 
-            Speed = speed;
-            Duration = totalDamage / speed; // # of activations
+            ActivationDamage = activationDamage; 
         }
 
         public override void PerformEffectOn(Actor target)
         {
             Player player = Game.Player;
-            target.Health -= Magnitude;
+            target.Health -= ActivationDamage;
             if (target == Game.Player)
             {
-                Game.MessageLog.Add($"{target.Name} takes {Magnitude} poison damage.");
+                Game.MessageLog.Add($"{target.Name} takes {ActivationDamage} poison damage.");
             }
             else
             {

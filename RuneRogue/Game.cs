@@ -202,13 +202,7 @@ namespace RuneRogue
 
             //RLKeyPress keyPress = _rootConsole.Keyboard.GetKeyPress();
 
-            //Poison poison = new Poison();
-            //poison.Target = Player;
-            //poison.Magnitude = 1;
-            //poison.Duration = 4;
-            //poison.Speed = 5;
-            //SchedulingSystem.Add(poison);
-
+            //Poison poison = new Poison(Player,10,6,3);
 
             // Begin RLNET's game loop
             _rootConsole.Run();

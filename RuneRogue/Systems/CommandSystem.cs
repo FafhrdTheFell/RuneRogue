@@ -288,11 +288,9 @@ namespace RuneRogue.Systems
 
                 if (effect != null)
                 {
+                    // add effect before DoEffect in case DoEffect also stops effect
+                    Game.SchedulingSystem.Add(effect);
                     effect.DoEffect();
-                    if (!effect.EffectFinished())
-                    {
-                        Game.SchedulingSystem.Add(effect);
-                    }
                 }
             }
         }

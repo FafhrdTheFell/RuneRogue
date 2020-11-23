@@ -427,7 +427,7 @@ namespace RuneRogue.Systems
                         int activationDamage = Dice.Roll("1d4"); // damage
                         int poisonSpeed = activationDamage * 2 + Dice.Roll("2d4"); // speed of activation
                         Poison poison = new Poison(target, totalDamage, poisonSpeed, activationDamage);
-                        Game.SchedulingSystem.Add(poison);
+                        //Game.SchedulingSystem.Add(poison);
                     }
                 }
             }

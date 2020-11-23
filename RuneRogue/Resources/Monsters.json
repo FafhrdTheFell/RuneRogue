@@ -14,7 +14,8 @@
     "symbol": "b",
     "numberAppearing": "d3+d6-1",
     "minLevel": 1,
-    "maxLevel": 6
+    "maxLevel": 6,
+    "saVenomous" : true
   },
   {
     "kind": "boneClaws",
