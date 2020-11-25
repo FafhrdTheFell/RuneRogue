@@ -404,8 +404,12 @@ namespace RuneRogue.Systems
                 }
                 if (attacker.SADoppelganger)
                 {
-                    attacker.DoppelgangTransform();
-                    attackMessage.AppendFormat(" {0} transforms into {1}.", attacker.Name, defender.Name);
+                    // if symbol is @, then already has transformed
+                    if !(attacker.Symbol == "@")
+                    {
+                        attackMessage.AppendFormat(" {0} transforms into {1}.", attacker.Name, defender.Name);
+                        attacker.DoppelgangTransform();
+                    }
                 }
                 // Player gets attack XP on hit
                 if (attacker == Game.Player && Game.XpOnAction)

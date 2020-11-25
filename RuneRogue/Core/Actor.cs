@@ -244,10 +244,6 @@ namespace RuneRogue.Core
         public void DoppelgangTransform()
         {
             // if @, already transformed
-            if (Symbol == '@')
-            {
-                return;
-            }
             Symbol = '@';
             MaxHealth = 3 + Game.Player.MaxHealth / 3;
             Health = MaxHealth;
