@@ -528,7 +528,6 @@ namespace RuneRogue.Systems
             {
                 if (defender.Gold > 0)
                 {
-                    attackMessage.AppendFormat(" {0} dropped some gold. ", defender.Name);
 
                     if (Game.DungeonMap.GetItemAt(defender.X, defender.Y) is Gold)
                     {

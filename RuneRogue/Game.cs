@@ -140,7 +140,8 @@ namespace RuneRogue
             // _rootConsole = new RLRootConsole(fontFileName, _screenWidth, _screenHeight, 8, 8, 1f, consoleTitle);
             RLSettings rLSettings = new RLSettings
             {
-                StartWindowState = RLWindowState.Fullscreen,
+                //StartWindowState = RLWindowState.Fullscreen,
+                StartWindowState = RLWindowState.Maximized,
                 Height = _screenHeight,
                 Width = _screenWidth,
                 CharHeight = fontHeight,

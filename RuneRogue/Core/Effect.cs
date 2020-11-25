@@ -62,7 +62,6 @@ namespace RuneRogue.Core
 
         public virtual void FinishEffect()
         {
-            Console.WriteLine("stop");
             Game.SchedulingSystem.Remove(this);
         }
 
