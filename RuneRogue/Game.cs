@@ -205,8 +205,8 @@ namespace RuneRogue
 
             //Poison poison = new Poison(Player,10,6,3);
 
-            // Begin RLNET's game loop
-            _rootConsole.Run();
+            // Begin RLNET's game loop at 45 fps
+            _rootConsole.Run(45);
         }
 
         public static bool FinalLevel()

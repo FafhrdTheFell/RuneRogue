@@ -405,7 +405,7 @@ namespace RuneRogue.Systems
                 if (attacker.SADoppelganger)
                 {
                     // if symbol is @, then already has transformed
-                    if !(attacker.Symbol == "@")
+                    if (!(attacker.Symbol == '@'))
                     {
                         attackMessage.AppendFormat(" {0} transforms into {1}.", attacker.Name, defender.Name);
                         attacker.DoppelgangTransform();

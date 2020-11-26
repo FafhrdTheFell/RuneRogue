@@ -63,6 +63,13 @@ namespace RuneRogue.Behaviors
                     path = pathFinder.ShortestPath(
                        dungeonMap.GetCell(monster.X, monster.Y),
                        dungeonMap.GetCell(player.X, player.Y));
+                    Console.WriteLine(monster.Name + " path");
+
+                    // long paths are usually indirect. Avoid them if monster would fall asleep.
+                    if (path.Length > 15)
+                    {
+                        path = null;
+                    }
                 }
                 catch (PathNotFoundException)
                 {
@@ -75,6 +82,8 @@ namespace RuneRogue.Behaviors
                 // Don't forget to set the walkable status back to false
                 dungeonMap.SetIsWalkable(monster.X, monster.Y, false);
                 dungeonMap.SetIsWalkable(player.X, player.Y, false);
+
+                
 
                 // In the case that there was a path, tell the CommandSystem to move the monster
                 if (path != null)
@@ -115,6 +124,7 @@ namespace RuneRogue.Behaviors
                     {
                         commandSystem.MoveMonster(monster, dungeonMap.GetCell(monster.X + dx, monster.Y));
                     }
+                    Console.WriteLine(monster.Name + " " + dx.ToString() + " " + dy.ToString());
                 }
 
                 monster.TurnsAlerted++;
