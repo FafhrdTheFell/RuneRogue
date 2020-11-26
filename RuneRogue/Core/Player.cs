@@ -96,14 +96,14 @@ namespace RuneRogue.Core
             Color = Colors.Player;
             Defense = 4;
             DefenseChance = 40;
-            DefenseSkill = 4;
+            DefenseSkill = 5;
             Gold = 100;
             XpAttackSkill = 0;
             XpDefenseSkill = 0;
             XpHealth = 0;
             XpTotalReceived = 0;
-            Health = 25;
-            MaxHealth = 25;
+            Health = 30;
+            MaxHealth = 30;
             Name = "Rogue";
             Speed = 10;
             Symbol = '@';
