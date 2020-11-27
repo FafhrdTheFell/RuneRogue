@@ -28,13 +28,15 @@ namespace RuneRogue.Systems
         {
             "line",
             "ball",
-            "point"
+            "point",
+            "missile"
         };
 
         private string[] _effectTypes =
         {
             "Elements",
-            "Death"
+            "Death",
+            "Iron"
         };
 
         private string[] _elements =
@@ -79,21 +81,31 @@ namespace RuneRogue.Systems
             DrawOnTargetedCells("targeting");
         }
 
-        public void DrawOnTargetedCells(string colorPattern)
+        public void DrawOnTargetedCells(string colorPattern, int? whichcell=null, char? symbol=null)
         {
+            
             if (colorPattern != "targeting" &&
                 colorPattern != "Elements" &&
-                colorPattern != "Death")
+                colorPattern != "Death" &&
+                colorPattern != "Iron")
             {
                 throw new ArgumentException($"Invalid colorPattern {colorPattern}.");
             }
             DungeonMap dungeonMap = Game.DungeonMap;
             Player player = Game.Player;
 
+            _console.Clear();
+            dungeonMap.Draw(_console, _nullConsole);
+
             List<Monster> monstersSeen = dungeonMap.MonstersInFOV();
 
             RLColor highlightColor = Colors.Gold;
-            foreach (Cell point in TargetCells())
+            List<Cell> targetCells = TargetCells();
+            if (whichcell.HasValue)
+            {
+                targetCells = targetCells.GetRange((int)whichcell, 1);
+            }
+            foreach (Cell point in targetCells)
             {
                 if (!dungeonMap.IsInFov(point.X, point.Y))
                 {
@@ -123,7 +135,7 @@ namespace RuneRogue.Systems
                         case 3:
                             highlightColor = Colors.Poisoncloud3;
                             break;
-                    }   
+                    }
                 }
                 else if (colorPattern == "Elements")
                 {
@@ -143,6 +155,10 @@ namespace RuneRogue.Systems
                             break;
                     }
                 }
+                else if (colorPattern == "Iron")
+                {
+                    highlightColor = Swatch.DbBrightMetal;
+                }
                 if (point.X == player.X && point.Y == player.Y)
                 {
                     player.Draw(_console, dungeonMap);
@@ -161,7 +177,14 @@ namespace RuneRogue.Systems
                 }
                 else if (point.IsWalkable)
                 {
-                    _console.Set(point.X, point.Y, Colors.FloorFov, highlightColor, '.');
+                    if (symbol.HasValue)
+                    {
+                        _console.Set(point.X, point.Y, highlightColor, Colors.FloorBackgroundFov, (char)symbol);
+                    }
+                    else
+                    {
+                        _console.Set(point.X, point.Y, Colors.FloorFov, highlightColor, '.');
+                    }
                 }
                 else
                 {
@@ -308,7 +331,7 @@ namespace RuneRogue.Systems
 
             List<Cell> cellsTargeted = new List<Cell>();
 
-            if (_projectileType == "line")
+            if (_projectileType == "line" || _projectileType == "missile")
             {
                 cellsTargeted = dungeonMap.GetCellsAlongLine(_playerPosition.X, _playerPosition.Y,
                     _currentTarget.X, _currentTarget.Y).ToList();
@@ -428,6 +451,64 @@ namespace RuneRogue.Systems
                         int poisonSpeed = activationDamage * 2 + Dice.Roll("2d4"); // speed of activation
                         Poison poison = new Poison(target, totalDamage, poisonSpeed, activationDamage);
                         //Game.SchedulingSystem.Add(poison);
+                    }
+                }
+            }
+            if (_effect == "Iron")
+            {
+                Player player = Game.Player;
+                float dx = Math.Abs(_playerPosition.X - _currentTarget.X);
+                float dy = Math.Abs(_playerPosition.Y - _currentTarget.Y);
+                char missileChar;
+                if (dx / dy > 1.5)
+                {
+                    missileChar = '-';
+                }
+                else if (dx / dy < 0.66)
+                {
+                    missileChar = '|';
+                }
+                else if ((dx >= 0 && dy >= 0) || (dx < 0 && dy < 0))
+                {
+                    missileChar = '\\';
+                }
+                else
+                {
+                    missileChar = '/';
+                }
+                for (int i = 0; i < TargetCells().Count; i++)
+                {
+                    DrawOnTargetedCells(_effect, i, missileChar);
+                    for (int j = 0; j < 10; j++)
+                    {
+                        Game.DrawRoot();
+                    }
+                }
+
+                int damage;
+                foreach (Actor target in TargetActors())
+                {
+                    StringBuilder discardMessage = new StringBuilder();
+                    damage = CommandSystem.ResolveArmor(target, player, Runes.BonusToDamageIron, discardMessage);
+                    target.Health -= damage;
+
+                    if (damage > 0)
+                    {
+                        attackMessage.AppendFormat("{0} is perforated.", target.Name);
+                        if (target.Health > 0)
+                        {
+                            attackMessage.AppendFormat(" {0} takes {1} damage. ", target.Name, damage);
+                        }
+                        else
+                        {
+                            attackMessage.AppendFormat(" {0} takes {1} damage, killing it. ", target.Name, damage);
+                            CommandSystem.ResolveDeath(target, attackMessage);
+                        }
+                    }
+                    else
+                    {
+                        attackMessage.AppendFormat("The dart bounces off {0}'s armor.", target.Name);
+                        break;
                     }
                 }
             }

@@ -94,8 +94,8 @@ namespace RuneRogue.Core
             AttackSkill = 5;
             Awareness = 15;
             Color = Colors.Player;
-            Defense = 4;
-            DefenseChance = 40;
+            Defense = 5;
+            DefenseChance = 50;
             DefenseSkill = 5;
             Gold = 100;
             XpAttackSkill = 0;

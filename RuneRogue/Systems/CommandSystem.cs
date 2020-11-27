@@ -437,7 +437,7 @@ namespace RuneRogue.Systems
             return attackHit;
         }
 
-        private static int ResolveArmor(Actor defender, Actor attacker, int damageBonus, StringBuilder attackMessage)
+        public static int ResolveArmor(Actor defender, Actor attacker, int damageBonus, StringBuilder attackMessage)
         {
             string attackDice;
             if (!attacker.SAHighImpact)

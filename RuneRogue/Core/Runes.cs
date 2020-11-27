@@ -32,12 +32,11 @@ namespace RuneRogue.Core
             12,
             15,
             500,
-            15,
+            80,
             10
         };
 
-        public const int BonusToAttackIron = 6;
-        public const int BonusToDefenseIron = 4;
+        public const int BonusToDamageIron = 18;
         public const int BonusToSpeedTime = 4;
 
         private Dictionary<string, int> _decayProbability;
@@ -56,11 +55,12 @@ namespace RuneRogue.Core
                 _decayProbability.Add(_runeNames[i], _runeDecayProbabilities[i]);
             }
 
-            AcquireRune("Elements");
-            AcquireRune("Time");
-            //AcquireRune("Iron");
+            //AcquireRune("Elements");
+            //AcquireRune("Death");
+            //AcquireRune("Time");
+            AcquireRune("Iron");
             AcquireRune("Magic");
-            AcquireRune("Darkness");
+            //AcquireRune("Darkness");
         }
 
 
@@ -151,6 +151,16 @@ namespace RuneRogue.Core
                     Game.MessageLog.Add("Select your target.");
                     return false;
                 }
+                else if (rune == "Iron")
+                {
+                    CheckDecay(rune);
+                    Game.SecondaryConsoleActive = true;
+                    Game.AcceleratePlayer = false;
+                    Game.CurrentSecondary = Game.TargetingSystem;
+                    Game.TargetingSystem.InitializeNewTarget("missile", "Iron", 10);
+                    Game.MessageLog.Add("Select your target.");
+                    return false;
+                }
 
                 StartRune(rune);
 
@@ -189,11 +199,6 @@ namespace RuneRogue.Core
                     Game.MessageLog.Add($"{Game.Player.Name} begins to move faster.");
                     Game.Player.Speed -= BonusToSpeedTime;
                     break;
-                case "Iron":
-                    Game.MessageLog.Add($"{Game.Player.Name}'s equipment transforms into adamant.");
-                    Game.Player.Attack += BonusToAttackIron;
-                    Game.Player.Defense += BonusToDefenseIron;
-                    break;
                 case "Darkness":
                     Game.MessageLog.Add($"{Game.Player.Name} fades into the shadows.");
                     Game.Player.IsInvisible = true;
@@ -225,11 +230,6 @@ namespace RuneRogue.Core
                 case "Time":
                     Game.MessageLog.Add($"{Game.Player.Name} no longer moves quickly.");
                     Game.Player.Speed += BonusToSpeedTime;
-                    break;
-                case "Iron":
-                    Game.MessageLog.Add($"{Game.Player.Name}'s equipment transforms back to normal.");
-                    Game.Player.Attack -= BonusToAttackIron;
-                    Game.Player.Defense -= BonusToDefenseIron;
                     break;
                 case "Darkness":
                     Game.MessageLog.Add($"{Game.Player.Name} is no longer hidden by darkness.");

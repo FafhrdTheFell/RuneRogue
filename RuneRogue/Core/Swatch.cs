@@ -43,6 +43,7 @@ namespace RuneRogue.Core
         public static RLColor DbWater = new RLColor(89, 125, 206);
         public static RLColor DbBrightWood = new RLColor(210, 125, 44);
         public static RLColor DbMetal = new RLColor(133, 149, 161);
+        public static RLColor DbBrightMetal = new RLColor(194, 204, 210);
         public static RLColor DbGrass = new RLColor(109, 170, 44);
         public static RLColor DbSkin = new RLColor(210, 170, 153);
         public static RLColor DbSky = new RLColor(109, 194, 202);

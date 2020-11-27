@@ -323,18 +323,21 @@ namespace RuneRogue
                 {
                     if (rLMouse.GetLeftClick())
                     {
-                        if (DungeonMap.GetCell(rLMouse.X, rLMouse.Y).IsExplored)
+                        if (rLMouse.X <= MapWidth && rLMouse.Y <= MapHeight)
                         {
-                            AutoMovePlayer = true;
-                            AutoMoveXTarget = rLMouse.X;
-                            AutoMoveYTarget = rLMouse.Y;
-                            if (DungeonMap.GetMonsterAt(rLMouse.X, rLMouse.Y) != null)
+                            if (DungeonMap.GetCell(rLMouse.X, rLMouse.Y).IsExplored)
                             {
-                                AutoMoveMonsterTarget = DungeonMap.GetMonsterAt(rLMouse.X, rLMouse.Y);
-                            }
-                            else
-                            {
-                                AutoMoveMonsterTarget = null;
+                                AutoMovePlayer = true;
+                                AutoMoveXTarget = rLMouse.X;
+                                AutoMoveYTarget = rLMouse.Y;
+                                if (DungeonMap.GetMonsterAt(rLMouse.X, rLMouse.Y) != null)
+                                {
+                                    AutoMoveMonsterTarget = DungeonMap.GetMonsterAt(rLMouse.X, rLMouse.Y);
+                                }
+                                else
+                                {
+                                    AutoMoveMonsterTarget = null;
+                                }
                             }
                         }
                     }
