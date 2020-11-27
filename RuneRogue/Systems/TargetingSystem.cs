@@ -56,12 +56,6 @@ namespace RuneRogue.Systems
             _console = new RLConsole(Game.MapWidth, Game.MapHeight);
             _nullConsole = new RLConsole(30, Game.MapHeight);
 
-            //_playerPosition = new Point
-            //{
-            //    X = Game.Player.X,
-            //    Y = Game.Player.Y
-            //};
-
             InitializeNewTarget("ball", "Elements", 8, 3);
         }
 
@@ -96,6 +90,7 @@ namespace RuneRogue.Systems
 
             _console.Clear();
             dungeonMap.Draw(_console, _nullConsole);
+            player.Draw(_console, dungeonMap);
 
             List<Monster> monstersSeen = dungeonMap.MonstersInFOV();
 
@@ -337,7 +332,6 @@ namespace RuneRogue.Systems
                     _currentTarget.X, _currentTarget.Y).ToList();
                 // Contains player cell, drop it.
                 cellsTargeted.RemoveAt(0);
-
             }
             else if (_projectileType == "ball")
             {
@@ -360,7 +354,6 @@ namespace RuneRogue.Systems
             {
                 throw new ArgumentException("projectiletype TargetCells not implemented.");
             }
-            
             return cellsTargeted;
         }
 
@@ -457,18 +450,18 @@ namespace RuneRogue.Systems
             if (_effect == "Iron")
             {
                 Player player = Game.Player;
-                float dx = Math.Abs(_playerPosition.X - _currentTarget.X);
-                float dy = Math.Abs(_playerPosition.Y - _currentTarget.Y);
+                float dx = _playerPosition.X - _currentTarget.X;
+                float dy = _playerPosition.Y - _currentTarget.Y;
                 char missileChar;
-                if (dx / dy > 1.5)
+                if (Math.Abs(dx) / Math.Abs(dy) > 1.5)
                 {
                     missileChar = '-';
                 }
-                else if (dx / dy < 0.66)
+                else if (Math.Abs(dx) / Math.Abs(dy) < 0.66)
                 {
                     missileChar = '|';
                 }
-                else if ((dx >= 0 && dy >= 0) || (dx < 0 && dy < 0))
+                else if ((dx > 0 && dy > 0) || (dx < 0 && dy < 0))
                 {
                     missileChar = '\\';
                 }
