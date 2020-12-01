@@ -16,6 +16,9 @@ namespace RuneRogue.Core
         public string Gold { get; set; }
         //public int Health { get; set; }
         public string MaxHealth { get; set; }
+        public int MissileAttack { get; set; }
+        public int MissileRange { get; set; }
+        public string MissileType { get; set; }
         public string Name { get; set; }
         public int Speed { get; set; }
         public char Symbol { get; set; }

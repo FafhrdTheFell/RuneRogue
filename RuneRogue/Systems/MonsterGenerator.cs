@@ -288,6 +288,9 @@ namespace RuneRogue.Systems
             monster.Attack = Dice.Roll(_monsterManual[page].Attack);
             monster.AttackChance = Dice.Roll(_monsterManual[page].AttackChance);
             monster.AttackSkill = monster.AttackChance / 10;
+            monster.MissileAttack = _monsterManual[page].MissileAttack;
+            monster.MissileRange = _monsterManual[page].MissileRange;
+            monster.MissileType = _monsterManual[page].MissileType;
             monster.Awareness = _monsterManual[page].Awareness;
             monster.Color = Colors.ColorLookup(_monsterManual[page].Color);
             monster.Defense = Dice.Roll(_monsterManual[page].Defense);

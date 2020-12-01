@@ -26,18 +26,15 @@ namespace RuneRogue.Core
 
         private string[] _projectileTypes =
         {
-            "line",
-            "ball",
-            "point",
-            "missile"
+            "line", // hits everything on a line: death ray
+            "ball", // explodes in a radius
+            "point", // hits a particular cell
+            "missile" // hits initial target(s) on a line: arrow
         };
 
         private string[] _effectTypes =
         {
-            "Elements",
-            "Death",
-            "Iron",
-            "Arrow"
+            "Elements","Death","Iron","Arrow","Spit", "Boulder"
         };
 
         private string[] _elements =
@@ -321,12 +318,20 @@ namespace RuneRogue.Core
                     }
                 }
             }
-            else if (_effect == "Iron" || _effect == "Arrow")
+            else if (_effect == "Iron" || _effect == "Arrow" || _effect == "Spit" || _effect == "Boulder")
             {
                 Player player = Game.Player;
                 int dx = _origin.X - _target.X;
                 int dy = _origin.Y - _target.Y;
                 char missileChar = LengthyProjectileChar(dx, dy);
+                if (_effect == "Spit")
+                {
+                    missileChar = '*';
+                }
+                if (_effect == "Boulder")
+                {
+                    missileChar = 'o';
+                }
                 for (int i = 0; i < TargetCells().Count; i++)
                 {
                     DrawPatternOnTargetedCells(_effect, i, missileChar);

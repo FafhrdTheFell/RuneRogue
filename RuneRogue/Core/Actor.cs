@@ -16,6 +16,7 @@ namespace RuneRogue.Core
         private int _attackSkill;
         private int _missileAttack;
         private int _missileRange;
+        private string _missileType;
         private int _awareness;
         private int _defense;
         private int _defenseChance;
@@ -61,6 +62,11 @@ namespace RuneRogue.Core
         {
             get { return _missileRange; }
             set { _missileRange = value; }
+        }
+        public string MissileType
+        {
+            get { return _missileType; }
+            set { _missileType = value; }
         }
 
         public int AttackChance

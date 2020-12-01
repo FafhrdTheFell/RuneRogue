@@ -34,6 +34,19 @@ namespace RuneRogue.Behaviors
                 }
             }
 
+            // If the monster has not been alerted, compute a field-of-view 
+            // Use the monsters Awareness value for the distance in the FoV check
+            // If the player is in the monster's FoV then alert it
+            // Add a message to the MessageLog regarding this alerted status
+            if (!monster.TurnsAlerted.HasValue)
+            {
+                if (canSeePlayer)
+                {
+                    // Game.MessageLog.Add( $"{monster.Name} is eager to fight {player.Name}" );
+                    monster.TurnsAlerted = 1;
+                }
+            }
+
             if (monster.MissileRange >= distFromPlayer)
             {
                 if (Dice.Roll("1d10") > 5)
@@ -57,19 +70,12 @@ namespace RuneRogue.Behaviors
                     }
                 }
             }
-
-            //monsterFov.ComputeFov(monster.X, monster.Y, monster.Awareness, true);
-
-            // If the monster has not been alerted, compute a field-of-view 
-            // Use the monsters Awareness value for the distance in the FoV check
-            // If the player is in the monster's FoV then alert it
-            // Add a message to the MessageLog regarding this alerted status
-            if (!monster.TurnsAlerted.HasValue)
+            else if (monster.MissileRange > 0)
             {
-                if (canSeePlayer)
+                // sometimes wait
+                if (Dice.Roll("1d10") > 5)
                 {
-                    // Game.MessageLog.Add( $"{monster.Name} is eager to fight {player.Name}" );
-                    monster.TurnsAlerted = 1;
+                    return true;
                 }
             }
 
@@ -88,7 +94,6 @@ namespace RuneRogue.Behaviors
                     path = pathFinder.ShortestPath(
                        dungeonMap.GetCell(monster.X, monster.Y),
                        dungeonMap.GetCell(player.X, player.Y));
-                    Console.WriteLine(monster.Name + " path");
 
                     // long paths are usually indirect. Avoid them if monster would fall asleep.
                     if (path.Length > 15)

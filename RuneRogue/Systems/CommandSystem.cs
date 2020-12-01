@@ -311,7 +311,7 @@ namespace RuneRogue.Systems
             DungeonMap dungeonMap = Game.DungeonMap;
             Game.SecondaryConsoleActive = true;
             Game.AcceleratePlayer = false;
-            Instant shot = new Instant("missile", "Arrow");
+            Instant shot = new Instant("missile", attacker.MissileType);
             shot.Origin = dungeonMap.GetCell(attacker.X, attacker.Y);
             shot.Target = dungeonMap.GetCell(defender.X, defender.Y);
             Game.CurrentSecondary = shot;
