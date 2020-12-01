@@ -117,15 +117,8 @@ namespace RuneRogue.Behaviors
                             dy = 0;
                         }
                     }
-                    if (dx == 0)
-                    {
-                        commandSystem.MoveMonster(monster, dungeonMap.GetCell(monster.X, monster.Y + dy));
-                    }
-                    else
-                    {
-                        commandSystem.MoveMonster(monster, dungeonMap.GetCell(monster.X + dx, monster.Y));
-                    }
-                    Console.WriteLine(monster.Name + " " + dx.ToString() + " " + dy.ToString());
+                    commandSystem.MoveMonster(monster, dungeonMap.GetCell(monster.X + dx, monster.Y + dy));
+
                 }
 
                 monster.TurnsAlerted++;
