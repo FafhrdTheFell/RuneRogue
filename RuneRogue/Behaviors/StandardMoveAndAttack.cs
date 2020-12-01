@@ -51,6 +51,7 @@ namespace RuneRogue.Behaviors
 
             if (monster.TurnsAlerted.HasValue && canSeePlayer)
             {
+
                 // Before we find a path, make sure to make the monster and player Cells walkable
                 dungeonMap.SetIsWalkable(monster.X, monster.Y, true);
                 dungeonMap.SetIsWalkable(player.X, player.Y, true);

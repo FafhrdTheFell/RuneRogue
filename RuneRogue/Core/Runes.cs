@@ -55,7 +55,7 @@ namespace RuneRogue.Core
                 _decayProbability.Add(_runeNames[i], _runeDecayProbabilities[i]);
             }
 
-            //AcquireRune("Elements");
+            AcquireRune("Elements");
             //AcquireRune("Death");
             //AcquireRune("Time");
             AcquireRune("Iron");
@@ -137,6 +137,7 @@ namespace RuneRogue.Core
                     Game.SecondaryConsoleActive = true;
                     Game.AcceleratePlayer = false;
                     Game.CurrentSecondary = Game.TargetingSystem;
+                    Game.PostSecondary = new Instant("line", "Elements");
                     Game.TargetingSystem.InitializeNewTarget("line", "Elements", 8);
                     Game.MessageLog.Add("Select your target.");
                     return false;
@@ -147,6 +148,7 @@ namespace RuneRogue.Core
                     Game.SecondaryConsoleActive = true;
                     Game.AcceleratePlayer = false;
                     Game.CurrentSecondary = Game.TargetingSystem;
+                    Game.PostSecondary = new Instant("ball", "Death", 5);
                     Game.TargetingSystem.InitializeNewTarget("ball", "Death", 8, 5);
                     Game.MessageLog.Add("Select your target.");
                     return false;
@@ -157,6 +159,7 @@ namespace RuneRogue.Core
                     Game.SecondaryConsoleActive = true;
                     Game.AcceleratePlayer = false;
                     Game.CurrentSecondary = Game.TargetingSystem;
+                    Game.PostSecondary = new Instant("missile", "Iron");
                     Game.TargetingSystem.InitializeNewTarget("missile", "Iron", 10);
                     Game.MessageLog.Add("Select your target.");
                     return false;

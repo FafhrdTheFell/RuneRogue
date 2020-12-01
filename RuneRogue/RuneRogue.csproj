@@ -127,6 +127,7 @@
     <Compile Include="Core\Monster.cs" />
     <Compile Include="Core\Player.cs" />
     <Compile Include="Core\Swatch.cs" />
+    <Compile Include="Core\Instant.cs" />
     <Compile Include="Effects\Poison.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Interfaces\IActor.cs" />

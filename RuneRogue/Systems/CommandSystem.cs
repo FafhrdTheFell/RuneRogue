@@ -118,7 +118,7 @@ namespace RuneRogue.Systems
         }
 
 
-            public bool AutoMovePlayer(int targetX, int targetY)
+        public bool AutoMovePlayer(int targetX, int targetY)
         {
             DungeonMap dungeonMap = Game.DungeonMap;
             Player player = Game.Player;
@@ -304,6 +304,17 @@ namespace RuneRogue.Systems
                     Attack(monster, Game.Player);
                 }
             }
+        }
+
+        public void Shoot(Actor attacker, Actor defender)
+        {
+            DungeonMap dungeonMap = Game.DungeonMap;
+            Game.SecondaryConsoleActive = true;
+            Game.AcceleratePlayer = false;
+            Instant shot = new Instant("missile", "Iron");
+            shot.Origin = dungeonMap.GetCell(attacker.X, attacker.Y);
+            shot.Target = dungeonMap.GetCell(defender.X, defender.Y);
+            Game.CurrentSecondary = shot;
         }
 
         public void Attack(Actor attacker, Actor defender)

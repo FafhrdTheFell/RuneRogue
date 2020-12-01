@@ -5,23 +5,23 @@ using RogueSharp;
 using RogueSharp.DiceNotation;
 using RuneRogue.Core;
 using RuneRogue.Effects;
+using RuneRogue.Systems;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization.Formatters;
 using System.Text;
 
-namespace RuneRogue.Systems
+namespace RuneRogue.Core
 {
-    public class TargetingSystem : SecondaryConsole
+    public class Instant : SecondaryConsole
     {
 
-        private Point _currentTarget;
-        private Point _playerPosition;
+        private Cell _origin;
+        private Cell _target;
         private RLConsole _nullConsole;
         private string _projectileType;
         private string _effect;
-        private int _range;
         private int _radius;
 
         private string[] _projectileTypes =
@@ -50,13 +50,47 @@ namespace RuneRogue.Systems
             "air"
         };
 
-        public TargetingSystem()
+        public Cell Origin
+        {
+            get { return _origin; }
+            set { _origin = value; }
+        }
+
+        public Cell Target
+        {
+            get { return _target; }
+            set { _target = value; }
+        }
+
+        //public Instant(Cell source, Cell target, string shape, string effect, int radius=1)
+        public Instant(string shape, string effect, int radius = 1)
         {
 
             _console = new RLConsole(Game.MapWidth, Game.MapHeight);
             _nullConsole = new RLConsole(30, Game.MapHeight);
 
-            InitializeNewTarget("ball", "Elements", 8, 3);
+            List<string> typesCheck = new List<string>(_projectileTypes);
+            if (typesCheck.Contains(shape))
+            {
+                _projectileType = shape;
+
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid instant shape {shape}.");
+            }
+            typesCheck = new List<string>(_effectTypes);
+            if (typesCheck.Contains(effect))
+            {
+                _effect = effect;
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid instant effect {effect}.");
+            }
+            _radius = radius;
+            //_origin = source;
+            //_target = target;
         }
 
         public override void DrawConsole()
@@ -68,23 +102,13 @@ namespace RuneRogue.Systems
             dungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
             dungeonMap.Draw(_console, _nullConsole);
             player.Draw(_console, dungeonMap);
-            if (_currentTarget == _playerPosition)
-            {
-                return;
-            }
-            DrawOnTargetedCells("targeting");
+            DrawEffect();
+            DoEffectOnTarget();
         }
 
-        public void DrawOnTargetedCells(string colorPattern, int? whichcell=null, char? symbol=null)
+        public void DrawPatternOnTargetedCells(string colorPattern, int? whichcell = null, char? symbol = null)
         {
-            
-            if (colorPattern != "targeting" &&
-                colorPattern != "Elements" &&
-                colorPattern != "Death" &&
-                colorPattern != "Iron")
-            {
-                throw new ArgumentException($"Invalid colorPattern {colorPattern}.");
-            }
+
             DungeonMap dungeonMap = Game.DungeonMap;
             Player player = Game.Player;
 
@@ -108,7 +132,7 @@ namespace RuneRogue.Systems
                 }
                 if (colorPattern == "targeting")
                 {
-                    if (point.X == _currentTarget.X && point.Y == _currentTarget.Y)
+                    if (point.X == _target.X && point.Y == _target.Y)
                     {
                         highlightColor = Colors.FloorTarget;
                     }
@@ -188,144 +212,6 @@ namespace RuneRogue.Systems
             }
         }
 
-        public void InitializeNewTarget(string projectiletype, string effect, int range, int radius = 5)
-        {
-            //if (projectiletype == "line" || projectiletype == "ball" || projectiletype == "point")
-            List<string> typesCheck = new List<string>(_projectileTypes);
-            if (typesCheck.Contains(projectiletype))
-            {
-                _projectileType = projectiletype;
-
-            }
-            else
-            {
-                throw new ArgumentException($"Invalid projectiletype {projectiletype}.");
-            }
-            typesCheck = new List<string>(_effectTypes);
-            if (typesCheck.Contains(effect))
-            {
-                _effect = effect;
-
-            }
-            else
-            {
-                throw new ArgumentException($"Invalid effect {effect}.");
-            }
-            if (projectiletype == "point")
-            {
-                radius = 1;
-            }
-            _effect = effect;
-            _range = range;
-            _radius = radius;
-            _currentTarget = new Point
-            {
-                X = Game.Player.X,
-                Y = Game.Player.Y
-            };
-            _playerPosition = new Point
-            {
-                X = Game.Player.X,
-                Y = Game.Player.Y
-            };
-        }
-
-        private int Distance(Point p, Point q)
-        {
-            DungeonMap dungeonMap = Game.DungeonMap;
-            int d = 0;
-            foreach (Cell point in dungeonMap.GetCellsAlongLine(p.X, p.Y, q.X, q.Y))
-            {
-                d++;
-            }
-            // subtract 1 because starting point is player
-            return d - 1;
-        }
-
-        // process key press and return true iff finished with console
-        public override bool ProcessInput(RLKeyPress rLKeyPress, RLMouse rLMouse)
-        {
-            Player player = Game.Player;
-            Point _newTarget = new Point
-            {
-                X = _currentTarget.X,
-                Y = _currentTarget.Y
-            };
-            bool leftClick = rLMouse.GetLeftClick();
-            bool enterPressed = false;
-            if (leftClick)
-            {
-                _newTarget = new Point
-                {
-                    X = rLMouse.X,
-                    Y = rLMouse.Y
-                };
-            }
-            if (rLKeyPress != null)
-            {
-                InputSystem _inputSystem = new InputSystem();
-                Direction direction = _inputSystem.MoveDirection(rLKeyPress);
-                if (direction != Direction.None)
-                {
-                    _newTarget.X += Game.CommandSystem.DirectionToCoordinates(direction)[0];
-                    _newTarget.Y += Game.CommandSystem.DirectionToCoordinates(direction)[1];
-                }
-                if (rLKeyPress.Key == RLKey.Enter)
-                {
-                    enterPressed = true;
-                }
-            }
-            bool playerTargeted = (_newTarget.X == player.X && _newTarget.Y == player.Y);
-            if (_newTarget == _currentTarget && !playerTargeted &&
-                (leftClick || enterPressed))
-            {
-                _console.Clear();
-                DungeonMap dungeonMap = Game.DungeonMap;
-                //dungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
-                dungeonMap.Draw(_console, _nullConsole);
-                if (Game.PostSecondary is Instant)
-                {
-                    Instant nextSecondary = Game.PostSecondary as Instant;
-                    nextSecondary.Origin = dungeonMap.GetCell(player.X, player.Y);
-                    nextSecondary.Target = dungeonMap.GetCell(_newTarget.X, _newTarget.Y);
-                }
-                //DoEffectOnTarget();
-                return true;
-            }
-            else if (_newTarget == _currentTarget && playerTargeted &&
-                (leftClick || enterPressed))
-            {
-                Game.MessageLog.Add("You cannot target yourself.");
-            }
-            if (_newTarget.X < 1 || _newTarget.X > Game.MapWidth ||
-                _newTarget.Y < 1 || _newTarget.Y > Game.MapHeight)
-            {
-                return false;
-            }
-            if (Distance(_playerPosition, _newTarget) > _range)
-            {
-                Game.MessageLog.Add("That target would be too far away.");
-                return false;
-            }
-            Game.DungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
-            if (!Game.DungeonMap.IsInFov(_newTarget.X, _newTarget.Y) ||
-                !Game.DungeonMap.IsTransparent(_newTarget.X, _newTarget.Y))
-            {
-                Game.MessageLog.Add("You would not be able to see that target.");
-                return false;
-            }
-            else
-            {
-                _currentTarget = _newTarget;
-            }
-            return false;
-        }
-
-        public Point Target()
-        {
-            return _currentTarget;
-        }
-
         public List<Cell> TargetCells()
         {
             DungeonMap dungeonMap = Game.DungeonMap;
@@ -334,17 +220,16 @@ namespace RuneRogue.Systems
 
             if (_projectileType == "line" || _projectileType == "missile")
             {
-                cellsTargeted = dungeonMap.GetCellsAlongLine(_playerPosition.X, _playerPosition.Y,
-                    _currentTarget.X, _currentTarget.Y).ToList();
-                // Contains player cell, drop it.
+                cellsTargeted = dungeonMap.GetCellsAlongLine(_origin.X, _origin.Y, _target.X, _target.Y).ToList();
+                // Contains origin cell, drop it.
                 cellsTargeted.RemoveAt(0);
             }
             else if (_projectileType == "ball")
             {
                 FieldOfView targetFOV = new FieldOfView(dungeonMap);
-                targetFOV.ComputeFov(_currentTarget.X, _currentTarget.Y, _radius + 1, true);
+                targetFOV.ComputeFov(_target.X, _target.Y, _radius + 1, true);
 
-                foreach (Cell cell in dungeonMap.GetCellsInRadius(_currentTarget.X, _currentTarget.Y, _radius))
+                foreach (Cell cell in dungeonMap.GetCellsInRadius(_target.X, _target.Y, _radius))
                 {
                     if (targetFOV.IsInFov(cell.X, cell.Y))
                     {
@@ -354,7 +239,7 @@ namespace RuneRogue.Systems
             }
             else if (_projectileType == "point")
             {
-                cellsTargeted.Add(dungeonMap.GetCell(_currentTarget.X, _currentTarget.Y));
+                cellsTargeted.Add(dungeonMap.GetCell(_target.X, _target.Y));
             }
             else
             {
@@ -367,7 +252,7 @@ namespace RuneRogue.Systems
         {
             DungeonMap dungeonMap = Game.DungeonMap;
             Player player = Game.Player;
-            
+
             List<Actor> actors = new List<Actor>();
 
             foreach (Cell cell in TargetCells())
@@ -376,7 +261,7 @@ namespace RuneRogue.Systems
                 {
                     Actor actor = dungeonMap.GetMonsterAt(cell.X, cell.Y) as Actor;
                     actors.Add(actor);
-                } 
+                }
                 else if (player.X == cell.X && player.Y == cell.Y)
                 {
                     Actor actor = player as Actor;
@@ -386,20 +271,77 @@ namespace RuneRogue.Systems
             return actors;
         }
 
-        public bool DoEffectOnTarget()
+        // returns char symbol for long projectiles -- arrows, spears, etc
+        // based on direction of missile path
+        public char LengthyProjectileChar(int dxInt, int dyInt)
         {
-            StringBuilder attackMessage = new StringBuilder();
+            float dx = (float)dxInt;
+            float dy = (float)dyInt;
+            if (Math.Abs(dx) / Math.Abs(dy) > 1.5)
+            {
+                return '-';
+            }
+            else if (Math.Abs(dx) / Math.Abs(dy) < 0.66)
+            {
+                return '|';
+            }
+            else if ((dx > 0 && dy > 0) || (dx < 0 && dy < 0))
+            {
+                return '\\';
+            }
+            else
+            {
+                return '/';
+            }
+        }
+
+        public void DrawEffect()
+        {
             if (_effect == "Elements")
             {
                 for (int i = 0; i < 8; i++)
                 {
-                    DrawOnTargetedCells(_effect);
+                    DrawPatternOnTargetedCells(_effect);
                     for (int j = 0; j < 10; j++)
                     {
                         Game.DrawRoot(this.Console);
                     }
                 }
+            }
+            else if (_effect == "Death")
+            {
+                // not sure how to do the graphics timing better than these loops
+                for (int i = 0; i < 8; i++)
+                {
+                    DrawPatternOnTargetedCells(_effect);
+                    for (int j = 0; j < 10; j++)
+                    {
+                        Game.DrawRoot(this.Console);
+                    }
+                }
+            }
+            else if (_effect == "Iron")
+            {
+                Player player = Game.Player;
+                int dx = _origin.X - _target.X;
+                int dy = _origin.Y - _target.Y;
+                char missileChar = LengthyProjectileChar(dx, dy);
+                for (int i = 0; i < TargetCells().Count; i++)
+                {
+                    DrawPatternOnTargetedCells(_effect, i, missileChar);
+                    for (int j = 0; j < 10; j++)
+                    {
+                        Game.DrawRoot(this.Console);
+                    }
+                }
+            }
+        }
 
+        public bool DoEffectOnTarget()
+        {
+            StringBuilder attackMessage = new StringBuilder();
+            if (_effect == "Elements")
+            {
                 int damage;
                 foreach (Actor target in TargetActors())
                 {
@@ -425,16 +367,6 @@ namespace RuneRogue.Systems
             }
             if (_effect == "Death")
             {
-                // not sure how to do the graphics timing better than these loops
-                for (int i = 0; i < 8; i++)
-                {
-                    DrawOnTargetedCells(_effect);
-                    for (int j = 0; j < 10; j++)
-                    {
-                        Game.DrawRoot(this.Console);
-                    }
-                }
-                
                 foreach (Actor target in TargetActors())
                 {
                     attackMessage.AppendFormat("{0} is immersed in poisonous vapors. ", target.Name);
@@ -455,40 +387,27 @@ namespace RuneRogue.Systems
             }
             if (_effect == "Iron")
             {
-                Player player = Game.Player;
-                float dx = _playerPosition.X - _currentTarget.X;
-                float dy = _playerPosition.Y - _currentTarget.Y;
-                char missileChar;
-                if (Math.Abs(dx) / Math.Abs(dy) > 1.5)
+                // figure out which Actor shot iron
+                DungeonMap dungeonMap = Game.DungeonMap;
+                Actor source;
+                if (dungeonMap.GetMonsterAt(_origin.X, _origin.Y) != null)
                 {
-                    missileChar = '-';
-                }
-                else if (Math.Abs(dx) / Math.Abs(dy) < 0.66)
-                {
-                    missileChar = '|';
-                }
-                else if ((dx > 0 && dy > 0) || (dx < 0 && dy < 0))
-                {
-                    missileChar = '\\';
+                    source = dungeonMap.GetMonsterAt(_origin.X, _origin.Y);
                 }
                 else
                 {
-                    missileChar = '/';
-                }
-                for (int i = 0; i < TargetCells().Count; i++)
-                {
-                    DrawOnTargetedCells(_effect, i, missileChar);
-                    for (int j = 0; j < 10; j++)
+                    source = Game.Player;
+                    if (!(_origin.X == source.X && _origin.Y == source.Y))
                     {
-                        Game.DrawRoot(this.Console);
+                        throw new ArgumentException($"Iron requires Actor source. No Actor found at origin ({_origin.X}, {_origin.Y}).");
                     }
                 }
-
+                
                 int damage;
                 foreach (Actor target in TargetActors())
                 {
                     StringBuilder discardMessage = new StringBuilder();
-                    damage = CommandSystem.ResolveArmor(target, player, Runes.BonusToDamageIron, discardMessage);
+                    damage = CommandSystem.ResolveArmor(target, source, Runes.BonusToDamageIron, discardMessage);
                     target.Health -= damage;
 
                     if (damage > 0)
@@ -515,6 +434,11 @@ namespace RuneRogue.Systems
             {
                 Game.MessageLog.Add(attackMessage.ToString());
             }
+            return true;
+        }
+
+        public override bool ProcessInput(RLKeyPress rLKeyPress, RLMouse rLMouse)
+        {
             return true;
         }
 

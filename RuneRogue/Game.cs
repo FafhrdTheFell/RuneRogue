@@ -57,6 +57,7 @@ namespace RuneRogue
         public static MonsterGenerator MonsterGenerator { get; private set; }
         public static Runes RuneSystem { get; private set; }
         public static SecondaryConsole CurrentSecondary { get; set; }
+        public static SecondaryConsole PostSecondary { get; set; }
 
         public static TargetingSystem TargetingSystem { get; set; }
 
@@ -244,11 +245,11 @@ namespace RuneRogue
                 if (finished)
                 {
                     SecondaryConsoleActive = false;
-                    //if (CurrentSecondary is TargetingSystem)
-                    //{
-                    //    TargetingSystem ts = CurrentSecondary as TargetingSystem;
-                    //    ts.TargetCells();
-                    //}
+                    if (CurrentSecondary is TargetingSystem)
+                    {
+                        CurrentSecondary = PostSecondary;
+                        SecondaryConsoleActive = true;
+                    }
                 }
                 _renderRequired = true;
 
@@ -455,9 +456,9 @@ namespace RuneRogue
             }
         }
 
-        public static void DrawRoot()
+        public static void DrawRoot(RLConsole drawnConsole)
         {
-            RLConsole.Blit(CurrentSecondary.Console, 0, 0, _mapWidth, _mapHeight, _rootConsole, 0, 0);
+            RLConsole.Blit(drawnConsole, 0, 0, _mapWidth, _mapHeight, _rootConsole, 0, 0);
             _rootConsole.Draw();
         }
 
