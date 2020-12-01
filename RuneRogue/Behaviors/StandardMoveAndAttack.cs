@@ -47,7 +47,7 @@ namespace RuneRogue.Behaviors
                 }
             }
 
-            if (monster.MissileRange >= distFromPlayer)
+            if (canSeePlayer && monster.MissileRange >= distFromPlayer)
             {
                 if (Dice.Roll("1d10") > 5)
                 {
