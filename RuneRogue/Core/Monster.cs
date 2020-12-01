@@ -91,7 +91,7 @@ namespace RuneRogue.Core
             statConsole.Print(2, yPosition, $": {Name}", Swatch.DbLight);
         }
 
-        public virtual void PerformAction(CommandSystem commandSystem)
+        public void PerformAction(CommandSystem commandSystem)
         {
             var behavior = new StandardMoveAndAttack();
             behavior.Act(this, commandSystem);

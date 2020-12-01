@@ -36,7 +36,8 @@ namespace RuneRogue.Systems
         {
             "Elements",
             "Death",
-            "Iron"
+            "Iron",
+            "Arrow"
         };
 
         private string[] _elements =
@@ -488,7 +489,7 @@ namespace RuneRogue.Systems
                 foreach (Actor target in TargetActors())
                 {
                     StringBuilder discardMessage = new StringBuilder();
-                    damage = CommandSystem.ResolveArmor(target, player, Runes.BonusToDamageIron, discardMessage);
+                    damage = CommandSystem.ResolveArmor(target, player, Runes.BonusToDamageIron, false, discardMessage);
                     target.Health -= damage;
 
                     if (damage > 0)

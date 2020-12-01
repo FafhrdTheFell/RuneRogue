@@ -311,13 +311,13 @@ namespace RuneRogue.Systems
             DungeonMap dungeonMap = Game.DungeonMap;
             Game.SecondaryConsoleActive = true;
             Game.AcceleratePlayer = false;
-            Instant shot = new Instant("missile", "Iron");
+            Instant shot = new Instant("missile", "Arrow");
             shot.Origin = dungeonMap.GetCell(attacker.X, attacker.Y);
             shot.Target = dungeonMap.GetCell(defender.X, defender.Y);
             Game.CurrentSecondary = shot;
         }
 
-        public void Attack(Actor attacker, Actor defender)
+        public static void Attack(Actor attacker, Actor defender, bool missileAttack = false)
         {
             StringBuilder attackMessage = new StringBuilder();
 
@@ -327,13 +327,13 @@ namespace RuneRogue.Systems
             }
 
             bool isCritical;
-            bool attackHit = ResolveAttack(attacker, defender, attackMessage, out isCritical);
+            bool attackHit = ResolveAttack(attacker, defender, attackMessage, missileAttack, out isCritical);
 
             int damage = 0;
             if (attackHit)
             {
                 int damageBonus = attacker.Attack * Convert.ToInt32(isCritical) / 2;
-                damage = ResolveArmor(defender, attacker, damageBonus, attackMessage);
+                damage = ResolveArmor(defender, attacker, damageBonus, missileAttack, attackMessage);
                 if (defender == Game.Player && Game.XpOnAction)
                 {
                     Game.Player.XpHealth += damage;
@@ -360,7 +360,8 @@ namespace RuneRogue.Systems
         }
 
         // The attacker rolls based on his stats to see if he gets any hits
-        private static bool ResolveAttack(Actor attacker, Actor defender, StringBuilder attackMessage, out bool critical)
+        private static bool ResolveAttack(Actor attacker, Actor defender, StringBuilder attackMessage, 
+            bool missileAttack, out bool critical)
         {
             bool attackHit = false;
             // criticals only on backstab
@@ -448,7 +449,7 @@ namespace RuneRogue.Systems
             return attackHit;
         }
 
-        public static int ResolveArmor(Actor defender, Actor attacker, int damageBonus, StringBuilder attackMessage)
+        public static int ResolveArmor(Actor defender, Actor attacker, int damageBonus, bool missileAttack, StringBuilder attackMessage)
         {
             string attackDice;
             if (!attacker.SAHighImpact)

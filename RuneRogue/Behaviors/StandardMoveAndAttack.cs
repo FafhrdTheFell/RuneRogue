@@ -19,17 +19,41 @@ namespace RuneRogue.Behaviors
 
             FieldOfView monsterFov = new FieldOfView(dungeonMap);
             monsterFov.ComputeFov(monster.X, monster.Y, monster.Awareness, true);
+            int distFromPlayer = Math.Abs(player.X - monster.X) + Math.Abs(player.Y - monster.Y);
             if (monsterFov.IsInFov(player.X, player.Y))
             {
                 canSeePlayer = true;
                 if (player.IsInvisible)
                 {
-                    int dist = Math.Abs(player.X - monster.X) + Math.Abs(player.Y - monster.Y);
-                    string dieSize = (dist + 3).ToString();
+                    string dieSize = (distFromPlayer + 3).ToString();
                     if (Dice.Roll("1d" + dieSize) > 2)
                     {
                         canSeePlayer = false;
                         monster.TurnsAlerted = null;
+                    }
+                }
+            }
+
+            if (monster.MissileRange >= distFromPlayer)
+            {
+                if (Dice.Roll("1d10") > 5)
+                {
+                    bool shotNotBlocked = true;
+                    foreach (Cell cell in dungeonMap.GetCellsAlongLine(monster.X, monster.Y, player.X, player.Y))
+                    {
+                        if (cell.X == monster.X && cell.Y == monster.Y)
+                        {
+                            continue;
+                        }
+                        if (dungeonMap.GetMonsterAt(cell.X, cell.Y) != null)
+                        {
+                            shotNotBlocked = false;
+                        }
+                    }
+                    if (shotNotBlocked)
+                    {
+                        commandSystem.Shoot(monster, player);
+                        return true;
                     }
                 }
             }

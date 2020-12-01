@@ -36,7 +36,8 @@ namespace RuneRogue.Core
         {
             "Elements",
             "Death",
-            "Iron"
+            "Iron",
+            "Arrow"
         };
 
         private string[] _elements =
@@ -320,7 +321,7 @@ namespace RuneRogue.Core
                     }
                 }
             }
-            else if (_effect == "Iron")
+            else if (_effect == "Iron" || _effect == "Arrow")
             {
                 Player player = Game.Player;
                 int dx = _origin.X - _target.X;
@@ -365,7 +366,7 @@ namespace RuneRogue.Core
                     }
                 }
             }
-            if (_effect == "Death")
+            else if (_effect == "Death")
             {
                 foreach (Actor target in TargetActors())
                 {
@@ -385,7 +386,7 @@ namespace RuneRogue.Core
                     }
                 }
             }
-            if (_effect == "Iron")
+            else if (_effect == "Iron")
             {
                 // figure out which Actor shot iron
                 DungeonMap dungeonMap = Game.DungeonMap;
@@ -399,15 +400,16 @@ namespace RuneRogue.Core
                     source = Game.Player;
                     if (!(_origin.X == source.X && _origin.Y == source.Y))
                     {
-                        throw new ArgumentException($"Iron requires Actor source. No Actor found at origin ({_origin.X}, {_origin.Y}).");
+                        throw new ArgumentException($"Iron requires Actor source. " +
+                            $"No Actor found at origin ({_origin.X}, {_origin.Y}).");
                     }
                 }
-                
+
                 int damage;
                 foreach (Actor target in TargetActors())
                 {
                     StringBuilder discardMessage = new StringBuilder();
-                    damage = CommandSystem.ResolveArmor(target, source, Runes.BonusToDamageIron, discardMessage);
+                    damage = CommandSystem.ResolveArmor(target, source, Runes.BonusToDamageIron, false, discardMessage);
                     target.Health -= damage;
 
                     if (damage > 0)
@@ -430,6 +432,35 @@ namespace RuneRogue.Core
                     }
                 }
             }
+            else if (_effect == "Arrow")
+            {
+                // figure out which Actor shot
+                DungeonMap dungeonMap = Game.DungeonMap;
+                Actor source;
+                if (dungeonMap.GetMonsterAt(_origin.X, _origin.Y) != null)
+                {
+                    source = dungeonMap.GetMonsterAt(_origin.X, _origin.Y);
+                }
+                else
+                {
+                    source = Game.Player;
+                    if (!(_origin.X == source.X && _origin.Y == source.Y))
+                    {
+                        throw new ArgumentException($"Arrow requires Actor source. " +
+                            $"No Actor found at origin ({_origin.X}, {_origin.Y}).");
+                    }
+                }
+
+                Actor target = TargetActors().FirstOrDefault();
+                if (target == null)
+                {
+                    return false;
+                }
+
+                // Attack does its own messaging
+                CommandSystem.Attack(source, target, true);
+            }
+
             if (!string.IsNullOrWhiteSpace(attackMessage.ToString()))
             {
                 Game.MessageLog.Add(attackMessage.ToString());
