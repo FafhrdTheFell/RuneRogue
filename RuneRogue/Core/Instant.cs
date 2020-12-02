@@ -12,6 +12,14 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters;
 using System.Text;
 
+// The Instant class both applies an instantly occuring effect, such as being attacked by
+// a spell / rune-magic or missile weapon, and animates it. Technically it is a secondary
+// console that replaces the primary console temporarily. It replaces it by default for
+// _totalSteps draw steps. DrawEffect(x) is the code to draw step x. Typically the same
+// drawing occurs for several (5) steps; otherwise it is too fast to easily be seen. When the
+// player presses a key or _totalSteps have been drawn, DoEffectOnTarget() is called and
+// actually executes the effect.
+
 namespace RuneRogue.Core
 {
     public class Instant : SecondaryConsole
@@ -24,7 +32,8 @@ namespace RuneRogue.Core
         private string _effect;
         private int _radius;
         private int _step;
-        private int _totalSteps = 60;
+        private int _animateSteps = 5;
+        private int _totalSteps = 36;
 
         private string[] _projectileTypes =
         {
@@ -102,7 +111,13 @@ namespace RuneRogue.Core
 
         public override void DrawConsole()
         {
-            DungeonMap dungeonMap = Game.DungeonMap;
+            // sometimes short range missiles are too slow
+            if (_projectileType == "missile")
+            {
+                _totalSteps = TargetCells().Count() * _animateSteps;
+            }
+
+                DungeonMap dungeonMap = Game.DungeonMap;
             Player player = Game.Player;
 
             _console.Clear();
@@ -136,7 +151,7 @@ namespace RuneRogue.Core
                 // generate seemingly random color for each cell that will
                 // remain constant for 8 draw consoles, using hand-coded
                 // pseudo-RNG
-                int cursorStepSize = _totalSteps / 8;
+                int cursorStepSize = _totalSteps / _animateSteps;
                 int i = _step / cursorStepSize;
                 int colorChoiceRNG = 1 + i * 101 + point.X * 11 + point.Y * 37 + (point.X * point.Y % 17);
 
@@ -157,33 +172,33 @@ namespace RuneRogue.Core
                 }
                 else if (colorPattern == "Death")
                 {
-                    switch (1 + colorChoiceRNG % 3)
+                    switch (colorChoiceRNG % 3)
                     {
-                        case 1:
+                        case 0:
                             highlightColor = Colors.Poisoncloud1;
                             break;
-                        case 2:
+                        case 1:
                             highlightColor = Colors.Poisoncloud2;
                             break;
-                        case 3:
+                        case 2:
                             highlightColor = Colors.Poisoncloud3;
                             break;
                     }
                 }
-                else if (1 + colorPattern == "Elements")
+                else if (colorPattern == "Elements")
                 {
                     switch (colorChoiceRNG % 4)
                     {
-                        case 1:
+                        case 0:
                             highlightColor = Swatch.DbDeepWater;
                             break;
-                        case 2:
+                        case 1:
                             highlightColor = Colors.Gold;
                             break;
-                        case 3:
+                        case 2:
                             highlightColor = Swatch.DbSky;
                             break;
-                        case 4:
+                        case 3:
                             highlightColor = Swatch.DbBlood;
                             break;
                     }
@@ -192,6 +207,19 @@ namespace RuneRogue.Core
                 {
                     highlightColor = Swatch.DbBrightMetal;
                 }
+                else if (colorPattern == "Spit")
+                {
+                    highlightColor = Swatch.DbVegetation;
+                }
+                else if (colorPattern == "Arrow")
+                {
+                    highlightColor = Swatch.DbMetal;
+                }
+                else if (colorPattern == "Boulder")
+                {
+                    highlightColor = Swatch.DbStone;
+                }
+
                 if (point.X == player.X && point.Y == player.Y)
                 {
                     player.Draw(_console, dungeonMap);
@@ -315,7 +343,6 @@ namespace RuneRogue.Core
             {
                 DrawPatternOnTargetedCells(_effect);
             }
-            //else if (_effect == "Iron" || _effect == "Arrow" || _effect == "Spit" || _effect == "Boulder")
             else if (_projectileType == "missile")
             {
                 Player player = Game.Player;
@@ -330,9 +357,9 @@ namespace RuneRogue.Core
                 {
                     missileChar = 'o';
                 }
-                int cursorStepSize = _totalSteps / TargetCells().Count();
-                int i = drawStep / cursorStepSize;
-                DrawPatternOnTargetedCells(_effect, i, missileChar);
+                float pctComplete = (float)drawStep / (float)_totalSteps;
+                int animateStep = (int)((float)(TargetCells().Count() - 1) * pctComplete + 0.5);
+                DrawPatternOnTargetedCells(_effect, animateStep, missileChar);
             }
         }
 
@@ -372,7 +399,7 @@ namespace RuneRogue.Core
 
                     if (target.IsUndead)
                     {
-                        attackMessage.AppendFormat("{0} is immune to the poisonous vapors. ", target.Name);
+                        attackMessage.AppendFormat("{0} is unaffected by the poisonous vapors. ", target.Name);
                     }
                     else
                     {
@@ -380,7 +407,6 @@ namespace RuneRogue.Core
                         int activationDamage = Dice.Roll("1d4"); // damage
                         int poisonSpeed = activationDamage * 2 + Dice.Roll("2d4"); // speed of activation
                         Poison poison = new Poison(target, totalDamage, poisonSpeed, activationDamage);
-                        //Game.SchedulingSystem.Add(poison);
                     }
                 }
             }
