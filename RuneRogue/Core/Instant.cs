@@ -23,6 +23,8 @@ namespace RuneRogue.Core
         private string _projectileType;
         private string _effect;
         private int _radius;
+        private int _step;
+        private int _totalSteps = 60;
 
         private string[] _projectileTypes =
         {
@@ -60,6 +62,12 @@ namespace RuneRogue.Core
             set { _target = value; }
         }
 
+        public int Step
+        {
+            get { return _step; }
+            set { _step = value; }
+        }
+
         //public Instant(Cell source, Cell target, string shape, string effect, int radius=1)
         public Instant(string shape, string effect, int radius = 1)
         {
@@ -89,6 +97,7 @@ namespace RuneRogue.Core
             _radius = radius;
             //_origin = source;
             //_target = target;
+            _step = 0;
         }
 
         public override void DrawConsole()
@@ -100,8 +109,8 @@ namespace RuneRogue.Core
             dungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
             dungeonMap.Draw(_console, _nullConsole);
             player.Draw(_console, dungeonMap);
-            DrawEffect();
-            DoEffectOnTarget();
+            DrawEffect(_step);
+            _step++;
         }
 
         public void DrawPatternOnTargetedCells(string colorPattern, int? whichcell = null, char? symbol = null)
@@ -124,6 +133,13 @@ namespace RuneRogue.Core
             }
             foreach (Cell point in targetCells)
             {
+                // generate seemingly random color for each cell that will
+                // remain constant for 8 draw consoles, using hand-coded
+                // pseudo-RNG
+                int cursorStepSize = _totalSteps / 8;
+                int i = _step / cursorStepSize;
+                int colorChoiceRNG = 1 + i * 101 + point.X * 11 + point.Y * 37 + (point.X * point.Y % 17);
+
                 if (!dungeonMap.IsInFov(point.X, point.Y))
                 {
                     continue;
@@ -141,7 +157,7 @@ namespace RuneRogue.Core
                 }
                 else if (colorPattern == "Death")
                 {
-                    switch (Dice.Roll("1d3"))
+                    switch (1 + colorChoiceRNG % 3)
                     {
                         case 1:
                             highlightColor = Colors.Poisoncloud1;
@@ -154,9 +170,9 @@ namespace RuneRogue.Core
                             break;
                     }
                 }
-                else if (colorPattern == "Elements")
+                else if (1 + colorPattern == "Elements")
                 {
-                    switch (Dice.Roll("1d4"))
+                    switch (colorChoiceRNG % 4)
                     {
                         case 1:
                             highlightColor = Swatch.DbDeepWater;
@@ -293,32 +309,14 @@ namespace RuneRogue.Core
             }
         }
 
-        public void DrawEffect()
+        public void DrawEffect(int drawStep)
         {
-            if (_effect == "Elements")
+            if (_projectileType == "ball" || _projectileType == "line" || _projectileType == "point")
             {
-                for (int i = 0; i < 8; i++)
-                {
-                    DrawPatternOnTargetedCells(_effect);
-                    for (int j = 0; j < 10; j++)
-                    {
-                        Game.DrawRoot(this.Console);
-                    }
-                }
+                DrawPatternOnTargetedCells(_effect);
             }
-            else if (_effect == "Death")
-            {
-                // not sure how to do the graphics timing better than these loops
-                for (int i = 0; i < 8; i++)
-                {
-                    DrawPatternOnTargetedCells(_effect);
-                    for (int j = 0; j < 10; j++)
-                    {
-                        Game.DrawRoot(this.Console);
-                    }
-                }
-            }
-            else if (_effect == "Iron" || _effect == "Arrow" || _effect == "Spit" || _effect == "Boulder")
+            //else if (_effect == "Iron" || _effect == "Arrow" || _effect == "Spit" || _effect == "Boulder")
+            else if (_projectileType == "missile")
             {
                 Player player = Game.Player;
                 int dx = _origin.X - _target.X;
@@ -332,14 +330,9 @@ namespace RuneRogue.Core
                 {
                     missileChar = 'o';
                 }
-                for (int i = 0; i < TargetCells().Count; i++)
-                {
-                    DrawPatternOnTargetedCells(_effect, i, missileChar);
-                    for (int j = 0; j < 10; j++)
-                    {
-                        Game.DrawRoot(this.Console);
-                    }
-                }
+                int cursorStepSize = _totalSteps / TargetCells().Count();
+                int i = drawStep / cursorStepSize;
+                DrawPatternOnTargetedCells(_effect, i, missileChar);
             }
         }
 
@@ -475,7 +468,21 @@ namespace RuneRogue.Core
 
         public override bool ProcessInput(RLKeyPress rLKeyPress, RLMouse rLMouse)
         {
-            return true;
+            if (rLMouse.GetLeftClick() || rLKeyPress != null)
+            {
+                // skip to end of animation
+                _step = _totalSteps - 2;
+            }
+            
+            if (_step < _totalSteps)
+            {
+                return false;
+            }
+            else
+            {
+                DoEffectOnTarget();
+                return true;
+            }
         }
 
     }

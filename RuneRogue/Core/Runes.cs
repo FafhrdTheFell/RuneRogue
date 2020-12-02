@@ -56,7 +56,7 @@ namespace RuneRogue.Core
             }
 
             AcquireRune("Elements");
-            //AcquireRune("Death");
+            AcquireRune("Death");
             //AcquireRune("Time");
             AcquireRune("Iron");
             AcquireRune("Magic");
