@@ -145,10 +145,7 @@ namespace RuneRogue.Core
                 var cell = GetCell(x, y);
                 // Once the door is opened it should be marked as transparent and no longer block field-of-view
                 SetCellProperties(x, y, true, cell.IsWalkable, cell.IsExplored);
-                if (actor is Player)
-                {
-                    UpdatePlayerFieldOfView();
-                }
+                UpdatePlayerFieldOfView();
             }
         }
 
@@ -161,10 +158,7 @@ namespace RuneRogue.Core
                 var cell = GetCell(x, y);
                 // Once the door is opened it should be marked as transparent and no longer block field-of-view
                 SetCellProperties(x, y, false, cell.IsWalkable, cell.IsExplored);
-                if (actor is Player)
-                {
-                    UpdatePlayerFieldOfView();
-                }
+                UpdatePlayerFieldOfView();
             }
         }
 

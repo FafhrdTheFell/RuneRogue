@@ -262,7 +262,7 @@ namespace RuneRogue.Systems
 
         private void CreateDoors(Rectangle room)
         {
-            // The the boundries of the room
+            // The the boundaries of the room
             int xMin = room.Left;
             int xMax = room.Right;
             int yMin = room.Top;
