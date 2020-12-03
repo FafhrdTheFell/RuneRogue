@@ -34,6 +34,9 @@ namespace RuneRogue.Core
         private int _step;
         private int _animateSteps = 5;
         private int _totalSteps = 36;
+        // used to pass miscellaneous information, e.g., that rune decay should
+        // be tested
+        private string _specialOption; 
 
         private string[] _projectileTypes =
         {
@@ -77,8 +80,13 @@ namespace RuneRogue.Core
             set { _step = value; }
         }
 
-        //public Instant(Cell source, Cell target, string shape, string effect, int radius=1)
-        public Instant(string shape, string effect, int radius = 1)
+        public string Effect
+        {
+            get { return _effect; }
+            set { _effect = value; }
+        }
+
+        public Instant(string shape, string effect, int radius = 1, string special = "")
         {
 
             _console = new RLConsole(Game.MapWidth, Game.MapHeight);
@@ -104,6 +112,7 @@ namespace RuneRogue.Core
                 throw new ArgumentException($"Invalid instant effect {effect}.");
             }
             _radius = radius;
+            _specialOption = special;
             //_origin = source;
             //_target = target;
             _step = 0;
@@ -492,8 +501,9 @@ namespace RuneRogue.Core
             return true;
         }
 
-        public override bool ProcessInput(RLKeyPress rLKeyPress, RLMouse rLMouse)
+        public override bool ProcessInput(RLKeyPress rLKeyPress, RLMouse rLMouse, out string message)
         {
+            message = "";
             if (rLMouse.GetLeftClick() || rLKeyPress != null)
             {
                 // skip to end of animation
@@ -507,6 +517,10 @@ namespace RuneRogue.Core
             else
             {
                 DoEffectOnTarget();
+                if (_specialOption == "Rune")
+                {
+                    Game.RuneSystem.CheckDecay(Effect);
+                }
                 return true;
             }
         }

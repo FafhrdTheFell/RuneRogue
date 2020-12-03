@@ -11,7 +11,7 @@ namespace RuneRogue.Core
     {
 
 
-        private readonly string[] _runeNames =
+        private static readonly string[] _runeNames =
         {
             "Life",
             "Death",
@@ -23,8 +23,13 @@ namespace RuneRogue.Core
             "Darkness"
         };
 
+        public static string[] AllRunes
+        {
+            get { return _runeNames; }
+        }
+
         // x out of 1000
-        private readonly int[] _runeDecayProbabilities =
+        private static readonly int[] _runeDecayProbabilities =
         {
             20,
             500,
@@ -133,33 +138,35 @@ namespace RuneRogue.Core
 
                 if (rune == "Elements")
                 {
-                    CheckDecay(rune);
+                    // XXX simplify these conditions
+                    //CheckDecay(rune);
                     Game.SecondaryConsoleActive = true;
                     Game.AcceleratePlayer = false;
                     Game.CurrentSecondary = Game.TargetingSystem;
-                    Game.PostSecondary = new Instant("line", "Elements");
+                    string message = "Rune";
+                    Game.PostSecondary = new Instant("line", "Elements", special:"Rune");
                     Game.TargetingSystem.InitializeNewTarget("line", "Elements", 8);
                     Game.MessageLog.Add("Select your target.");
                     return false;
                 }
                 else if (rune == "Death")
                 {
-                    CheckDecay(rune);
+                    //CheckDecay(rune);
                     Game.SecondaryConsoleActive = true;
                     Game.AcceleratePlayer = false;
                     Game.CurrentSecondary = Game.TargetingSystem;
-                    Game.PostSecondary = new Instant("ball", "Death", 5);
+                    Game.PostSecondary = new Instant("ball", "Death", radius:5, special:"Rune");
                     Game.TargetingSystem.InitializeNewTarget("ball", "Death", 8, 5);
                     Game.MessageLog.Add("Select your target.");
                     return false;
                 }
                 else if (rune == "Iron")
                 {
-                    CheckDecay(rune);
+                    //CheckDecay(rune);
                     Game.SecondaryConsoleActive = true;
                     Game.AcceleratePlayer = false;
                     Game.CurrentSecondary = Game.TargetingSystem;
-                    Game.PostSecondary = new Instant("missile", "Iron");
+                    Game.PostSecondary = new Instant("missile", "Iron", special:"Rune");
                     Game.TargetingSystem.InitializeNewTarget("missile", "Iron", 10);
                     Game.MessageLog.Add("Select your target.");
                     return false;

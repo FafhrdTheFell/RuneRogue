@@ -241,15 +241,21 @@ namespace RuneRogue
             if (SecondaryConsoleActive)
             {
                 AcceleratePlayer = false;
-                bool finished = CurrentSecondary.ProcessInput(keyPress, rLMouse);
+                string completionMessage = "";
+                bool finished = CurrentSecondary.ProcessInput(keyPress, rLMouse, out completionMessage);
                 if (finished)
                 {
-                    SecondaryConsoleActive = false;
-                    if (CurrentSecondary is TargetingSystem)
+                    if (completionMessage != "Cancelled")
                     {
-                        CurrentSecondary = PostSecondary;
-                        SecondaryConsoleActive = true;
+                        didPlayerAct = true;
+                        
+                        if (CurrentSecondary is TargetingSystem)
+                        {
+                            CurrentSecondary = PostSecondary;
+                            SecondaryConsoleActive = true;
+                        }
                     }
+                    SecondaryConsoleActive = false;
                 }
                 _renderRequired = true;
 

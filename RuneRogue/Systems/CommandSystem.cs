@@ -280,6 +280,8 @@ namespace RuneRogue.Systems
                     Game.SchedulingSystem.Add(monster);
                 }
 
+                // activate next schedulable without returning to main loop:
+                // makes game faster and only need main loop for player input
                 ActivateMonsters();
             }
             else if (scheduleable is Effect)
@@ -292,6 +294,8 @@ namespace RuneRogue.Systems
                     Game.SchedulingSystem.Add(effect);
                     effect.DoEffect();
                 }
+
+                ActivateMonsters();
             }
         }
 
@@ -311,9 +315,11 @@ namespace RuneRogue.Systems
             DungeonMap dungeonMap = Game.DungeonMap;
             Game.SecondaryConsoleActive = true;
             Game.AcceleratePlayer = false;
-            Instant shot = new Instant("missile", attacker.MissileType);
-            shot.Origin = dungeonMap.GetCell(attacker.X, attacker.Y);
-            shot.Target = dungeonMap.GetCell(defender.X, defender.Y);
+            Instant shot = new Instant("missile", attacker.MissileType)
+            {
+                Origin = dungeonMap.GetCell(attacker.X, attacker.Y),
+                Target = dungeonMap.GetCell(defender.X, defender.Y)
+            };
             Game.CurrentSecondary = shot;
         }
 
@@ -340,7 +346,7 @@ namespace RuneRogue.Systems
                 }
             }
 
-            ResolveDamage(attacker, defender, damage, attackMessage);
+            ResolveDamage(attacker, defender, damage, missileAttack, attackMessage);
 
             if (defender.Health <= 0)
             {
@@ -366,7 +372,16 @@ namespace RuneRogue.Systems
             bool attackHit = false;
             // criticals only on backstab
             critical = false;
-            int diff = attacker.AttackSkill - defender.DefenseSkill;
+            int diff;
+            if (missileAttack)
+            {
+                diff = attacker.AttackSkill - 5;
+            }
+            else
+            {
+                diff = attacker.AttackSkill - defender.DefenseSkill;
+            }
+
             if (attacker.SASenseThoughts && !defender.IsUndead)
             {
                 diff += 4;
@@ -397,7 +412,7 @@ namespace RuneRogue.Systems
                 attackMessage.AppendFormat("{0} hits {1} (roll {2} < {3}).", attacker.Name, 
                     defender.Name, roll, chanceInt);
                 attackHit = true;
-                if (attacker.SALifedrainOnHit)
+                if (attacker.SALifedrainOnHit && !missileAttack)
                 {
                     if (defender.Health == defender.MaxHealth)
                     {
@@ -414,7 +429,7 @@ namespace RuneRogue.Systems
                     }
                     attackMessage.AppendFormat(" {0} feels cold.", defender.Name);
                 }
-                if (attacker.SADoppelganger)
+                if (attacker.SADoppelganger && !missileAttack)
                 {
                     // if symbol is @, then already has transformed
                     if (!(attacker.Symbol == '@'))
@@ -452,13 +467,23 @@ namespace RuneRogue.Systems
         public static int ResolveArmor(Actor defender, Actor attacker, int damageBonus, bool missileAttack, StringBuilder attackMessage)
         {
             string attackDice;
-            if (!attacker.SAHighImpact)
+            int baseAttack;
+            if (missileAttack)
             {
-                attackDice = "1d" + (attacker.Attack + damageBonus).ToString();
+                baseAttack = attacker.MissileAttack + damageBonus;
             }
             else
             {
-                attackDice = "2d" + (attacker.Attack + damageBonus).ToString() + "k1";
+                baseAttack = attacker.Attack + damageBonus;
+            }
+            // HighImpact also applies to missile weapons
+            if (attacker.SAHighImpact)
+            {
+                attackDice = "2d" + baseAttack.ToString() + "k1";
+            }
+            else
+            {
+                attackDice = "1d" + baseAttack.ToString();
             }
             int attackResult = Dice.Roll(attackDice);
             int defenseResult;
@@ -489,12 +514,12 @@ namespace RuneRogue.Systems
 
 
         // Apply any damage that wasn't blocked to the defender
-        private static void ResolveDamage(Actor attacker, Actor defender, int damage, StringBuilder attackMessage)
+        private static void ResolveDamage(Actor attacker, Actor defender, int damage, bool missileAttack, StringBuilder attackMessage)
         {
             if (damage > 0)
             {
                 defender.Health -= damage;
-                if (attacker.SAVenomous)
+                if (attacker.SAVenomous && !missileAttack)
                 {
                     int totalDamage = Dice.Roll("2d" + attacker.Attack.ToString());
                     int activationDamage = Dice.Roll("1d" + (attacker.Attack / 2).ToString()); // damage each activation
@@ -502,13 +527,13 @@ namespace RuneRogue.Systems
                     Poison poison = new Poison(defender, totalDamage, poisonSpeed, activationDamage);
                     //Game.SchedulingSystem.Add(poison);
                 }
-                if (attacker.SAVampiric)
+                if (attacker.SAVampiric && !missileAttack)
                 {
                     int gain = damage;
                     attacker.Health = Math.Min(attacker.Health + gain, attacker.MaxHealth);
                     attackMessage.AppendFormat(" {0} feeds on {1}'s life.", attacker.Name, defender.Name);
                 }
-                if (damage > 0 && attacker.SALifedrainOnDamage)
+                if (damage > 0 && attacker.SALifedrainOnDamage && !missileAttack)
                 {
                     int drain = Math.Max(damage / 2, 1);
                     defender.MaxHealth -= drain;

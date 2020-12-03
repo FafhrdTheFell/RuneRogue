@@ -32,8 +32,9 @@ namespace RuneRogue.Core
         }
 
         // process key press and return true iff finished with console
-        public virtual bool ProcessInput(RLKeyPress rLKeyPress, RLMouse rLMouse)
+        public virtual bool ProcessInput(RLKeyPress rLKeyPress, RLMouse rLMouse, out string message)
         {
+            message = "";
             int choiceNum = -1;
             if (rLMouse.GetLeftClick())
             {
@@ -42,6 +43,7 @@ namespace RuneRogue.Core
                     if (rLMouse.Y - 4 - _verticalOffset + 2 - NumOptions * 2 == 3)
                     {
                         // exit row pressed
+                        message = "Cancelled";
                         return true;
                     }
                     if ((rLMouse.Y - 4 - _verticalOffset) % 2 == 0)
@@ -65,11 +67,12 @@ namespace RuneRogue.Core
                 {
                     return false;
                 }
-                if (rLKeyPress.Key == RLKey.X || rLKeyPress.Key == RLKey.R)
+                if (rLKeyPress.Key == RLKey.X || rLKeyPress.Key == RLKey.R || rLKeyPress.Key == RLKey.Escape)
                 {
+                    message = "Cancelled";
                     return true;
                 }
-                //int choiceNum;
+
                 bool isNumber = int.TryParse(rLKeyPress.Char.ToString(), out choiceNum);
                 if (!isNumber || choiceNum > NumOptions || choiceNum < 1)
                 {

@@ -244,8 +244,9 @@ namespace RuneRogue.Systems
         }
 
         // process key press and return true iff finished with console
-        public override bool ProcessInput(RLKeyPress rLKeyPress, RLMouse rLMouse)
+        public override bool ProcessInput(RLKeyPress rLKeyPress, RLMouse rLMouse, out string message)
         {
+            message = "";
             Player player = Game.Player;
             Point _newTarget = new Point
             {
@@ -254,6 +255,7 @@ namespace RuneRogue.Systems
             };
             bool leftClick = rLMouse.GetLeftClick();
             bool enterPressed = false;
+            bool cancelPressed = false;
             if (leftClick)
             {
                 _newTarget = new Point
@@ -275,6 +277,7 @@ namespace RuneRogue.Systems
                 {
                     enterPressed = true;
                 }
+                cancelPressed = _inputSystem.CancelKeyPressed(rLKeyPress);
             }
             bool playerTargeted = (_newTarget.X == player.X && _newTarget.Y == player.Y);
             if (_newTarget == _currentTarget && !playerTargeted &&
@@ -282,15 +285,19 @@ namespace RuneRogue.Systems
             {
                 _console.Clear();
                 DungeonMap dungeonMap = Game.DungeonMap;
-                //dungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
                 dungeonMap.Draw(_console, _nullConsole);
                 if (Game.PostSecondary is Instant)
                 {
                     Instant nextSecondary = Game.PostSecondary as Instant;
+
                     nextSecondary.Origin = dungeonMap.GetCell(player.X, player.Y);
                     nextSecondary.Target = dungeonMap.GetCell(_newTarget.X, _newTarget.Y);
                 }
-                //DoEffectOnTarget();
+                return true;
+            }
+            else if (_newTarget == _currentTarget && (cancelPressed))
+            {
+                message = "Cancelled";
                 return true;
             }
             else if (_newTarget == _currentTarget && playerTargeted &&

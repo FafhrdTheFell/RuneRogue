@@ -137,6 +137,11 @@ namespace RuneRogue.Systems
             return yesquit;
         }
 
+        public bool CancelKeyPressed(RLKeyPress keyPress)
+        {
+            return ((keyPress.Key == RLKey.Escape) || (keyPress.Key == RLKey.X));
+        }
+
         public bool DescendStairs(RLKeyPress keyPress)
         {
             return (keyPress.Key == RLKey.Period && keyPress.Shift);
