@@ -143,7 +143,6 @@ namespace RuneRogue.Core
                     Game.SecondaryConsoleActive = true;
                     Game.AcceleratePlayer = false;
                     Game.CurrentSecondary = Game.TargetingSystem;
-                    string message = "Rune";
                     Game.PostSecondary = new Instant("line", "Elements", special:"Rune");
                     Game.TargetingSystem.InitializeNewTarget("line", "Elements", 8);
                     Game.MessageLog.Add("Select your target.");

@@ -136,7 +136,10 @@ namespace RuneRogue.Systems
             }
             return yesquit;
         }
-
+        public bool CloseDoorKeyPressed(RLKeyPress keyPress)
+        {
+            return keyPress.Key == RLKey.C;
+        }
         public bool CancelKeyPressed(RLKeyPress keyPress)
         {
             return ((keyPress.Key == RLKey.Escape) || (keyPress.Key == RLKey.X));

@@ -8,11 +8,6 @@ using RuneRogue.Interfaces;
 using RuneRogue.Effects;
 using RuneRogue.Items;
 using System;
-using System.Runtime.ExceptionServices;
-using System.Security.Policy;
-using System.Security.Cryptography.X509Certificates;
-using System.Collections.Generic;
-using System.Threading;
 
 namespace RuneRogue.Systems
 {
@@ -217,6 +212,28 @@ namespace RuneRogue.Systems
                 Game.AcceleratePlayer = false;
                 Game.CurrentSecondary = shop;
             }
+        }
+
+        public bool CloseDoorsNextTo(Actor actor)
+        {
+            DungeonMap dungeonMap = Game.DungeonMap;
+            bool closedDoors = false;
+            for (int dx = -1; dx < 2; dx++)
+            {
+                for (int dy = -1; dy < 2; dy++)
+                {
+                    if (dx == 0 && dy == 0)
+                    {
+                        continue;
+                    }
+                    else if (dungeonMap.GetDoor(actor.X+dx, actor.Y+dy) != null)
+                    {
+                        closedDoors = true;
+                        dungeonMap.CloseDoor(actor, actor.X + dx, actor.Y + dy);
+                    }
+                }
+            }
+            return closedDoors;
         }
 
         public bool PickupItemPlayer()

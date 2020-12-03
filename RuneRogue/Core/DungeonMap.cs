@@ -81,6 +81,15 @@ namespace RuneRogue.Core
                     return false;
                 }
             }
+            // bump into door to open
+            if (GetDoor(x, y) != null)
+            {
+                if (!GetDoor(x, y).IsOpen)
+                    {
+                    OpenDoor(actor, x, y);
+                    return true;
+                }
+            }
             // Only allow actor placement if the cell is walkable
             if (GetCell(x, y).IsWalkable)
             {
@@ -92,7 +101,7 @@ namespace RuneRogue.Core
                 // The new cell the actor is on is now not walkable
                 SetIsWalkable(actor.X, actor.Y, false);
                 // Try to open a door if one exists here
-                OpenDoor(actor, x, y);
+                //OpenDoor(actor, x, y);
                 // Don't forget to update the field of view if we just repositioned the player
                 if (actor is Player)
                 {
@@ -136,7 +145,26 @@ namespace RuneRogue.Core
                 var cell = GetCell(x, y);
                 // Once the door is opened it should be marked as transparent and no longer block field-of-view
                 SetCellProperties(x, y, true, cell.IsWalkable, cell.IsExplored);
+                if (actor is Player)
+                {
+                    UpdatePlayerFieldOfView();
+                }
+            }
+        }
 
+        public void CloseDoor(Actor actor, int x, int y)
+        {
+            Door door = GetDoor(x, y);
+            if (door != null && door.IsOpen)
+            {
+                door.IsOpen = false;
+                var cell = GetCell(x, y);
+                // Once the door is opened it should be marked as transparent and no longer block field-of-view
+                SetCellProperties(x, y, false, cell.IsWalkable, cell.IsExplored);
+                if (actor is Player)
+                {
+                    UpdatePlayerFieldOfView();
+                }
             }
         }
 

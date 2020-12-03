@@ -241,7 +241,7 @@ namespace RuneRogue
             if (SecondaryConsoleActive)
             {
                 AcceleratePlayer = false;
-                string completionMessage = "";
+                string completionMessage;
                 bool finished = CurrentSecondary.ProcessInput(keyPress, rLMouse, out completionMessage);
                 if (finished)
                 {
@@ -363,6 +363,10 @@ namespace RuneRogue
                                 AcceleratePlayer = _inputSystem.ShiftDown(keyPress);
                                 AccelerateDirection = direction;
                                 didPlayerAct = CommandSystem.MovePlayer(direction);
+                            }
+                            else if (_inputSystem.CloseDoorKeyPressed(keyPress))
+                            {
+                                didPlayerAct = CommandSystem.CloseDoorsNextTo(Player);
                             }
                             else if (_inputSystem.QuitKeyPressed(keyPress))
                             {
