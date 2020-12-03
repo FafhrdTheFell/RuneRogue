@@ -3,12 +3,14 @@ using RLNET;
 using RuneRogue.Behaviors;
 using RuneRogue.Interfaces;
 using RuneRogue.Systems;
+using RogueSharp;
 
 namespace RuneRogue.Core
 {
     public class Monster : Actor, INPC
     {
         public int? TurnsAlerted { get; set; }
+        public Cell LastLocationPlayerSeen { get; set; }
 
         private string _numberAppearing;
         private int _minLevel;

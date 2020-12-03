@@ -15,8 +15,11 @@ namespace RuneRogue.Behaviors
             DungeonMap dungeonMap = Game.DungeonMap;
             Player player = Game.Player;
 
+            // Compute a field-of-view 
+            // Use the monsters Awareness value for the distance in the FoV check
+            // If the player is in the monster's FoV then alert it, unless the
+            // player is invisible and passes a stealth test
             bool canSeePlayer = false;
-
             FieldOfView monsterFov = new FieldOfView(dungeonMap);
             monsterFov.ComputeFov(monster.X, monster.Y, monster.Awareness, true);
             int distFromPlayer = Math.Abs(player.X - monster.X) + Math.Abs(player.Y - monster.Y);
@@ -26,25 +29,26 @@ namespace RuneRogue.Behaviors
                 if (player.IsInvisible)
                 {
                     string dieSize = (distFromPlayer + 3).ToString();
-                    if (Dice.Roll("1d" + dieSize) > 2)
+                    int stealthRoll = Dice.Roll("1d" + dieSize); // higher roll = more stealthy
+                    if (stealthRoll > 2)
                     {
+                        // player unseen
                         canSeePlayer = false;
-                        monster.TurnsAlerted = null;
+                        //monster.TurnsAlerted = null;
+                        if (stealthRoll > 4)
+                        {
+                            // lose awareness of player's last location
+                            monster.LastLocationPlayerSeen = dungeonMap.GetCell(monster.X, monster.Y);
+                        }
                     }
                 }
             }
 
-            // If the monster has not been alerted, compute a field-of-view 
-            // Use the monsters Awareness value for the distance in the FoV check
-            // If the player is in the monster's FoV then alert it
-            // Add a message to the MessageLog regarding this alerted status
-            if (!monster.TurnsAlerted.HasValue)
+            if (canSeePlayer)
             {
-                if (canSeePlayer)
-                {
-                    // Game.MessageLog.Add( $"{monster.Name} is eager to fight {player.Name}" );
-                    monster.TurnsAlerted = 1;
-                }
+                // update memory
+                monster.TurnsAlerted = 1;
+                monster.LastLocationPlayerSeen = dungeonMap.GetCell(player.X, player.Y);
             }
 
             if (canSeePlayer && monster.MissileRange >= distFromPlayer)
@@ -79,7 +83,7 @@ namespace RuneRogue.Behaviors
                 }
             }
 
-            if (monster.TurnsAlerted.HasValue && canSeePlayer)
+            if (monster.TurnsAlerted.HasValue)
             {
 
                 // Before we find a path, make sure to make the monster and player Cells walkable
@@ -93,7 +97,7 @@ namespace RuneRogue.Behaviors
                 {
                     path = pathFinder.ShortestPath(
                        dungeonMap.GetCell(monster.X, monster.Y),
-                       dungeonMap.GetCell(player.X, player.Y));
+                       dungeonMap.GetCell(monster.LastLocationPlayerSeen.X, monster.LastLocationPlayerSeen.Y));
 
                     // long paths are usually indirect. Avoid them if monster would fall asleep.
                     if (path.Length > 15)
@@ -132,8 +136,10 @@ namespace RuneRogue.Behaviors
                 else
                 {
                     // move monster towards player if there is space
-                    int dx = 1 * Convert.ToInt32(player.X > monster.X) - 1 * Convert.ToInt32(monster.X > player.X);
-                    int dy = 1 * Convert.ToInt32(player.Y > monster.Y) - 1 * Convert.ToInt32(monster.Y > player.Y);
+                    int dx = 1 * Convert.ToInt32(monster.LastLocationPlayerSeen.X > monster.X) 
+                        - 1 * Convert.ToInt32(monster.LastLocationPlayerSeen.X > player.X);
+                    int dy = 1 * Convert.ToInt32(monster.LastLocationPlayerSeen.Y > monster.Y) 
+                        - 1 * Convert.ToInt32(monster.LastLocationPlayerSeen.Y > player.Y);
                     if (!(dx == 0) && !(dy == 0))
                     {
                         // pick random direction
@@ -150,9 +156,16 @@ namespace RuneRogue.Behaviors
 
                 }
 
+                // if monster reached last known player location, give up until
+                // can see player again
+                if (monster.X == monster.LastLocationPlayerSeen.X && monster.Y == monster.LastLocationPlayerSeen.Y)
+                {
+                    monster.TurnsAlerted = null;
+                }
+
                 monster.TurnsAlerted++;
 
-                // Lose alerted status every 15 turns. 
+                // Lose alerted status 15 turns after losing sight of the player. 
                 // As long as the player is still in FoV the monster will be realerted
                 // Otherwise the monster will quit chasing the player.
                 if (monster.TurnsAlerted > 15)

@@ -245,6 +245,7 @@ namespace RuneRogue
                 bool finished = CurrentSecondary.ProcessInput(keyPress, rLMouse, out completionMessage);
                 if (finished)
                 {
+                    SecondaryConsoleActive = false;
                     if (completionMessage != "Cancelled")
                     {   
                         if (CurrentSecondary is TargetingSystem)
@@ -253,7 +254,6 @@ namespace RuneRogue
                             SecondaryConsoleActive = true;
                         }
                     }
-                    SecondaryConsoleActive = false;
                 }
                 _renderRequired = true;
 
