@@ -246,9 +246,7 @@ namespace RuneRogue
                 if (finished)
                 {
                     if (completionMessage != "Cancelled")
-                    {
-                        didPlayerAct = true;
-                        
+                    {   
                         if (CurrentSecondary is TargetingSystem)
                         {
                             CurrentSecondary = PostSecondary;
@@ -377,6 +375,7 @@ namespace RuneRogue
                                 AcceleratePlayer = false;
                                 CurrentSecondary = RuneSystem;
                                 _renderRequired = true;
+                                didPlayerAct = true;
                             }
                             else if (_inputSystem.PickupKeyPressed(keyPress))
                             {
