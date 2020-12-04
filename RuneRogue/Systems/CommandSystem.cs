@@ -578,6 +578,12 @@ namespace RuneRogue.Systems
             if (defender is Player)
             {
                 //Game.MessageLog.Add($"{defender.Name} has died. Game Over! Final score: {Game.Player.LifetimeGold}.");
+                if (Game.RuneSystem.RunesOwned().Contains("Life"))
+                {
+                    Game.MessageLog.Add($"{defender.Name}'s Rune of Life flashes!");
+                    defender.Health = defender.MaxHealth;
+                    Game.RuneSystem.CheckDecay("Life");
+                }
                 
 
 

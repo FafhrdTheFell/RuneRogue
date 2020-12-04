@@ -10,7 +10,6 @@ namespace RuneRogue.Core
     public class Runes : SecondaryConsole
     {
 
-
         private static readonly string[] _runeNames =
         {
             "Life",
@@ -29,22 +28,62 @@ namespace RuneRogue.Core
         }
 
         // x out of 1000
-        private static readonly int[] _runeDecayProbabilities =
+        private static readonly Dictionary<string, int> _decayProbability = new Dictionary<string, int>()
         {
-            20,
-            500,
-            500,
-            12,
-            15,
-            500,
-            80,
-            10
+            ["Life"] = 20,
+            ["Death"] = 500,
+            ["Elements"] = 500,
+            ["Thought"] = 12,
+            ["Time"] = 15,
+            ["Magic"] = 500,
+            ["Iron"] = 80,
+            ["Darkness"] = 20
+        };
+
+        private static readonly List<string> _passiveRunes = new List<string>()
+        {
+            "Magic",
+            "Life"
+        };
+
+        private static readonly List<string> _functionalRunes = new List<string>()
+        {
+            "Thought",
+            "Time",
+            "Darkness"
+        };
+
+        private static readonly List<string> _offensiveRunes = new List<string>()
+        {
+            "Elements",
+            "Death",
+            "Iron"
+        };
+
+        private static readonly Dictionary<string, string> _offensiveProjectile = new Dictionary<string, string>()
+        {
+            ["Elements"] = "line",
+            ["Death"] = "ball",
+            ["Iron"] = "missile"
+        };
+
+        private static readonly Dictionary<string, int> _offensiveRange = new Dictionary<string, int>()
+        {
+            ["Elements"] = 8,
+            ["Death"] = 8,
+            ["Iron"] = 10
+        };
+
+        private static readonly Dictionary<string, int> _offensiveRadius = new Dictionary<string, int>()
+        {
+            ["Elements"] = 1,
+            ["Death"] = 5,
+            ["Iron"] = 1
         };
 
         public const int BonusToDamageIron = 18;
         public const int BonusToSpeedTime = 4;
 
-        private Dictionary<string, int> _decayProbability;
         private List<string> _runesOwned;
         private List<string> _runesActive;
 
@@ -54,17 +93,18 @@ namespace RuneRogue.Core
             _runesOwned = new List<string>();
             _runesActive = new List<string>();
             
-            _decayProbability = new Dictionary<string, int>();
-            for (int i = 0; i < _runeNames.Length; i++)
-            {
-                _decayProbability.Add(_runeNames[i], _runeDecayProbabilities[i]);
-            }
+            //_decayProbability = new Dictionary<string, int>();
+            //for (int i = 0; i < _runeNames.Length; i++)
+            //{
+            //    _decayProbability.Add(_runeNames[i], _runeDecayProbabilities[i]);
+            //}
 
             AcquireRune("Elements");
             AcquireRune("Death");
             //AcquireRune("Time");
             AcquireRune("Iron");
             AcquireRune("Magic");
+            AcquireRune("Life");
             //AcquireRune("Darkness");
         }
 
@@ -128,51 +168,29 @@ namespace RuneRogue.Core
         {
             if (_runesOwned.Contains(rune) && !(_runesActive.Contains(rune)))
             {
-                if (rune == "Magic")
+                if (_passiveRunes.Contains(rune))
                 {
-                    Game.MessageLog.Add("The Rune of Magic cannot be activated.");
+                    Game.MessageLog.Add($"The Rune of {rune} cannot be activated.");
                     return false;
                 }
 
                 Game.MessageLog.Add($"{Game.Player.Name} channels Rune of {rune}.");
 
-                if (rune == "Elements")
+                if (_offensiveRunes.Contains(rune))
                 {
-                    // XXX simplify these conditions
-                    //CheckDecay(rune);
                     Game.SecondaryConsoleActive = true;
                     Game.AcceleratePlayer = false;
                     Game.CurrentSecondary = Game.TargetingSystem;
-                    Game.PostSecondary = new Instant("line", "Elements", special:"Rune");
-                    Game.TargetingSystem.InitializeNewTarget("line", "Elements", 8);
-                    Game.MessageLog.Add("Select your target.");
-                    return false;
-                }
-                else if (rune == "Death")
-                {
-                    //CheckDecay(rune);
-                    Game.SecondaryConsoleActive = true;
-                    Game.AcceleratePlayer = false;
-                    Game.CurrentSecondary = Game.TargetingSystem;
-                    Game.PostSecondary = new Instant("ball", "Death", radius:5, special:"Rune");
-                    Game.TargetingSystem.InitializeNewTarget("ball", "Death", 8, 5);
-                    Game.MessageLog.Add("Select your target.");
-                    return false;
-                }
-                else if (rune == "Iron")
-                {
-                    //CheckDecay(rune);
-                    Game.SecondaryConsoleActive = true;
-                    Game.AcceleratePlayer = false;
-                    Game.CurrentSecondary = Game.TargetingSystem;
-                    Game.PostSecondary = new Instant("missile", "Iron", special:"Rune");
-                    Game.TargetingSystem.InitializeNewTarget("missile", "Iron", 10);
+                    Game.PostSecondary = new Instant(_offensiveProjectile[rune], rune, radius: 
+                        _offensiveRadius[rune], special: "Rune");
+                    Game.TargetingSystem.InitializeNewTarget(_offensiveProjectile[rune], rune, 
+                        _offensiveRange[rune], _offensiveRadius[rune]);
                     Game.MessageLog.Add("Select your target.");
                     return false;
                 }
 
+                // functional rune
                 StartRune(rune);
-
                 return true;
             }
             else if (_runesOwned.Contains(rune) && _runesActive.Contains(rune))
@@ -196,10 +214,10 @@ namespace RuneRogue.Core
             _runesActive.Add(rune);
             switch (rune)
             {
-                case "Life":
-                    Game.MessageLog.Add($"{Game.Player.Name} begins to regenerate.");
-                    Game.Player.SARegeneration = true;
-                    break;
+                //case "Life":
+                //    Game.MessageLog.Add($"{Game.Player.Name} begins to regenerate.");
+                //    Game.Player.SARegeneration = true;
+                //    break;
                 case "Thought":
                     Game.MessageLog.Add($"{Game.Player.Name} begins to sense nearby thoughts.");
                     Game.Player.SASenseThoughts = true;
@@ -271,6 +289,11 @@ namespace RuneRogue.Core
             }
 
             return runeList;
+        }
+
+        public List<string> RunesOwned()
+        {
+            return new List<string>(_runesOwned);
         }
 
         public override void DrawConsole()
