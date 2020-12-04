@@ -71,7 +71,7 @@ namespace RuneRogue.Behaviors
                         {
                             continue;
                         }
-                        if (dungeonMap.GetMonsterAt(cell.X, cell.Y) != null)
+                        if (dungeonMap.GetMonsterAt(cell.X, cell.Y) != null || !cell.IsTransparent)
                         {
                             shotNotBlocked = false;
                         }

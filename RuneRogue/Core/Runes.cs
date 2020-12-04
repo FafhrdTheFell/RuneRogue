@@ -99,21 +99,15 @@ namespace RuneRogue.Core
             _numOptions = _runeNames.Length;
             _runesOwned = new List<string>();
             _runesActive = new List<string>();
-            
-            //_decayProbability = new Dictionary<string, int>();
-            //for (int i = 0; i < _runeNames.Length; i++)
-            //{
-            //    _decayProbability.Add(_runeNames[i], _runeDecayProbabilities[i]);
-            //}
 
-            AcquireRune("Elements");
-            AcquireRune("Death");
+            //AcquireRune("Elements");
+            //AcquireRune("Death");
             //AcquireRune("Time");
-            AcquireRune("Iron");
-            AcquireRune("Magic");
-            AcquireRune("Life");
-            AcquireRune("Ram");
-            AcquireRune("Darkness");
+            //AcquireRune("Iron");
+            //AcquireRune("Magic");
+            //AcquireRune("Life");
+            //AcquireRune("Ram");
+            //AcquireRune("Darkness");
         }
 
 
