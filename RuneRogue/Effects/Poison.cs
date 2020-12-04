@@ -27,8 +27,28 @@ namespace RuneRogue.Effects
             : base(poisoned, speed, 
                   speed * (totalDamage / activationDamage + 1 * Convert.ToInt32(totalDamage % activationDamage > 0)))
         {
-            ActivationDamage = activationDamage; 
+            ActivationDamage = activationDamage;
+            EffectType = "poison";
         }
+        public override void StartEffect()
+        {
+            if (Target.ExistingEffect("poison") != null)
+            {
+                Poison oldPoison = Target.ExistingEffect("poison") as Poison;
+                int totalDamage = ActivationDamage * Duration / Speed;
+                int timeLeft = oldPoison.Duration - (Game.SchedulingSystem.GetTime() - oldPoison.StartTime);
+                int newDuration = timeLeft + Duration / 2;
+                int newActivationDamage = (ActivationDamage + oldPoison.ActivationDamage) / 2 + 1;
+                oldPoison.Duration = newDuration;
+                oldPoison.ActivationDamage = newActivationDamage;
+            }
+            else
+            {
+                Game.SchedulingSystem.Add(this);
+                Target.AddEffect(this);
+            }
+        }
+
 
         public override void PerformEffectOn(Actor target)
         {

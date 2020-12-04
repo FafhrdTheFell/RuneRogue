@@ -226,6 +226,7 @@ namespace RuneRogue.Systems
                     rerollMonster = false;
 
                     monster = CreateMonster(monsterType);
+                    
                     if (DungeonLevel < monster.MinLevel || DungeonLevel > monster.MaxLevel)
                     {
                         rerollMonster = true;
@@ -257,6 +258,8 @@ namespace RuneRogue.Systems
             }
 
             int numberOfMonsters = Dice.Roll(numInRoomDice);
+
+            //monsterType = "beetle";
 
             for (int i = 0; i < numberOfMonsters; i++)
             {

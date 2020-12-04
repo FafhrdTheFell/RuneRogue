@@ -87,7 +87,12 @@ namespace RuneRogue.Core
             int width = Convert.ToInt32(((double)Health / (double)MaxHealth) * (double)(Game.StatWidth - 4));
             int remainingWidth = Game.StatWidth - 5 - width;
             // Set the background colors of the health bar to show how damaged the monster is
-            statConsole.SetBackColor(3, yPosition, width, 1, Swatch.PrimaryLighter);
+            RLColor healthBarColor = Swatch.PrimaryLighter;
+            if (this.IsPoisoned)
+            {
+                healthBarColor = Swatch.DbGrass;
+            }
+            statConsole.SetBackColor(3, yPosition, width, 1, healthBarColor);
             statConsole.SetBackColor(3 + width, yPosition, remainingWidth, 1, Swatch.PrimaryDarkest);
             // Print the monsters name over top of the health bar
             statConsole.Print(2, yPosition, $": {Name}", Swatch.DbLight);

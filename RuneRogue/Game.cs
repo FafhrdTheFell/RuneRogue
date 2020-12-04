@@ -205,6 +205,8 @@ namespace RuneRogue
             //RLKeyPress keyPress = _rootConsole.Keyboard.GetKeyPress();
 
             //Poison poison = new Poison(Player,10,6,3);
+            //bool isP = Player.ExistingEffect("poison") != null;
+            //System.Console.WriteLine(isP);
 
             // Begin RLNET's game loop at 45 fps
             _rootConsole.Run(45);
@@ -236,7 +238,6 @@ namespace RuneRogue
                 }
                 
             }
-            
 
             if (SecondaryConsoleActive)
             {

@@ -3,6 +3,8 @@ using RogueSharp;
 using RogueSharp.DiceNotation;
 using RuneRogue.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.ComponentModel;
 using System.ComponentModel.Design.Serialization;
 
@@ -38,7 +40,27 @@ namespace RuneRogue.Core
         private bool _ferocious;
         private bool _venomous;
 
+        private List<Effect> _currentEffects = new List<Effect>();
 
+        public List<Effect> CurrentEffects
+        {
+            get { return _currentEffects; }
+        }
+
+        public Effect ExistingEffect(string effectType)
+        {
+            return _currentEffects.FirstOrDefault(d => d.EffectType == effectType);
+        }
+
+        public void AddEffect(Effect effect)
+        {
+            _currentEffects.Add(effect);
+        }
+
+        public void RemoveEffect(Effect effect)
+        {
+            _currentEffects.Remove(effect);
+        }
 
         public int Attack
         {
@@ -210,6 +232,10 @@ namespace RuneRogue.Core
             get { return _undead; }
             set { _undead = value; }
         }
+        public bool IsPoisoned
+        {
+            get { return this.ExistingEffect("poison") != null; }
+        }
         public bool SAFerocious
         {
             get { return _ferocious; }
@@ -260,6 +286,8 @@ namespace RuneRogue.Core
             get { return _senseThoughts; }
             set { _senseThoughts = value; }
         }
+
+
 
         public void DoppelgangTransform()
         {

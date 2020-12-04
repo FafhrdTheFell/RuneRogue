@@ -9,12 +9,13 @@ using System.Threading.Tasks;
 
 namespace RuneRogue.Core
 {
-    class Effect : IScheduleable
+    public class Effect : IScheduleable
     {
         Actor _target;
         int _speed;
         int _starttime;
         int _duration;
+        string _effectType;
 
         public Actor Target
         {
@@ -41,6 +42,12 @@ namespace RuneRogue.Core
             set { _duration = value; }
         }
 
+        public string EffectType
+        {
+            get { return _effectType; }
+            set { _effectType = value; }
+        }
+
         public virtual int Time
         {
             get { return Speed; }
@@ -58,11 +65,13 @@ namespace RuneRogue.Core
         public virtual void StartEffect()
         {
             Game.SchedulingSystem.Add(this);
+            Target.AddEffect(this);
         }
 
         public virtual void FinishEffect()
         {
             Game.SchedulingSystem.Remove(this);
+            Target.RemoveEffect(this);
         }
 
 
