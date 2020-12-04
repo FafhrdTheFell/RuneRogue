@@ -26,19 +26,28 @@ namespace RuneRogue.Behaviors
             if (monsterFov.IsInFov(player.X, player.Y))
             {
                 canSeePlayer = true;
+                monster.LastLocationPlayerSeen = dungeonMap.GetCell(player.X, player.Y);
                 if (player.IsInvisible)
                 {
-                    string dieSize = (distFromPlayer + 3).ToString();
+                    string dieSize = (distFromPlayer + 5).ToString();
                     int stealthRoll = Dice.Roll("1d" + dieSize); // higher roll = more stealthy
                     if (stealthRoll > 2)
                     {
                         // player unseen
                         canSeePlayer = false;
                         //monster.TurnsAlerted = null;
-                        if (stealthRoll > 4)
+                        if (stealthRoll > 3)
                         {
                             // lose awareness of player's last location
-                            monster.LastLocationPlayerSeen = dungeonMap.GetCell(monster.X, monster.Y);
+                            monster.TurnsAlerted = null;
+                            int dx = Dice.Roll("2d3k1") - Dice.Roll("2d3k1");
+                            int dy = Dice.Roll("2d3k1") - Dice.Roll("2d3k1");
+                            monster.LastLocationPlayerSeen = dungeonMap.GetCell(
+                                monster.LastLocationPlayerSeen.X + dx, monster.LastLocationPlayerSeen.Y + dy);
+                            if (monster.X == monster.LastLocationPlayerSeen.X && monster.Y == monster.LastLocationPlayerSeen.Y)
+                            {
+                                monster.TurnsAlerted = null;
+                            }
                         }
                     }
                 }

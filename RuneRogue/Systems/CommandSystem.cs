@@ -411,9 +411,10 @@ namespace RuneRogue.Systems
             if (attacker.IsInvisible && defender is Monster)
             {
                 Monster monster = defender as Monster;
-                if (monster.TurnsAlerted == null)
+                // if defender thinks attacker's location is not true location, critical
+                if (!(monster.LastLocationPlayerSeen.X == attacker.X && monster.LastLocationPlayerSeen.Y == attacker.Y))
                 {
-                    attackMessage.AppendFormat("{0} looks bewildered .", monster.Name);
+                    attackMessage.AppendFormat("{1} ambushes {0}! ", monster.Name, attacker.Name);
                     diff += 6;
                     critical = true;
                 }

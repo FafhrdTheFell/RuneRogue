@@ -113,7 +113,7 @@ namespace RuneRogue.Core
             AcquireRune("Magic");
             AcquireRune("Life");
             AcquireRune("Ram");
-            //AcquireRune("Darkness");
+            AcquireRune("Darkness");
         }
 
 
