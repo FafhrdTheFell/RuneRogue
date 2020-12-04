@@ -20,7 +20,6 @@ namespace RuneRogue.Systems
         private Point _playerPosition;
         private RLConsole _nullConsole;
         private string _projectileType;
-        private string _effect;
         private int _range;
         private int _radius;
 
@@ -32,32 +31,14 @@ namespace RuneRogue.Systems
             "missile"
         };
 
-        private string[] _effectTypes =
-        {
-            "Elements",
-            "Death",
-            "Iron",
-            "Arrow"
-        };
 
-        private string[] _elements =
-        {
-            "fire",
-            "lightning",
-            "ice",
-            "cold",
-            "steam",
-            "water",
-            "air"
-        };
-
-        public TargetingSystem()
+        public TargetingSystem(string projectiletype, int range, int radius = 5)
         {
 
             _console = new RLConsole(Game.MapWidth, Game.MapHeight);
             _nullConsole = new RLConsole(30, Game.MapHeight);
 
-            InitializeNewTarget("ball", "Elements", 8, 3);
+            InitializeNewTarget(projectiletype, range, radius);
         }
 
         public override void DrawConsole()
@@ -73,19 +54,11 @@ namespace RuneRogue.Systems
             {
                 return;
             }
-            DrawOnTargetedCells("targeting");
+            DrawOnTargetedCells();
         }
 
-        public void DrawOnTargetedCells(string colorPattern, int? whichcell=null, char? symbol=null)
+        public void DrawOnTargetedCells()
         {
-            
-            if (colorPattern != "targeting" &&
-                colorPattern != "Elements" &&
-                colorPattern != "Death" &&
-                colorPattern != "Iron")
-            {
-                throw new ArgumentException($"Invalid colorPattern {colorPattern}.");
-            }
             DungeonMap dungeonMap = Game.DungeonMap;
             Player player = Game.Player;
 
@@ -97,63 +70,20 @@ namespace RuneRogue.Systems
 
             RLColor highlightColor = Colors.Gold;
             List<Cell> targetCells = TargetCells();
-            if (whichcell.HasValue)
-            {
-                targetCells = targetCells.GetRange((int)whichcell, 1);
-            }
+
             foreach (Cell point in targetCells)
             {
                 if (!dungeonMap.IsInFov(point.X, point.Y))
                 {
                     continue;
                 }
-                if (colorPattern == "targeting")
+                if (point.X == _currentTarget.X && point.Y == _currentTarget.Y)
                 {
-                    if (point.X == _currentTarget.X && point.Y == _currentTarget.Y)
-                    {
-                        highlightColor = Colors.FloorTarget;
-                    }
-                    else
-                    {
-                        highlightColor = Colors.FloorHighlight;
-                    }
+                    highlightColor = Colors.FloorTarget;
                 }
-                else if (colorPattern == "Death")
+                else
                 {
-                    switch (Dice.Roll("1d3"))
-                    {
-                        case 1:
-                            highlightColor = Colors.Poisoncloud1;
-                            break;
-                        case 2:
-                            highlightColor = Colors.Poisoncloud2;
-                            break;
-                        case 3:
-                            highlightColor = Colors.Poisoncloud3;
-                            break;
-                    }
-                }
-                else if (colorPattern == "Elements")
-                {
-                    switch (Dice.Roll("1d4"))
-                    {
-                        case 1:
-                            highlightColor = Swatch.DbDeepWater;
-                            break;
-                        case 2:
-                            highlightColor = Colors.Gold;
-                            break;
-                        case 3:
-                            highlightColor = Swatch.DbSky;
-                            break;
-                        case 4:
-                            highlightColor = Swatch.DbBlood;
-                            break;
-                    }
-                }
-                else if (colorPattern == "Iron")
-                {
-                    highlightColor = Swatch.DbBrightMetal;
+                    highlightColor = Colors.FloorHighlight;
                 }
                 if (point.X == player.X && point.Y == player.Y)
                 {
@@ -173,14 +103,7 @@ namespace RuneRogue.Systems
                 }
                 else if (point.IsWalkable)
                 {
-                    if (symbol.HasValue)
-                    {
-                        _console.Set(point.X, point.Y, highlightColor, Colors.FloorBackgroundFov, (char)symbol);
-                    }
-                    else
-                    {
-                        _console.Set(point.X, point.Y, Colors.FloorFov, highlightColor, '.');
-                    }
+                    _console.Set(point.X, point.Y, Colors.FloorFov, highlightColor, '.');
                 }
                 else
                 {
@@ -189,9 +112,8 @@ namespace RuneRogue.Systems
             }
         }
 
-        public void InitializeNewTarget(string projectiletype, string effect, int range, int radius = 5)
+        public void InitializeNewTarget(string projectiletype, int range, int radius = 5)
         {
-            //if (projectiletype == "line" || projectiletype == "ball" || projectiletype == "point")
             List<string> typesCheck = new List<string>(_projectileTypes);
             if (typesCheck.Contains(projectiletype))
             {
@@ -202,21 +124,10 @@ namespace RuneRogue.Systems
             {
                 throw new ArgumentException($"Invalid projectiletype {projectiletype}.");
             }
-            typesCheck = new List<string>(_effectTypes);
-            if (typesCheck.Contains(effect))
-            {
-                _effect = effect;
-
-            }
-            else
-            {
-                throw new ArgumentException($"Invalid effect {effect}.");
-            }
             if (projectiletype == "point")
             {
                 radius = 1;
             }
-            _effect = effect;
             _range = range;
             _radius = radius;
             _currentTarget = new Point
@@ -392,138 +303,6 @@ namespace RuneRogue.Systems
                 }
             }
             return actors;
-        }
-
-        public bool DoEffectOnTarget()
-        {
-            StringBuilder attackMessage = new StringBuilder();
-            if (_effect == "Elements")
-            {
-                for (int i = 0; i < 8; i++)
-                {
-                    DrawOnTargetedCells(_effect);
-                    for (int j = 0; j < 10; j++)
-                    {
-                        Game.DrawRoot(this.Console);
-                    }
-                }
-
-                int damage;
-                foreach (Actor target in TargetActors())
-                {
-                    for (int i = 0; i < 4; i++)
-                    {
-                        damage = Dice.Roll("1d10");
-                        string element = (string)Game.RandomArrayValue(_elements);
-                        target.Health -= damage;
-
-                        attackMessage.AppendFormat("{0} is blasted by {1}.", target.Name, element);
-                        if (target.Health > 0)
-                        {
-                            attackMessage.AppendFormat(" {0} takes {1} damage. ", target.Name, damage);
-                        }
-                        else
-                        {
-                            attackMessage.AppendFormat(" {0} takes {1} damage, killing it. ", target.Name, damage);
-                            CommandSystem.ResolveDeath(target, attackMessage);
-                            break;
-                        }
-                    }
-                }
-            }
-            if (_effect == "Death")
-            {
-                // not sure how to do the graphics timing better than these loops
-                for (int i = 0; i < 8; i++)
-                {
-                    DrawOnTargetedCells(_effect);
-                    for (int j = 0; j < 10; j++)
-                    {
-                        Game.DrawRoot(this.Console);
-                    }
-                }
-                
-                foreach (Actor target in TargetActors())
-                {
-                    attackMessage.AppendFormat("{0} is immersed in poisonous vapors. ", target.Name);
-
-                    if (target.IsUndead)
-                    {
-                        attackMessage.AppendFormat("{0} is immune to the poisonous vapors. ", target.Name);
-                    }
-                    else
-                    {
-                        int totalDamage = Dice.Roll("4d10");
-                        int activationDamage = Dice.Roll("1d4"); // damage
-                        int poisonSpeed = activationDamage * 2 + Dice.Roll("2d4"); // speed of activation
-                        Poison poison = new Poison(target, totalDamage, poisonSpeed, activationDamage);
-                        //Game.SchedulingSystem.Add(poison);
-                    }
-                }
-            }
-            if (_effect == "Iron")
-            {
-                Player player = Game.Player;
-                float dx = _playerPosition.X - _currentTarget.X;
-                float dy = _playerPosition.Y - _currentTarget.Y;
-                char missileChar;
-                if (Math.Abs(dx) / Math.Abs(dy) > 1.5)
-                {
-                    missileChar = '-';
-                }
-                else if (Math.Abs(dx) / Math.Abs(dy) < 0.66)
-                {
-                    missileChar = '|';
-                }
-                else if ((dx > 0 && dy > 0) || (dx < 0 && dy < 0))
-                {
-                    missileChar = '\\';
-                }
-                else
-                {
-                    missileChar = '/';
-                }
-                for (int i = 0; i < TargetCells().Count; i++)
-                {
-                    DrawOnTargetedCells(_effect, i, missileChar);
-                    for (int j = 0; j < 10; j++)
-                    {
-                        Game.DrawRoot(this.Console);
-                    }
-                }
-
-                int damage;
-                foreach (Actor target in TargetActors())
-                {
-                    StringBuilder discardMessage = new StringBuilder();
-                    damage = CommandSystem.ResolveArmor(target, player, Runes.BonusToDamageIron, false, discardMessage);
-                    target.Health -= damage;
-
-                    if (damage > 0)
-                    {
-                        attackMessage.AppendFormat("{0} is perforated.", target.Name);
-                        if (target.Health > 0)
-                        {
-                            attackMessage.AppendFormat(" {0} takes {1} damage. ", target.Name, damage);
-                        }
-                        else
-                        {
-                            attackMessage.AppendFormat(" {0} takes {1} damage, killing it. ", target.Name, damage);
-                            CommandSystem.ResolveDeath(target, attackMessage);
-                        }
-                    }
-                    else
-                    {
-                        attackMessage.AppendFormat("The dart bounces off {0}'s armor.", target.Name);
-                        break;
-                    }
-                }
-            }
-            if (!string.IsNullOrWhiteSpace(attackMessage.ToString()))
-            {
-                Game.MessageLog.Add(attackMessage.ToString());
-            }
-            return true;
         }
 
     }

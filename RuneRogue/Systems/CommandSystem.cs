@@ -340,7 +340,7 @@ namespace RuneRogue.Systems
             Game.CurrentSecondary = shot;
         }
 
-        public static void Attack(Actor attacker, Actor defender, bool missileAttack = false)
+        public static void Attack(Actor attacker, Actor defender, bool missileAttack = false, int bonus = 0)
         {
             StringBuilder attackMessage = new StringBuilder();
 
@@ -350,12 +350,12 @@ namespace RuneRogue.Systems
             }
 
             bool isCritical;
-            bool attackHit = ResolveAttack(attacker, defender, attackMessage, missileAttack, out isCritical);
+            bool attackHit = ResolveAttack(attacker, defender, attackMessage, missileAttack, out isCritical, adjustment: bonus);
 
             int damage = 0;
             if (attackHit)
             {
-                int damageBonus = attacker.Attack * Convert.ToInt32(isCritical) / 2;
+                int damageBonus = attacker.Attack * Convert.ToInt32(isCritical) / 2 + bonus;
                 damage = ResolveArmor(defender, attacker, damageBonus, missileAttack, attackMessage);
                 if (defender == Game.Player && Game.XpOnAction)
                 {
@@ -384,7 +384,7 @@ namespace RuneRogue.Systems
 
         // The attacker rolls based on his stats to see if he gets any hits
         private static bool ResolveAttack(Actor attacker, Actor defender, StringBuilder attackMessage, 
-            bool missileAttack, out bool critical)
+            bool missileAttack, out bool critical, int adjustment = 0)
         {
             bool attackHit = false;
             // criticals only on backstab
@@ -407,6 +407,7 @@ namespace RuneRogue.Systems
             {
                 diff -= 4;
             }
+            diff += adjustment;
             if (attacker.IsInvisible && defender is Monster)
             {
                 Monster monster = defender as Monster;
@@ -585,8 +586,6 @@ namespace RuneRogue.Systems
                     Game.RuneSystem.CheckDecay("Life");
                 }
                 
-
-
             }
             else if (defender is Monster)
             {

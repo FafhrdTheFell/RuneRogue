@@ -48,7 +48,7 @@ namespace RuneRogue.Core
 
         private string[] _effectTypes =
         {
-            "Elements","Death","Iron","Arrow","Spit", "Boulder"
+            "Elements","Death","Iron","Arrow","Spit","Boulder","Ram"
         };
 
         private string[] _elements =
@@ -228,6 +228,10 @@ namespace RuneRogue.Core
                 {
                     highlightColor = Swatch.DbStone;
                 }
+                else if (colorPattern == "Ram")
+                {
+                    highlightColor = Swatch.ComplimentLightest;
+                }
 
                 if (point.X == player.X && point.Y == player.Y)
                 {
@@ -366,6 +370,10 @@ namespace RuneRogue.Core
                 {
                     missileChar = 'o';
                 }
+                if (_effect == "Ram")
+                {
+                    missileChar = SourceActor().Symbol;
+                }
                 float pctComplete = (float)drawStep / (float)_totalSteps;
                 int animateStep = (int)((float)(TargetCells().Count() - 1) * pctComplete + 0.5);
                 DrawPatternOnTargetedCells(_effect, animateStep, missileChar);
@@ -465,24 +473,55 @@ namespace RuneRogue.Core
                     }
                 }
             }
+            else if (_effect == "Ram")
+            {
+                DungeonMap dungeonMap = Game.DungeonMap;
+                Actor source = SourceActor();
+
+                // code if Ram-mer should stop at first target not destroyed
+                //Cell newPosition = dungeonMap.GetCell(source.X, source.Y);
+                //foreach (Cell cell in TargetCells())
+                //{
+                //    Actor target = source;
+                //    if (dungeonMap.GetMonsterAt(cell.X, cell.Y) != null)
+                //    {
+                //        target = dungeonMap.GetMonsterAt(cell.X, cell.Y);
+                //    }
+                //    else if (Game.Player.X == cell.X && Game.Player.Y == cell.Y)
+                //    {
+                //        target = Game.Player;
+                //    }
+                //    if (target != source)
+                //    {
+                //        CommandSystem.Attack(source, target);
+                //        // stop at defender that rammer attacked and failed to kill
+                //        if (target.Health > 0)
+                //        {
+                //            break;
+                //        }
+                //    }
+                //    else
+                //    {
+                //        newPosition = cell;
+                //    }
+                //    dungeonMap.SetActorPosition(source, newPosition.X, newPosition.Y);
+                //}
+                foreach (Actor target in TargetActors())
+                {
+                    StringBuilder discardMessage = new StringBuilder();
+                    CommandSystem.Attack(source, target, bonus: Runes.BonusToRamAttack);
+                }
+                Cell newPosition = TargetCells().LastOrDefault(c => c.IsWalkable == true);
+                if (newPosition != null)
+                {
+                    dungeonMap.SetActorPosition(source, newPosition.X, newPosition.Y);
+                }
+            }
             else if (_effect == "Arrow")
             {
                 // figure out which Actor shot
                 DungeonMap dungeonMap = Game.DungeonMap;
-                Actor source;
-                if (dungeonMap.GetMonsterAt(_origin.X, _origin.Y) != null)
-                {
-                    source = dungeonMap.GetMonsterAt(_origin.X, _origin.Y);
-                }
-                else
-                {
-                    source = Game.Player;
-                    if (!(_origin.X == source.X && _origin.Y == source.Y))
-                    {
-                        throw new ArgumentException($"Arrow requires Actor source. " +
-                            $"No Actor found at origin ({_origin.X}, {_origin.Y}).");
-                    }
-                }
+                Actor source = SourceActor();
 
                 Actor target = TargetActors().FirstOrDefault();
                 if (target == null)
@@ -522,6 +561,28 @@ namespace RuneRogue.Core
                     Game.RuneSystem.CheckDecay(Effect);
                 }
                 return true;
+            }
+        }
+
+        public Actor SourceActor()
+        {
+            // figure out which Actor shot for arrow-type effects
+            DungeonMap dungeonMap = Game.DungeonMap;
+            Actor player = Game.Player;
+            Actor source;
+            
+            if (dungeonMap.GetMonsterAt(_origin.X, _origin.Y) != null)
+            {
+                return dungeonMap.GetMonsterAt(_origin.X, _origin.Y);
+            }
+            else if (player.X == _origin.X && player.Y == _origin.Y)
+            {
+                return player;
+            }
+            else
+            {
+                throw new ArgumentException($"Instant {_effect} requires Actor source. " +
+                    $"No Actor found at origin ({_origin.X}, {_origin.Y}).");
             }
         }
 

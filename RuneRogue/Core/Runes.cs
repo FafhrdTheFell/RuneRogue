@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using RLNET;
 using RogueSharp.DiceNotation;
-using RuneRogue.Interfaces;
+using RuneRogue.Systems;
 
 namespace RuneRogue.Core
 {
@@ -19,7 +19,8 @@ namespace RuneRogue.Core
             "Time",
             "Magic",
             "Iron",
-            "Darkness"
+            "Darkness",
+            "Ram"
         };
 
         public static string[] AllRunes
@@ -37,7 +38,8 @@ namespace RuneRogue.Core
             ["Time"] = 15,
             ["Magic"] = 500,
             ["Iron"] = 80,
-            ["Darkness"] = 20
+            ["Darkness"] = 20,
+            ["Ram"] = 150
         };
 
         private static readonly List<string> _passiveRunes = new List<string>()
@@ -57,31 +59,36 @@ namespace RuneRogue.Core
         {
             "Elements",
             "Death",
-            "Iron"
+            "Iron",
+            "Ram"
         };
 
         private static readonly Dictionary<string, string> _offensiveProjectile = new Dictionary<string, string>()
         {
             ["Elements"] = "line",
             ["Death"] = "ball",
-            ["Iron"] = "missile"
+            ["Iron"] = "missile",
+            ["Ram"] = "missile"
         };
 
         private static readonly Dictionary<string, int> _offensiveRange = new Dictionary<string, int>()
         {
             ["Elements"] = 8,
             ["Death"] = 8,
-            ["Iron"] = 10
+            ["Iron"] = 10,
+            ["Ram"] = 6
         };
 
         private static readonly Dictionary<string, int> _offensiveRadius = new Dictionary<string, int>()
         {
             ["Elements"] = 1,
             ["Death"] = 5,
-            ["Iron"] = 1
+            ["Iron"] = 1,
+            ["Ram"] = 1
         };
 
         public const int BonusToDamageIron = 18;
+        public const int BonusToRamAttack = 9;
         public const int BonusToSpeedTime = 4;
 
         private List<string> _runesOwned;
@@ -105,6 +112,7 @@ namespace RuneRogue.Core
             AcquireRune("Iron");
             AcquireRune("Magic");
             AcquireRune("Life");
+            AcquireRune("Ram");
             //AcquireRune("Darkness");
         }
 
@@ -180,11 +188,12 @@ namespace RuneRogue.Core
                 {
                     Game.SecondaryConsoleActive = true;
                     Game.AcceleratePlayer = false;
-                    Game.CurrentSecondary = Game.TargetingSystem;
+                    Game.CurrentSecondary = new TargetingSystem(_offensiveProjectile[rune],
+                        _offensiveRange[rune], _offensiveRadius[rune]);
                     Game.PostSecondary = new Instant(_offensiveProjectile[rune], rune, radius: 
                         _offensiveRadius[rune], special: "Rune");
-                    Game.TargetingSystem.InitializeNewTarget(_offensiveProjectile[rune], rune, 
-                        _offensiveRange[rune], _offensiveRadius[rune]);
+                    //Game.TargetingSystem.InitializeNewTarget(_offensiveProjectile[rune], rune, 
+                    //    _offensiveRange[rune], _offensiveRadius[rune]);
                     Game.MessageLog.Add("Select your target.");
                     return false;
                 }

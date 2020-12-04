@@ -189,7 +189,7 @@ namespace RuneRogue
 
             CommandSystem = new CommandSystem();
 
-            TargetingSystem = new TargetingSystem();
+            //TargetingSystem = new TargetingSystem();
 
 
             // Set up a handler for RLNET's Update event
