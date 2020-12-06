@@ -290,8 +290,13 @@ namespace RuneRogue.Core
         
         // The Draw method will be called each time the map is updated
         // It will render all of the symbols/colors for each cell to the map sub console
-        public void Draw(RLConsole mapConsole, RLConsole statConsole)
+        public void Draw(RLConsole mapConsole, RLConsole statConsole, List<Cell> highlightContentsCells = null)
         {
+            // replace null list with empty one
+            highlightContentsCells = highlightContentsCells ?? new List<Cell>();
+
+            //Console.WriteLine(highlightContentsCells.Count.ToString());
+
             foreach (Cell cell in GetAllCells())
             {
                 SetConsoleSymbolForCell(mapConsole, cell);
@@ -325,7 +330,9 @@ namespace RuneRogue.Core
                 if (IsInFov(monster.X, monster.Y))
                 {
                     // Pass in the index to DrawStats and increment it afterwards
-                    monster.DrawStats(statConsole, i);
+                    bool highlightMonster = highlightContentsCells.Contains(GetCell(monster.X, monster.Y));
+                    monster.DrawStats(statConsole, i, 
+                        highlight: highlightMonster);
                     i++;
                 }
             }

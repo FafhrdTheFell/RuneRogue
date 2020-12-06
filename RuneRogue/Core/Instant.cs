@@ -86,6 +86,12 @@ namespace RuneRogue.Core
             set { _effect = value; }
         }
 
+        public override bool UsesTurn()
+        {
+            return (_specialOption=="Rune");
+        }
+
+
         public Instant(string shape, string effect, int radius = 1, string special = "")
         {
 
@@ -423,7 +429,9 @@ namespace RuneRogue.Core
                         int totalDamage = Dice.Roll("4d10");
                         int activationDamage = Dice.Roll("1d4"); // damage
                         int poisonSpeed = activationDamage * 2 + Dice.Roll("2d4"); // speed of activation
-                        Poison poison = new Poison(target, totalDamage, poisonSpeed, activationDamage);
+                        int potency = Dice.Roll("1d3") + 4;
+                        //Poison poison = new Poison(target, totalDamage, poisonSpeed, activationDamage);
+                        Poison poison = new Poison(target, potency);
                     }
                 }
             }
@@ -569,7 +577,6 @@ namespace RuneRogue.Core
             // figure out which Actor shot for arrow-type effects
             DungeonMap dungeonMap = Game.DungeonMap;
             Actor player = Game.Player;
-            Actor source;
             
             if (dungeonMap.GetMonsterAt(_origin.X, _origin.Y) != null)
             {

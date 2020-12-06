@@ -543,7 +543,9 @@ namespace RuneRogue.Systems
                     int totalDamage = Dice.Roll("2d" + attacker.Attack.ToString());
                     int activationDamage = Dice.Roll("1d" + (attacker.Attack / 2).ToString()); // damage each activation
                     int poisonSpeed = activationDamage * 2 + Dice.Roll("2d3"); // clock ticks per activation
-                    Poison poison = new Poison(defender, totalDamage, poisonSpeed, activationDamage);
+                    //Poison poison = new Poison(defender, totalDamage, poisonSpeed, activationDamage);
+                    int poisonPotency = attacker.MaxHealth / 10 + 1;
+                    Poison poison = new Poison(defender, poisonPotency);
                     //Game.SchedulingSystem.Add(poison);
                 }
                 if (attacker.SAVampiric && !missileAttack)

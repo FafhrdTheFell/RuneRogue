@@ -18,10 +18,12 @@ namespace RuneRogue.Systems
 
         private Point _currentTarget;
         private Point _playerPosition;
-        private RLConsole _nullConsole;
+        private RLConsole _statConsole;
         private string _projectileType;
         private int _range;
         private int _radius;
+        private int _targetNumber = -1;
+        private List<Cell> _targetableCells;
 
         private string[] _projectileTypes =
         {
@@ -31,13 +33,24 @@ namespace RuneRogue.Systems
             "missile"
         };
 
+        public RLConsole StatConsole
+        {
+            get { return _statConsole; }
+        }
+
+        public int TargetNumber
+        {
+            get { return _targetNumber; }
+            set { _targetNumber = value; }
+        }
 
         public TargetingSystem(string projectiletype, int range, int radius = 5)
         {
 
             _console = new RLConsole(Game.MapWidth, Game.MapHeight);
-            _nullConsole = new RLConsole(30, Game.MapHeight);
+            _statConsole = new RLConsole(Game.StatWidth, Game.MapHeight);
 
+            _targetableCells = TargetableCells();
             InitializeNewTarget(projectiletype, range, radius);
         }
 
@@ -47,29 +60,28 @@ namespace RuneRogue.Systems
             Player player = Game.Player;
 
             _console.Clear();
+            _statConsole.Clear();
+            _statConsole.SetBackColor(0, 0, Game.StatWidth, Game.MapHeight, Swatch.DbOldStone);
+            player.DrawStats(_statConsole);
+
             dungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
-            dungeonMap.Draw(_console, _nullConsole);
             player.Draw(_console, dungeonMap);
             if (_currentTarget == _playerPosition)
             {
+                dungeonMap.Draw(_console, _statConsole);
+                player.Draw(_console, dungeonMap);
                 return;
             }
-            DrawOnTargetedCells();
-        }
 
-        public void DrawOnTargetedCells()
-        {
-            DungeonMap dungeonMap = Game.DungeonMap;
-            Player player = Game.Player;
+            List<Cell> monsterCellsTargeted = TargetActorCells();
 
-            _console.Clear();
-            dungeonMap.Draw(_console, _nullConsole);
+            dungeonMap.Draw(_console, _statConsole, highlightContentsCells: monsterCellsTargeted);
             player.Draw(_console, dungeonMap);
-
-            List<Monster> monstersSeen = dungeonMap.MonstersInFOV();
 
             RLColor highlightColor = Colors.Gold;
             List<Cell> targetCells = TargetCells();
+
+            List<Monster> monstersSeen = dungeonMap.MonstersInFOV();
 
             foreach (Cell point in targetCells)
             {
@@ -124,10 +136,6 @@ namespace RuneRogue.Systems
             {
                 throw new ArgumentException($"Invalid projectiletype {projectiletype}.");
             }
-            if (projectiletype == "point")
-            {
-                radius = 1;
-            }
             _range = range;
             _radius = radius;
             _currentTarget = new Point
@@ -154,11 +162,13 @@ namespace RuneRogue.Systems
             return d - 1;
         }
 
+
         // process key press and return true iff finished with console
         public override bool ProcessInput(RLKeyPress rLKeyPress, RLMouse rLMouse, out string message)
         {
             message = "";
             Player player = Game.Player;
+            DungeonMap dungeonMap = Game.DungeonMap;
             Point _newTarget = new Point
             {
                 X = _currentTarget.X,
@@ -167,6 +177,8 @@ namespace RuneRogue.Systems
             bool leftClick = rLMouse.GetLeftClick();
             bool enterPressed = false;
             bool cancelPressed = false;
+            bool tabPressed = false;
+            
             if (leftClick)
             {
                 _newTarget = new Point
@@ -188,15 +200,19 @@ namespace RuneRogue.Systems
                 {
                     enterPressed = true;
                 }
+                if (rLKeyPress.Key == RLKey.Tab)
+                {
+                    tabPressed = true;
+                }
                 cancelPressed = _inputSystem.CancelKeyPressed(rLKeyPress);
+                System.Console.WriteLine(rLKeyPress.Key.ToString());
             }
             bool playerTargeted = (_newTarget.X == player.X && _newTarget.Y == player.Y);
             if (_newTarget == _currentTarget && !playerTargeted &&
                 (leftClick || enterPressed))
             {
                 _console.Clear();
-                DungeonMap dungeonMap = Game.DungeonMap;
-                dungeonMap.Draw(_console, _nullConsole);
+                dungeonMap.Draw(_console, _statConsole);
                 if (Game.PostSecondary is Instant)
                 {
                     Instant nextSecondary = Game.PostSecondary as Instant;
@@ -206,7 +222,7 @@ namespace RuneRogue.Systems
                 }
                 return true;
             }
-            else if (_newTarget == _currentTarget && (cancelPressed))
+            else if (_newTarget == _currentTarget && cancelPressed)
             {
                 message = "Cancelled";
                 return true;
@@ -215,6 +231,23 @@ namespace RuneRogue.Systems
                 (leftClick || enterPressed))
             {
                 Game.MessageLog.Add("You cannot target yourself.");
+            }
+            else if (tabPressed)
+            {
+                int targetsAvailable = TargetableActors().Count();
+                if (targetsAvailable == 0)
+                {
+                    return false;
+                }
+                TargetNumber++;
+                if (TargetNumber >= targetsAvailable)
+                {
+                    TargetNumber -= targetsAvailable;
+                }
+
+                _newTarget = new Point();
+                _newTarget.X = TargetableActors()[TargetNumber].X;
+                _newTarget.Y = TargetableActors()[TargetNumber].Y;
             }
             if (_newTarget.X < 1 || _newTarget.X > Game.MapWidth ||
                 _newTarget.Y < 1 || _newTarget.Y > Game.MapHeight)
@@ -240,11 +273,7 @@ namespace RuneRogue.Systems
             return false;
         }
 
-        public Point Target()
-        {
-            return _currentTarget;
-        }
-
+        // return cells that are being targeted based on shape and current target
         public List<Cell> TargetCells()
         {
             DungeonMap dungeonMap = Game.DungeonMap;
@@ -282,27 +311,67 @@ namespace RuneRogue.Systems
             return cellsTargeted;
         }
 
-        public List<Actor> TargetActors()
+        // returns all cells that are valid targets
+        public List<Cell> TargetableCells()
+        {
+            DungeonMap dungeonMap = Game.DungeonMap;
+            Player player = Game.Player;
+
+            List<Cell> targetables = new List<Cell>();
+
+            FieldOfView inPlayerRange = new FieldOfView(dungeonMap);
+            inPlayerRange.ComputeFov(player.X, player.Y, Math.Min(_range, player.Awareness), true);
+            foreach (Cell cell in dungeonMap.GetCellsInArea(player.X, player.Y, _range + 1))
+            {
+                if (inPlayerRange.IsInFov(cell.X, cell.Y))
+                {
+                    targetables.Add(cell);
+                }
+            }
+            return targetables;
+        }
+
+        // returns all actors that are valid targets
+        public List<Actor> TargetableActors()
+        {
+            DungeonMap dungeonMap = Game.DungeonMap;
+            Player player = Game.Player;
+
+            dungeonMap.ComputeFov(player.X, player.Y, Math.Min(_range, player.Awareness), true);
+            List<Monster> monstersSeen = dungeonMap.MonstersInFOV();
+            monstersSeen.Sort((x, y) => (100*x.X+x.Y).CompareTo(100*y.X+y.Y));
+            List<Actor> actorTargetable = new List<Actor>();
+            foreach(Monster m in monstersSeen)
+            {
+                actorTargetable.Add(m as Actor);
+            }
+
+            return actorTargetable;
+        }
+
+        // targeted cells containing actors
+        public List<Cell> TargetActorCells()
         {
             DungeonMap dungeonMap = Game.DungeonMap;
             Player player = Game.Player;
             
-            List<Actor> actors = new List<Actor>();
+            List<Cell> cells = new List<Cell>();
 
+            //foreach (Cell cell in dungeonMap.GetCellsInRadius(player.X, player.Y, _range))
             foreach (Cell cell in TargetCells())
             {
                 if (dungeonMap.GetMonsterAt(cell.X, cell.Y) != null)
                 {
-                    Actor actor = dungeonMap.GetMonsterAt(cell.X, cell.Y) as Actor;
-                    actors.Add(actor);
+                    //Actor actor = dungeonMap.GetMonsterAt(cell.X, cell.Y) as Actor;
+                    cells.Add(cell);
                 } 
                 else if (player.X == cell.X && player.Y == cell.Y)
                 {
-                    Actor actor = player as Actor;
-                    actors.Add(actor);
+                    //Actor actor = player as Actor;
+                    cells.Add(cell);
                 }
             }
-            return actors;
+            return cells;
         }
 
     }

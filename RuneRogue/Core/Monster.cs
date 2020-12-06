@@ -76,7 +76,7 @@ namespace RuneRogue.Core
 
 
 
-        public void DrawStats(RLConsole statConsole, int position)
+        public void DrawStats(RLConsole statConsole, int position, bool highlight=false)
         {
             // Start at Y=28 which is below the player stats.
             // Multiply the position by 2 to leave a space between each stat
@@ -95,7 +95,15 @@ namespace RuneRogue.Core
             statConsole.SetBackColor(3, yPosition, width, 1, healthBarColor);
             statConsole.SetBackColor(3 + width, yPosition, remainingWidth, 1, Swatch.PrimaryDarkest);
             // Print the monsters name over top of the health bar
-            statConsole.Print(2, yPosition, $": {Name}", Swatch.DbLight);
+            if (highlight)
+            {
+                statConsole.Print(2, yPosition, $": ", Swatch.DbLight);
+                statConsole.Print(4, yPosition, $"{Name}", Swatch.DbLight, Colors.Gold);
+            }
+            else
+            {
+                statConsole.Print(2, yPosition, $": {Name}", Swatch.DbLight);
+            }
         }
 
         public void PerformAction(CommandSystem commandSystem)

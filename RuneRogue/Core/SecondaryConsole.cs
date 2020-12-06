@@ -92,6 +92,11 @@ namespace RuneRogue.Core
             return false;
         }
 
+        public virtual bool UsesTurn()
+        {
+            return false;
+        }
+
         public RLConsole Console
         {
             get { return _console; }

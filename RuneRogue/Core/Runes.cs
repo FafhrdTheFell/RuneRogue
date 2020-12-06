@@ -103,7 +103,7 @@ namespace RuneRogue.Core
             //AcquireRune("Elements");
             //AcquireRune("Death");
             //AcquireRune("Time");
-            //AcquireRune("Iron");
+            AcquireRune("Iron");
             //AcquireRune("Magic");
             //AcquireRune("Life");
             //AcquireRune("Ram");
