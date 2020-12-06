@@ -259,7 +259,7 @@ namespace RuneRogue.Systems
 
             int numberOfMonsters = Dice.Roll(numInRoomDice);
 
-            monsterType = "goblin";
+            //monsterType = "goblin";
 
             for (int i = 0; i < numberOfMonsters; i++)
             {
@@ -294,6 +294,8 @@ namespace RuneRogue.Systems
             monster.MissileAttack = _monsterManual[page].MissileAttack;
             monster.MissileRange = _monsterManual[page].MissileRange;
             monster.MissileType = _monsterManual[page].MissileType;
+            monster.SpecialAttackRange = _monsterManual[page].SpecialAttackRange;
+            monster.SpecialAttackType = _monsterManual[page].SpecialAttackType;
             monster.Awareness = _monsterManual[page].Awareness;
             monster.Color = Colors.ColorLookup(_monsterManual[page].Color);
             monster.Defense = Dice.Roll(_monsterManual[page].Defense);

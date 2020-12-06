@@ -71,7 +71,7 @@ namespace RuneRogue.Core
         public virtual void FinishEffect()
         {
             Game.SchedulingSystem.Remove(this);
-            Target.RemoveEffect(this);
+            Target.RemoveEffect(this, calledFromEffect: true);
         }
 
 

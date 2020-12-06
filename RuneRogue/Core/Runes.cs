@@ -105,7 +105,7 @@ namespace RuneRogue.Core
             //AcquireRune("Time");
             AcquireRune("Iron");
             //AcquireRune("Magic");
-            //AcquireRune("Life");
+            AcquireRune("Life");
             //AcquireRune("Ram");
             //AcquireRune("Darkness");
         }
@@ -184,7 +184,7 @@ namespace RuneRogue.Core
                     Game.AcceleratePlayer = false;
                     Game.CurrentSecondary = new TargetingSystem(_offensiveProjectile[rune],
                         _offensiveRange[rune], _offensiveRadius[rune]);
-                    Game.PostSecondary = new Instant(_offensiveProjectile[rune], rune, radius: 
+                    Game.PostSecondary = new Instant(rune, radius: 
                         _offensiveRadius[rune], special: "Rune");
                     //Game.TargetingSystem.InitializeNewTarget(_offensiveProjectile[rune], rune, 
                     //    _offensiveRange[rune], _offensiveRadius[rune]);
@@ -249,10 +249,6 @@ namespace RuneRogue.Core
             _runesActive.Remove(rune);
             switch (rune)
             {
-                case "Life":
-                    Game.MessageLog.Add($"{Game.Player.Name} is not longer regenerating.");
-                    Game.Player.SARegeneration = false;
-                    break;
                 case "Thought":
                     Game.MessageLog.Add($"{Game.Player.Name} no longer senses thoughts.");
                     Game.Player.SASenseThoughts = false;

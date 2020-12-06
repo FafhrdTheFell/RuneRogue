@@ -19,6 +19,8 @@ namespace RuneRogue.Core
         public int MissileAttack { get; set; }
         public int MissileRange { get; set; }
         public string MissileType { get; set; }
+        public int SpecialAttackRange { get; set; }
+        public string SpecialAttackType { get; set; }
         public string Name { get; set; }
         public int Speed { get; set; }
         public char Symbol { get; set; }

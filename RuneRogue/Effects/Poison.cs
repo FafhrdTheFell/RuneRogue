@@ -10,16 +10,12 @@ namespace RuneRogue.Effects
 {
     class Poison : Effect
     {
-        // damage each activation
-        int _activationDamage;
-        int _potency;
+        // damage each activation plus how long poison lasts
+        private int _potency;
 
         public int ActivationDamage
         {
             get { return _potency; }
-            //set { _activationDamage = value; }
-            //get { return _activationDamage; }
-            //set { _activationDamage = value; }
         }
 
         public int Potency
@@ -40,28 +36,21 @@ namespace RuneRogue.Effects
         // duration = (p+2)*40/p = 40+80/p
         public Poison(Actor poisoned, int potency)
             : base(poisoned, 40 / potency, 40 + 80 / potency)
-        //public Poison(Actor poisoned, int totalDamage, int speed, int activationDamage) 
-        //    : base(poisoned, speed, 
-        //          speed * (totalDamage / activationDamage + 1 * Convert.ToInt32(totalDamage % activationDamage > 0)))
         {
-            //ActivationDamage = activationDamage;
             Potency = potency;
-            //ActivationDamage = potency;
             EffectType = "poison";
         }
         public override void StartEffect()
         {
+            // multiple instances of poison combine
             if (Target.ExistingEffect("poison") != null)
             {
                 Poison oldPoison = Target.ExistingEffect("poison") as Poison;
                 int newPotency = Math.Max(oldPoison.Potency, this.Potency) + 1;
-                //int totalDamage = ActivationDamage * Duration / Speed;
                 int timeLeft = oldPoison.Duration - (Game.SchedulingSystem.GetTime() - oldPoison.StartTime);
                 int newDuration = timeLeft + Duration;
-                //int newActivationDamage = (ActivationDamage + oldPoison.ActivationDamage) / 2 + 1;
                 oldPoison.Duration = newDuration;
                 oldPoison.Potency = newPotency;
-                //oldPoison.ActivationDamage = newActivationDamage;
             }
             else
             {

@@ -60,36 +60,37 @@ namespace RuneRogue.Behaviors
                 monster.LastLocationPlayerSeen = dungeonMap.GetCell(player.X, player.Y);
             }
 
-            if (canSeePlayer && monster.MissileRange >= distFromPlayer)
+            // 50% chance to use special abilities
+            if (Dice.Roll("1d10") > 5 && canSeePlayer)
             {
-                if (Dice.Roll("1d10") > 5)
+                bool canUseSpecial = (monster.SpecialAttackRange >= distFromPlayer && distFromPlayer > 1);
+                bool canUseMissile = (monster.MissileRange >= distFromPlayer && distFromPlayer > 1);
+                if (canUseSpecial || canUseMissile)
                 {
-                    bool shotNotBlocked = true;
-                    foreach (Cell cell in dungeonMap.GetCellsAlongLine(monster.X, monster.Y, player.X, player.Y))
+                    if (dungeonMap.MissileNotBlocked(monster, player))
                     {
-                        if (cell.X == monster.X && cell.Y == monster.Y)
+                        bool yesAttackSpecial = canUseSpecial;
+                        if (canUseMissile && canUseSpecial)
                         {
-                            continue;
+                            // 33% chance to use missiles if both are available
+                            yesAttackSpecial = (Dice.Roll("1d3") == 1);
                         }
-                        if (dungeonMap.GetMonsterAt(cell.X, cell.Y) != null || !cell.IsTransparent)
-                        {
-                            shotNotBlocked = false;
-                        }
-                    }
-                    if (shotNotBlocked)
-                    {
-                        commandSystem.Shoot(monster, player);
+                        //System.Console.WriteLine($"{canUseMissile} {canUseSpecial} {yesAttackSpecial}");
+                        commandSystem.Shoot(monster, player, specialAttack: yesAttackSpecial);
                         return true;
                     }
                 }
-            }
-            else if (monster.MissileRange > 0)
-            {
-                // sometimes wait
-                if (Dice.Roll("1d10") > 5)
-                {
-                    return true;
-                }
+                //if (canSeePlayer && dungeonMap.MissileNotBlocked(monster, player))
+                //{
+                    
+                //    if (canSeePlayer && monster.MissileRange >= distFromPlayer && distFromPlayer > 1)
+                //    {
+                //        if (dungeonMap.MissileNotBlocked(monster, player))
+                //        {
+                //            commandSystem.Shoot(monster, player);
+                //            return true;
+                //        }
+                //    }
             }
 
             if (monster.TurnsAlerted.HasValue)

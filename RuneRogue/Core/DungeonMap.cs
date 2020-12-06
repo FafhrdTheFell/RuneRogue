@@ -238,6 +238,23 @@ namespace RuneRogue.Core
             return _monsters.FirstOrDefault(m => m.X == x && m.Y == y);
         }
 
+        public bool MissileNotBlocked(Actor shooter, Actor target)
+        {
+            bool shotNotBlocked = true;
+            foreach (Cell cell in GetCellsAlongLine(shooter.X, shooter.Y, target.X, target.Y))
+            {
+                if (cell.X == shooter.X && cell.Y == shooter.Y)
+                {
+                    continue;
+                }
+                if (GetMonsterAt(cell.X, cell.Y) != null || !cell.IsTransparent)
+                {
+                    shotNotBlocked = false;
+                }
+            }
+            return shotNotBlocked;
+        }
+
         public bool CanMoveDownToNextLevel()
         {
             Player player = Game.Player;

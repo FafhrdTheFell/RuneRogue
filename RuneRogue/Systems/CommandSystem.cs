@@ -327,12 +327,17 @@ namespace RuneRogue.Systems
             }
         }
 
-        public void Shoot(Actor attacker, Actor defender)
+        public void Shoot(Actor attacker, Actor defender, bool specialAttack = false)
         {
             DungeonMap dungeonMap = Game.DungeonMap;
             Game.SecondaryConsoleActive = true;
             Game.AcceleratePlayer = false;
-            Instant shot = new Instant("missile", attacker.MissileType)
+            string attackType = attacker.MissileType;
+            if (specialAttack)
+            {
+                attackType = attacker.SpecialAttackType;
+            }
+            Instant shot = new Instant(attackType)
             {
                 Origin = dungeonMap.GetCell(attacker.X, attacker.Y),
                 Target = dungeonMap.GetCell(defender.X, defender.Y)
@@ -340,7 +345,8 @@ namespace RuneRogue.Systems
             Game.CurrentSecondary = shot;
         }
 
-        public static void Attack(Actor attacker, Actor defender, bool missileAttack = false, int bonus = 0)
+        public static void Attack(Actor attacker, Actor defender, bool missileAttack = false, 
+            int hitBonus = 0, int damageBonus = 0)
         {
             StringBuilder attackMessage = new StringBuilder();
 
@@ -349,14 +355,14 @@ namespace RuneRogue.Systems
                 Game.AutoMovePlayer = false;
             }
 
-            bool isCritical;
-            bool attackHit = ResolveAttack(attacker, defender, attackMessage, missileAttack, out isCritical, adjustment: bonus);
+            bool attackHit = ResolveAttack(attacker, defender, attackMessage, missileAttack, 
+                out bool isCritical, adjustment: hitBonus);
 
             int damage = 0;
             if (attackHit)
             {
-                int damageBonus = attacker.Attack * Convert.ToInt32(isCritical) / 2 + bonus;
-                damage = ResolveArmor(defender, attacker, damageBonus, missileAttack, attackMessage);
+                int damageTotalBonus = attacker.Attack * Convert.ToInt32(isCritical) / 2 + damageBonus;
+                damage = ResolveArmor(defender, attacker, damageTotalBonus, missileAttack, attackMessage);
                 if (defender == Game.Player && Game.XpOnAction)
                 {
                     Game.Player.XpHealth += damage;
@@ -540,13 +546,8 @@ namespace RuneRogue.Systems
                 defender.Health -= damage;
                 if (attacker.SAVenomous && !missileAttack)
                 {
-                    int totalDamage = Dice.Roll("2d" + attacker.Attack.ToString());
-                    int activationDamage = Dice.Roll("1d" + (attacker.Attack / 2).ToString()); // damage each activation
-                    int poisonSpeed = activationDamage * 2 + Dice.Roll("2d3"); // clock ticks per activation
-                    //Poison poison = new Poison(defender, totalDamage, poisonSpeed, activationDamage);
                     int poisonPotency = attacker.MaxHealth / 10 + 1;
                     Poison poison = new Poison(defender, poisonPotency);
-                    //Game.SchedulingSystem.Add(poison);
                 }
                 if (attacker.SAVampiric && !missileAttack)
                 {
@@ -584,8 +585,12 @@ namespace RuneRogue.Systems
                 //Game.MessageLog.Add($"{defender.Name} has died. Game Over! Final score: {Game.Player.LifetimeGold}.");
                 if (Game.RuneSystem.RunesOwned().Contains("Life"))
                 {
-                    Game.MessageLog.Add($"{defender.Name}'s Rune of Life flashes!");
+                    Game.MessageLog.Add($"{defender.Name}'s Rune of Life flashes! {defender.Name} is reborn whole.");
                     defender.Health = defender.MaxHealth;
+                    if (defender.ExistingEffect("poison") != null)
+                    {
+                        defender.ExistingEffect("poison").FinishEffect();
+                    }
                     Game.RuneSystem.CheckDecay("Life");
                 }
                 

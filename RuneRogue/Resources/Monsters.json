@@ -222,6 +222,26 @@
     "saFerocious": true
   },
   {
+    "kind": "minotaur",
+    "attack": "15",
+    "attackChance": "20D4",
+    "awareness": 13,
+    "color": "DwReddishGray",
+    "defense": "2D3",
+    "defenseChance": "8D10",
+    "gold": "8d10",
+    "maxHealth": "3d8",
+    "name": "Minotaur",
+    "speed": 8,
+    "symbol": "M",
+    "numberAppearing": "1",
+    "minLevel": 3,
+    "maxLevel": 13,
+    "saFerocious": true,
+    "specialAttackType": "Ram",
+    "specialAttackRange":  6
+  },
+  {
     "kind": "bonehemoth",
     "attack": "20",
     "attackChance": "25D4",

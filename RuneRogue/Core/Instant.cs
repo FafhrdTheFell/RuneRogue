@@ -38,7 +38,7 @@ namespace RuneRogue.Core
         // be tested
         private string _specialOption; 
 
-        private string[] _projectileTypes =
+        private readonly string[] _projectileTypes =
         {
             "line", // hits everything on a line: death ray
             "ball", // explodes in a radius
@@ -46,12 +46,60 @@ namespace RuneRogue.Core
             "missile" // hits initial target(s) on a line: arrow
         };
 
-        private string[] _effectTypes =
+        private readonly string[] _effectTypes =
         {
             "Elements","Death","Iron","Arrow","Spit","Boulder","Ram"
         };
 
-        private string[] _elements =
+        private readonly Dictionary<string, string> _projectile = new Dictionary<string, string>
+        {
+            ["Elements"] = "line",
+            ["Death"] = "ball",
+            ["Iron"] = "missile",
+            ["Arrow"] = "missile",
+            ["Spit"] = "missile",
+            ["Boulder"] = "missile",
+            ["Ram"] = "missile"
+        };
+
+        private readonly Dictionary<string, RLColor[]> _colorPattern = new Dictionary<string, RLColor[]>
+        {
+            ["Death"] = new RLColor[]
+            { 
+                Colors.Poisoncloud1,
+                Colors.Poisoncloud2,
+                Colors.Poisoncloud3
+            },
+            ["Elements"] = new RLColor[]
+            {
+                Swatch.DbDeepWater,
+                Colors.Gold,
+                Swatch.DbSky,
+                Swatch.DbBlood
+            },
+            ["Iron"] = new RLColor[]
+            {
+                Swatch.DbBrightMetal
+            },
+            ["Spit"] = new RLColor[]
+            {
+                Swatch.DbVegetation
+            },
+            ["Arrow"] = new RLColor[]
+            {
+                Swatch.DbMetal
+            },
+            ["Boulder"] = new RLColor[]
+            {
+                Swatch.DbStone
+            },
+            ["Ram"] = new RLColor[]
+            {
+                Swatch.ComplimentLightest
+            }
+        };
+
+        private readonly string[] _elements =
         {
             "fire",
             "lightning",
@@ -92,12 +140,16 @@ namespace RuneRogue.Core
         }
 
 
-        public Instant(string shape, string effect, int radius = 1, string special = "")
+        //public Instant(string shape, string effect, int radius = 1, string special = "")
+        public Instant(string effect, int radius = 1, string special = "")
         {
 
             _console = new RLConsole(Game.MapWidth, Game.MapHeight);
             _nullConsole = new RLConsole(30, Game.MapHeight);
 
+            //System.Console.WriteLine(effect);
+
+            string shape = _projectile[effect];
             List<string> typesCheck = new List<string>(_projectileTypes);
             if (typesCheck.Contains(shape))
             {
@@ -174,70 +226,8 @@ namespace RuneRogue.Core
                 {
                     continue;
                 }
-                if (colorPattern == "targeting")
-                {
-                    if (point.X == _target.X && point.Y == _target.Y)
-                    {
-                        highlightColor = Colors.FloorTarget;
-                    }
-                    else
-                    {
-                        highlightColor = Colors.FloorHighlight;
-                    }
-                }
-                else if (colorPattern == "Death")
-                {
-                    switch (colorChoiceRNG % 3)
-                    {
-                        case 0:
-                            highlightColor = Colors.Poisoncloud1;
-                            break;
-                        case 1:
-                            highlightColor = Colors.Poisoncloud2;
-                            break;
-                        case 2:
-                            highlightColor = Colors.Poisoncloud3;
-                            break;
-                    }
-                }
-                else if (colorPattern == "Elements")
-                {
-                    switch (colorChoiceRNG % 4)
-                    {
-                        case 0:
-                            highlightColor = Swatch.DbDeepWater;
-                            break;
-                        case 1:
-                            highlightColor = Colors.Gold;
-                            break;
-                        case 2:
-                            highlightColor = Swatch.DbSky;
-                            break;
-                        case 3:
-                            highlightColor = Swatch.DbBlood;
-                            break;
-                    }
-                }
-                else if (colorPattern == "Iron")
-                {
-                    highlightColor = Swatch.DbBrightMetal;
-                }
-                else if (colorPattern == "Spit")
-                {
-                    highlightColor = Swatch.DbVegetation;
-                }
-                else if (colorPattern == "Arrow")
-                {
-                    highlightColor = Swatch.DbMetal;
-                }
-                else if (colorPattern == "Boulder")
-                {
-                    highlightColor = Swatch.DbStone;
-                }
-                else if (colorPattern == "Ram")
-                {
-                    highlightColor = Swatch.ComplimentLightest;
-                }
+                int numColors = _colorPattern[_effect].Length;
+                highlightColor = _colorPattern[_effect][colorChoiceRNG % numColors];
 
                 if (point.X == player.X && point.Y == player.Y)
                 {
@@ -364,7 +354,6 @@ namespace RuneRogue.Core
             }
             else if (_projectileType == "missile")
             {
-                Player player = Game.Player;
                 int dx = _origin.X - _target.X;
                 int dy = _origin.Y - _target.Y;
                 char missileChar = LengthyProjectileChar(dx, dy);
@@ -426,11 +415,7 @@ namespace RuneRogue.Core
                     }
                     else
                     {
-                        int totalDamage = Dice.Roll("4d10");
-                        int activationDamage = Dice.Roll("1d4"); // damage
-                        int poisonSpeed = activationDamage * 2 + Dice.Roll("2d4"); // speed of activation
                         int potency = Dice.Roll("1d3") + 4;
-                        //Poison poison = new Poison(target, totalDamage, poisonSpeed, activationDamage);
                         Poison poison = new Poison(target, potency);
                     }
                 }
@@ -486,6 +471,21 @@ namespace RuneRogue.Core
                 DungeonMap dungeonMap = Game.DungeonMap;
                 Actor source = SourceActor();
 
+                int hitBonus = 0;
+                int damageBonus = 0;
+                if (_specialOption == "Rune")
+                {
+                    hitBonus = Runes.BonusToRamAttack;
+                    damageBonus = Runes.BonusToRamAttack;
+                }
+                else if (source is Monster)
+                {
+                    Game.MessageLog.Add($"{source.Name} charges {TargetActor().Name}!");
+                    hitBonus = 2 + (source.MissileAttack - source.Attack) / 2;
+                    // set damageBonus to replace source.Attack damage with MissileAttack damage
+                    damageBonus = source.MissileAttack - source.Attack;
+                }
+
                 // code if Ram-mer should stop at first target not destroyed
                 //Cell newPosition = dungeonMap.GetCell(source.X, source.Y);
                 //foreach (Cell cell in TargetCells())
@@ -517,7 +517,7 @@ namespace RuneRogue.Core
                 foreach (Actor target in TargetActors())
                 {
                     StringBuilder discardMessage = new StringBuilder();
-                    CommandSystem.Attack(source, target, bonus: Runes.BonusToRamAttack);
+                    CommandSystem.Attack(source, target, hitBonus: hitBonus, damageBonus: damageBonus);
                 }
                 Cell newPosition = TargetCells().LastOrDefault(c => c.IsWalkable == true);
                 if (newPosition != null)
@@ -525,7 +525,7 @@ namespace RuneRogue.Core
                     dungeonMap.SetActorPosition(source, newPosition.X, newPosition.Y);
                 }
             }
-            else if (_effect == "Arrow")
+            else if (_effect == "Arrow" || _effect == "Boulder" || _effect == "Spit")
             {
                 // figure out which Actor shot
                 DungeonMap dungeonMap = Game.DungeonMap;
@@ -577,22 +577,32 @@ namespace RuneRogue.Core
 
         public Actor SourceActor()
         {
+            return ActorAtCell(_origin);
+        }
+
+        public Actor TargetActor()
+        {
+            return ActorAtCell(_target);
+        }
+
+        public Actor ActorAtCell(Cell cell)
+        {
             // figure out which Actor shot for arrow-type effects
             DungeonMap dungeonMap = Game.DungeonMap;
             Actor player = Game.Player;
             
-            if (dungeonMap.GetMonsterAt(_origin.X, _origin.Y) != null)
+            if (dungeonMap.GetMonsterAt(cell.X, cell.Y) != null)
             {
-                return dungeonMap.GetMonsterAt(_origin.X, _origin.Y);
+                return dungeonMap.GetMonsterAt(cell.X, cell.Y);
             }
-            else if (player.X == _origin.X && player.Y == _origin.Y)
+            else if (player.X == cell.X && player.Y == cell.Y)
             {
                 return player;
             }
             else
             {
-                throw new ArgumentException($"Instant {_effect} requires Actor source. " +
-                    $"No Actor found at origin ({_origin.X}, {_origin.Y}).");
+                throw new ArgumentException($"Instant {_effect} requires Actor at cell. " +
+                    $"No Actor found at ({_origin.X}, {_origin.Y}).");
             }
         }
 

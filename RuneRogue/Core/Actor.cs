@@ -18,6 +18,8 @@ namespace RuneRogue.Core
         private int _attackSkill;
         private int _missileAttack;
         private int _missileRange;
+        private int _specialAttackRange;
+        private string _specialAttackType;
         private string _missileType;
         private int _awareness;
         private int _defense;
@@ -57,8 +59,13 @@ namespace RuneRogue.Core
             _currentEffects.Add(effect);
         }
 
-        public void RemoveEffect(Effect effect)
+        // to remove an effect, call FinishEffect on the effect
+        public void RemoveEffect(Effect effect, bool calledFromEffect = false)
         {
+            if (!calledFromEffect)
+            {
+                effect.FinishEffect();
+            }
             _currentEffects.Remove(effect);
         }
 
@@ -89,6 +96,17 @@ namespace RuneRogue.Core
         {
             get { return _missileType; }
             set { _missileType = value; }
+        }
+
+        public int SpecialAttackRange
+        {
+            get { return _specialAttackRange; }
+            set { _specialAttackRange = value; }
+        }
+        public string SpecialAttackType
+        {
+            get { return _specialAttackType; }
+            set { _specialAttackType = value; }
         }
 
         public int AttackChance
