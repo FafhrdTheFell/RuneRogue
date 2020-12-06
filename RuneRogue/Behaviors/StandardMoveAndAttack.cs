@@ -75,22 +75,10 @@ namespace RuneRogue.Behaviors
                             // 33% chance to use missiles if both are available
                             yesAttackSpecial = (Dice.Roll("1d3") == 1);
                         }
-                        //System.Console.WriteLine($"{canUseMissile} {canUseSpecial} {yesAttackSpecial}");
                         commandSystem.Shoot(monster, player, specialAttack: yesAttackSpecial);
                         return true;
                     }
                 }
-                //if (canSeePlayer && dungeonMap.MissileNotBlocked(monster, player))
-                //{
-                    
-                //    if (canSeePlayer && monster.MissileRange >= distFromPlayer && distFromPlayer > 1)
-                //    {
-                //        if (dungeonMap.MissileNotBlocked(monster, player))
-                //        {
-                //            commandSystem.Shoot(monster, player);
-                //            return true;
-                //        }
-                //    }
             }
 
             if (monster.TurnsAlerted.HasValue)

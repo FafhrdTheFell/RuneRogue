@@ -572,7 +572,7 @@ namespace RuneRogue.Systems
                 }
                 if (defender.Health <= 0 && defender.Health + damage > 0)
                 {
-                    attackMessage.AppendFormat(" {0} kills {1} ({2} damage).", attacker.Name, defender.Name, damage);
+                    attackMessage.AppendFormat(" {0} kills {1} ({2} damage). ", attacker.Name, defender.Name, damage);
                 }
             }
         }
@@ -585,7 +585,7 @@ namespace RuneRogue.Systems
                 //Game.MessageLog.Add($"{defender.Name} has died. Game Over! Final score: {Game.Player.LifetimeGold}.");
                 if (Game.RuneSystem.RunesOwned().Contains("Life"))
                 {
-                    Game.MessageLog.Add($"{defender.Name}'s Rune of Life flashes! {defender.Name} is reborn whole.");
+                    attackMessage.AppendFormat("{0}'s Rune of Life flashes! {0} is reborn whole.", defender.Name);
                     defender.Health = defender.MaxHealth;
                     if (defender.ExistingEffect("poison") != null)
                     {
