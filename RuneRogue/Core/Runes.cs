@@ -31,7 +31,7 @@ namespace RuneRogue.Core
         // x out of 1000
         private static readonly Dictionary<string, int> _decayProbability = new Dictionary<string, int>()
         {
-            ["Life"] = 20,
+            ["Life"] = 500,
             ["Death"] = 500,
             ["Elements"] = 500,
             ["Thought"] = 12,

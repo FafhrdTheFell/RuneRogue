@@ -205,7 +205,6 @@ namespace RuneRogue.Systems
                     tabPressed = true;
                 }
                 cancelPressed = _inputSystem.CancelKeyPressed(rLKeyPress);
-                System.Console.WriteLine(rLKeyPress.Key.ToString());
             }
             bool playerTargeted = (_newTarget.X == player.X && _newTarget.Y == player.Y);
             if (_newTarget == _currentTarget && !playerTargeted &&
@@ -306,7 +305,7 @@ namespace RuneRogue.Systems
             }
             else
             {
-                throw new ArgumentException("projectiletype TargetCells not implemented.");
+                throw new ArgumentException($"projectiletype {_projectileType} not implemented.");
             }
             return cellsTargeted;
         }

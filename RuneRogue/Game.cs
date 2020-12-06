@@ -248,12 +248,15 @@ namespace RuneRogue
                 {
                     SecondaryConsoleActive = false;
                     if (completionMessage != "Cancelled")
-                    {   
+                    {
                         if (CurrentSecondary is TargetingSystem)
                         {
                             CurrentSecondary = PostSecondary;
                             SecondaryConsoleActive = true;
-                            if (PostSecondary.UsesTurn())
+                        }
+                        else if (CurrentSecondary is Instant)
+                        {
+                            if (CurrentSecondary.UsesTurn())
                             {
                                 didPlayerAct = true;
                             }
@@ -261,16 +264,21 @@ namespace RuneRogue
                     }
                 }
                 _renderRequired = true;
-
             }
+
             else if (CommandSystem.IsPlayerTurn)
             {
+                if (AcceleratePlayer && DungeonMap.PlayerPeril)
+                {
+                    AcceleratePlayer = false;
+                }
+
                 // autopickup
                 if (DungeonMap.GetItemAt(Player.X, Player.Y) != null && DungeonMap.MonstersInFOV().Count == 0)
                 {
                     didPlayerAct = CommandSystem.PickupItemPlayer();
                 }
-                if (AutoMovePlayer)
+                else if (AutoMovePlayer)
                 {
                     if (AutoMoveMonsterTarget != null)
                     {
@@ -297,17 +305,9 @@ namespace RuneRogue
                         AutoMovePlayer = false;
                     }
                 }
-
-                if (AcceleratePlayer && DungeonMap.PlayerPeril)
-                {
-                    AcceleratePlayer = false;
-                }
-
-
-
                 // if player requested acceleration, use the previous direction,
                 // but turn off acceleration if a key is pressed to stop it.
-                if (AcceleratePlayer)
+                else if (AcceleratePlayer)
                 {
                     if (rLMouse.GetLeftClick() || keyPress != null)
                     {
@@ -327,113 +327,109 @@ namespace RuneRogue
                         }
                     }
                 }
-
-
-                if (CommandSystem.IsPlayerTurn)
+                else if (rLMouse.GetLeftClick())
                 {
-                    if (rLMouse.GetLeftClick())
+                    if (rLMouse.X <= MapWidth && rLMouse.Y <= MapHeight)
                     {
-                        if (rLMouse.X <= MapWidth && rLMouse.Y <= MapHeight)
+                        if (DungeonMap.GetCell(rLMouse.X, rLMouse.Y).IsExplored)
                         {
-                            if (DungeonMap.GetCell(rLMouse.X, rLMouse.Y).IsExplored)
+                            AutoMovePlayer = true;
+                            AutoMoveXTarget = rLMouse.X;
+                            AutoMoveYTarget = rLMouse.Y;
+                            if (DungeonMap.GetMonsterAt(rLMouse.X, rLMouse.Y) != null)
                             {
-                                AutoMovePlayer = true;
-                                AutoMoveXTarget = rLMouse.X;
-                                AutoMoveYTarget = rLMouse.Y;
-                                if (DungeonMap.GetMonsterAt(rLMouse.X, rLMouse.Y) != null)
-                                {
-                                    AutoMoveMonsterTarget = DungeonMap.GetMonsterAt(rLMouse.X, rLMouse.Y);
-                                }
-                                else
-                                {
-                                    AutoMoveMonsterTarget = null;
-                                }
+                                AutoMoveMonsterTarget = DungeonMap.GetMonsterAt(rLMouse.X, rLMouse.Y);
                             }
-                        }
-                    }
-                    if (keyPress != null)
-                    {
-                        if (_quittingGame)
-                        {
-                            _rootConsole.Close();
-                        }
-                        else
-                        {
-                            Direction direction = _inputSystem.MoveDirection(keyPress);
-                            if (direction != Direction.None)
+                            else
                             {
-                                // the acceleration system is ugly. AcceleratePlayer sometimes
-                                // gets set in the Command System, so need to check shift before
-                                // carrying out move.
-                                AcceleratePlayer = _inputSystem.ShiftDown(keyPress);
-                                AccelerateDirection = direction;
-                                didPlayerAct = CommandSystem.MovePlayer(direction);
-                            }
-                            else if (_inputSystem.CloseDoorKeyPressed(keyPress))
-                            {
-                                didPlayerAct = CommandSystem.CloseDoorsNextTo(Player);
-                            }
-                            else if (_inputSystem.QuitKeyPressed(keyPress))
-                            {
-                                QuitGame();
-                                _renderRequired = true;
-                            }
-                            else if (_inputSystem.RuneKeyPressed(keyPress))
-                            {
-                                SecondaryConsoleActive = true;
-                                AcceleratePlayer = false;
-                                CurrentSecondary = RuneSystem;
-                                _renderRequired = true;
-                            }
-                            else if (_inputSystem.PickupKeyPressed(keyPress))
-                            {
-                                didPlayerAct = CommandSystem.PickupItemPlayer();
-                            }
-                            else if (_inputSystem.DescendStairs(keyPress))
-                            {
-                                if (!FinalLevel() && DungeonMap.CanMoveDownToNextLevel())
-                                {
-                                    // MapGenerator treats Game.MaxDungeonLevel differently
-                                    MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, ++mapLevel);
-                                    DungeonMap = mapGenerator.CreateMap();
-                                    MessageLog = new MessageLog();
-                                    MessageLog.Add("The stairs collapse behind you.");
-                                    if (Game.FinalLevel())
-                                    {
-                                        MessageLog.Add("Are you ready to ascend the throne of runes?");
-                                    }
-                                    CommandSystem = new CommandSystem();
-                                    _rootConsole.Title = $"RuneRogue - Level {mapLevel}";
-                                    didPlayerAct = true;
-                                }
-                                else if (FinalLevel() && DungeonMap.CanMoveDownToNextLevel())
-                                {
-                                    if (DungeonMap.MonstersCount() > 0)
-                                    {
-                                        MessageLog.Add("You must be the sole challenger for the rune throne.");
-                                        didPlayerAct = true;
-                                    }
-                                    else if (!Game.RuneSystem.AllRunesOwned)
-                                    {
-                                        MessageLog.Add("You must be possess every rune to ascendc the rune throne.");
-                                        didPlayerAct = true;
-                                    }
-                                    else
-                                    {
-                                        MessageLog.Add($"You have won RuneRogue! Your final score is {Player.LifetimeGold * 3}.");
-                                        QuitGame();
-                                        didPlayerAct = true;
-                                    }
-
-                                }
-                            }
-                            else if (_inputSystem.WaitKey(keyPress))
-                            {
-                                didPlayerAct = true;
+                                AutoMoveMonsterTarget = null;
                             }
                         }
                     }
                 }
+                else if (keyPress != null)
+                {
+                    if (_quittingGame)
+                    {
+                        _rootConsole.Close();
+                    }
+                    else
+                    {
+                        Direction direction = _inputSystem.MoveDirection(keyPress);
+                        if (direction != Direction.None)
+                        {
+                            // the acceleration system is ugly. AcceleratePlayer sometimes
+                            // gets set in the Command System, so need to check shift before
+                            // carrying out move.
+                            AcceleratePlayer = _inputSystem.ShiftDown(keyPress);
+                            AccelerateDirection = direction;
+                            didPlayerAct = CommandSystem.MovePlayer(direction);
+                        }
+                        else if (_inputSystem.CloseDoorKeyPressed(keyPress))
+                        {
+                            didPlayerAct = CommandSystem.CloseDoorsNextTo(Player);
+                        }
+                        else if (_inputSystem.QuitKeyPressed(keyPress))
+                        {
+                            QuitGame();
+                            _renderRequired = true;
+                        }
+                        else if (_inputSystem.RuneKeyPressed(keyPress))
+                        {
+                            SecondaryConsoleActive = true;
+                            AcceleratePlayer = false;
+                            CurrentSecondary = RuneSystem;
+                            _renderRequired = true;
+                        }
+                        else if (_inputSystem.PickupKeyPressed(keyPress))
+                        {
+                            didPlayerAct = CommandSystem.PickupItemPlayer();
+                        }
+                        else if (_inputSystem.DescendStairs(keyPress))
+                        {
+                            if (!FinalLevel() && DungeonMap.CanMoveDownToNextLevel())
+                            {
+                                // MapGenerator treats Game.MaxDungeonLevel differently
+                                MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, ++mapLevel);
+                                DungeonMap = mapGenerator.CreateMap();
+                                MessageLog = new MessageLog();
+                                MessageLog.Add("The stairs collapse behind you.");
+                                if (Game.FinalLevel())
+                                {
+                                    MessageLog.Add("Are you ready to ascend the throne of runes?");
+                                }
+                                CommandSystem = new CommandSystem();
+                                _rootConsole.Title = $"RuneRogue - Level {mapLevel}";
+                                didPlayerAct = true;
+                            }
+                            else if (FinalLevel() && DungeonMap.CanMoveDownToNextLevel())
+                            {
+                                if (DungeonMap.MonstersCount() > 0)
+                                {
+                                    MessageLog.Add("You must be the sole challenger for the rune throne.");
+                                    didPlayerAct = true;
+                                }
+                                else if (!Game.RuneSystem.AllRunesOwned)
+                                {
+                                    MessageLog.Add("You must be possess every rune to ascendc the rune throne.");
+                                    didPlayerAct = true;
+                                }
+                                else
+                                {
+                                    MessageLog.Add($"You have won RuneRogue! Your final score is {Player.LifetimeGold * 3}.");
+                                    QuitGame();
+                                    didPlayerAct = true;
+                                }
+
+                            }
+                        }
+                        else if (_inputSystem.WaitKey(keyPress))
+                        {
+                            didPlayerAct = true;
+                        }
+                    }
+                }
+                //}
 
                 if (CommandSystem.IsPlayerTurn && didPlayerAct && Game.XpOnAction)
                 {
@@ -518,6 +514,10 @@ namespace RuneRogue
                     {
                         TargetingSystem targeting = CurrentSecondary as TargetingSystem;
                         RLConsole.Blit(targeting.StatConsole, 0, 0, _statWidth, _statHeight, _rootConsole, _mapWidth, 0);
+                    }
+                    else
+                    {
+                        RLConsole.Blit(_statConsole, 0, 0, _statWidth, _statHeight, _rootConsole, _mapWidth, 0);
                     }
                 }
                 RLConsole.Blit(_messageConsole, 0, 0, _messageWidth, _messageHeight, _rootConsole, 0, _screenHeight - _messageHeight);

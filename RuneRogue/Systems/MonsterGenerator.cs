@@ -259,7 +259,7 @@ namespace RuneRogue.Systems
 
             int numberOfMonsters = Dice.Roll(numInRoomDice);
 
-            monsterType = "beetle";
+            monsterType = "goblin";
 
             for (int i = 0; i < numberOfMonsters; i++)
             {

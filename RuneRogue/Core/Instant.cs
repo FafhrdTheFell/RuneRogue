@@ -554,7 +554,10 @@ namespace RuneRogue.Core
             if (rLMouse.GetLeftClick() || rLKeyPress != null)
             {
                 // skip to end of animation
-                _step = _totalSteps - 2;
+                if (_step < _totalSteps - 1)
+                {
+                    _step = _totalSteps - 1;
+                }
             }
             
             if (_step < _totalSteps)
