@@ -573,9 +573,7 @@ namespace RuneRogue.Core
             {
                 DoEffectOnTarget();
                 if (_specialOption == "Rune")
-                {
-                    Game.RuneSystem.CheckDecay(Effect);
-                }
+                Game.RuneSystem.CheckDecay(Effect);
                 return true;
             }
         }

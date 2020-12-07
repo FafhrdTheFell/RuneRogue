@@ -79,6 +79,14 @@ namespace RuneRogue.Core
             ["Ram"] = 6
         };
 
+        private static readonly Dictionary<string, int> _offensiveMinRange = new Dictionary<string, int>()
+        {
+            ["Elements"] = 1,
+            ["Death"] = 1,
+            ["Iron"] = 1,
+            ["Ram"] = 3
+        };
+
         private static readonly Dictionary<string, int> _offensiveRadius = new Dictionary<string, int>()
         {
             ["Elements"] = 1,
@@ -103,9 +111,9 @@ namespace RuneRogue.Core
             //AcquireRune("Elements");
             //AcquireRune("Death");
             //AcquireRune("Time");
-            AcquireRune("Iron");
+            //AcquireRune("Iron");
             //AcquireRune("Magic");
-            AcquireRune("Life");
+            //AcquireRune("Life");
             //AcquireRune("Ram");
             //AcquireRune("Darkness");
         }
@@ -124,22 +132,31 @@ namespace RuneRogue.Core
             }
         }
 
-        // checks decay of a non-continuous use, discrete use rune.
         // returns true if decay happened.
         public bool CheckDecay(string rune)
         {
+            bool decayed = CheckDecay(rune, out List<string> messages);
+            foreach (string s in messages)
+            {
+                Game.MessageLog.Add(s);
+            }
+            return decayed;
+        }
+        public bool CheckDecay(string rune, out List<string> decayMessages)
+        {
+            decayMessages = new List<string>();
             if (Dice.Roll("1d1000") < _decayProbability[rune])
             {
                 if (_runesOwned.Contains("Magic"))
                 {
-                    Game.MessageLog.Add($"{Game.Player.Name}'s Rune of {rune} trembles.");
-                    Game.MessageLog.Add($"{Game.Player.Name}'s Rune of Magic turns to dust.");
+                    decayMessages.Add($"{Game.Player.Name}'s Rune of {rune} trembles.");
+                    decayMessages.Add($"{Game.Player.Name}'s Rune of Magic turns to dust.");
                     _runesOwned.Remove("Magic");
                     return false;
                 }
                 else
                 {
-                    Game.MessageLog.Add($"{Game.Player.Name}'s Rune of {rune} turns to dust.");
+                    decayMessages.Add($"{Game.Player.Name}'s Rune of {rune} turns to dust.");
                     _runesOwned.Remove(rune);
                     return true;
                 }
@@ -183,12 +200,10 @@ namespace RuneRogue.Core
                     Game.SecondaryConsoleActive = true;
                     Game.AcceleratePlayer = false;
                     Game.CurrentSecondary = new TargetingSystem(_offensiveProjectile[rune],
-                        _offensiveRange[rune], _offensiveRadius[rune]);
+                        _offensiveRange[rune], _offensiveRadius[rune], _offensiveMinRange[rune]);
                     Game.PostSecondary = new Instant(rune, radius: 
                         _offensiveRadius[rune], special: "Rune");
-                    //Game.TargetingSystem.InitializeNewTarget(_offensiveProjectile[rune], rune, 
-                    //    _offensiveRange[rune], _offensiveRadius[rune]);
-                    Game.MessageLog.Add("Select your target.");
+                    Game.MessageLog.Add("Select your target (TAB to cycle).");
                     return false;
                 }
 

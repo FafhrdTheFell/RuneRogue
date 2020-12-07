@@ -212,6 +212,16 @@ namespace RuneRogue.Systems
             if (_newTarget == _currentTarget && !playerTargeted &&
                 (leftClick || enterPressed))
             {
+                if (Distance(_playerPosition, _newTarget) > _range)
+                {
+                    Game.MessageLog.Add("That target is too far away.");
+                    return false;
+                }
+                if (Distance(_playerPosition, _newTarget) < _minRange)
+                {
+                    Game.MessageLog.Add("That target is too close by.");
+                    return false;
+                }
                 _console.Clear();
                 dungeonMap.Draw(_console, _statConsole);
                 if (Game.PostSecondary is Instant)
@@ -253,16 +263,6 @@ namespace RuneRogue.Systems
             if (_newTarget.X < 1 || _newTarget.X > Game.MapWidth ||
                 _newTarget.Y < 1 || _newTarget.Y > Game.MapHeight)
             {
-                return false;
-            }
-            if (Distance(_playerPosition, _newTarget) > _range)
-            {
-                Game.MessageLog.Add("That target would be too far away.");
-                return false;
-            }
-            if (Distance(_playerPosition, _newTarget) < _minRange)
-            {
-                Game.MessageLog.Add("That target is too close by.");
                 return false;
             }
             Game.DungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);

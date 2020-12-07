@@ -8,6 +8,7 @@ using RuneRogue.Interfaces;
 using RuneRogue.Effects;
 using RuneRogue.Items;
 using System;
+using System.Collections.Generic;
 
 namespace RuneRogue.Systems
 {
@@ -588,13 +589,20 @@ namespace RuneRogue.Systems
                 //Game.MessageLog.Add($"{defender.Name} has died. Game Over! Final score: {Game.Player.LifetimeGold}.");
                 if (Game.RuneSystem.RunesOwned().Contains("Life"))
                 {
-                    attackMessage.AppendFormat("{0}'s Rune of Life flashes! {0} is reborn whole.", defender.Name);
+                    attackMessage.AppendFormat("{0}'s Rune of Life flashes! {0} is reborn whole. ", defender.Name);
                     defender.Health = defender.MaxHealth;
                     if (defender.ExistingEffect("poison") != null)
                     {
                         defender.ExistingEffect("poison").FinishEffect();
                     }
-                    Game.RuneSystem.CheckDecay("Life");
+                    bool decayed = Game.RuneSystem.CheckDecay("Life", out List<string> messages);
+                    if (decayed)
+                    {
+                        foreach (string s in messages)
+                        {
+                            attackMessage.Append(s + " ");
+                        }
+                    }
                 }
                 
             }
