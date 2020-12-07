@@ -259,7 +259,7 @@ namespace RuneRogue.Systems
 
             int numberOfMonsters = Dice.Roll(numInRoomDice);
 
-            monsterType = "minotaur";
+            //monsterType = "minotaur";
 
             for (int i = 0; i < numberOfMonsters; i++)
             {
