@@ -299,7 +299,10 @@ namespace RuneRogue.Systems
 
                 // activate next schedulable without returning to main loop:
                 // makes game faster and only need main loop for player input
-                ActivateMonsters();
+                if (!Game.SecondaryConsoleActive)
+                {
+                    ActivateMonsters();
+                }
             }
             else if (scheduleable is Effect)
             {
@@ -339,7 +342,7 @@ namespace RuneRogue.Systems
             }
             Instant shot = new Instant(attackType)
             {
-                Origin = dungeonMap.GetCell(attacker.X, attacker.Y),
+                Source = attacker, //Origin = dungeonMap.GetCell(attacker.X, attacker.Y),
                 Target = dungeonMap.GetCell(defender.X, defender.Y)
             };
             Game.CurrentSecondary = shot;

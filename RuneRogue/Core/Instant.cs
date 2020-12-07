@@ -24,7 +24,7 @@ namespace RuneRogue.Core
 {
     public class Instant : SecondaryConsole
     {
-
+        private Actor _source;
         private Cell _origin;
         private Cell _target;
         private RLConsole _nullConsole;
@@ -110,10 +110,12 @@ namespace RuneRogue.Core
             "air"
         };
 
-        public Cell Origin
+        public Actor Source
         {
-            get { return _origin; }
-            set { _origin = value; }
+            get { return _source; }
+            set { _source = value;
+                _origin = Game.DungeonMap.GetCell(value.X, value.Y);
+            }
         }
 
         public Cell Target
@@ -263,6 +265,8 @@ namespace RuneRogue.Core
             }
         }
 
+        
+
         public List<Cell> TargetCells()
         {
             DungeonMap dungeonMap = Game.DungeonMap;
@@ -274,6 +278,7 @@ namespace RuneRogue.Core
                 cellsTargeted = dungeonMap.GetCellsAlongLine(_origin.X, _origin.Y, _target.X, _target.Y).ToList();
                 // Contains origin cell, drop it.
                 cellsTargeted.RemoveAt(0);
+
             }
             else if (_projectileType == "ball")
             {
@@ -367,7 +372,7 @@ namespace RuneRogue.Core
                 }
                 if (_effect == "Ram")
                 {
-                    missileChar = SourceActor().Symbol;
+                    missileChar = Source.Symbol;
                 }
                 float pctComplete = (float)drawStep / (float)_totalSteps;
                 int animateStep = (int)((float)(TargetCells().Count() - 1) * pctComplete + 0.5);
@@ -469,7 +474,7 @@ namespace RuneRogue.Core
             else if (_effect == "Ram")
             {
                 DungeonMap dungeonMap = Game.DungeonMap;
-                Actor source = SourceActor();
+                Actor source = Source;
 
                 int hitBonus = 0;
                 int damageBonus = 0;
@@ -481,9 +486,9 @@ namespace RuneRogue.Core
                 else if (source is Monster)
                 {
                     Game.MessageLog.Add($"{source.Name} charges {TargetActor().Name}!");
-                    hitBonus = 2 + (source.MissileAttack - source.Attack) / 2;
+                    hitBonus = 2 + source.AttackSkill / 4;
                     // set damageBonus to replace source.Attack damage with MissileAttack damage
-                    damageBonus = source.MissileAttack - source.Attack;
+                    damageBonus = source.Attack / 2;
                 }
 
                 // code if Ram-mer should stop at first target not destroyed
@@ -529,7 +534,7 @@ namespace RuneRogue.Core
             {
                 // figure out which Actor shot
                 DungeonMap dungeonMap = Game.DungeonMap;
-                Actor source = SourceActor();
+                Actor source = Source;
 
                 Actor target = TargetActors().FirstOrDefault();
                 if (target == null)
@@ -575,10 +580,6 @@ namespace RuneRogue.Core
             }
         }
 
-        public Actor SourceActor()
-        {
-            return ActorAtCell(_origin);
-        }
 
         public Actor TargetActor()
         {

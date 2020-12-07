@@ -21,6 +21,7 @@ namespace RuneRogue.Systems
         private RLConsole _statConsole;
         private string _projectileType;
         private int _range;
+        private int _minRange;
         private int _radius;
         private int _targetNumber = -1;
         private List<Cell> _targetableCells;
@@ -44,14 +45,14 @@ namespace RuneRogue.Systems
             set { _targetNumber = value; }
         }
 
-        public TargetingSystem(string projectiletype, int range, int radius = 5)
+        public TargetingSystem(string projectiletype, int range, int radius = 5, int minRange = 1)
         {
 
             _console = new RLConsole(Game.MapWidth, Game.MapHeight);
             _statConsole = new RLConsole(Game.StatWidth, Game.MapHeight);
 
             _targetableCells = TargetableCells();
-            InitializeNewTarget(projectiletype, range, radius);
+            InitializeNewTarget(projectiletype, range, radius, minRange);
         }
 
         public override void DrawConsole()
@@ -124,7 +125,7 @@ namespace RuneRogue.Systems
             }
         }
 
-        public void InitializeNewTarget(string projectiletype, int range, int radius = 5)
+        public void InitializeNewTarget(string projectiletype, int range, int radius, int minRange)
         {
             List<string> typesCheck = new List<string>(_projectileTypes);
             if (typesCheck.Contains(projectiletype))
@@ -138,6 +139,7 @@ namespace RuneRogue.Systems
             }
             _range = range;
             _radius = radius;
+            _minRange = minRange;
             _currentTarget = new Point
             {
                 X = Game.Player.X,
@@ -216,7 +218,7 @@ namespace RuneRogue.Systems
                 {
                     Instant nextSecondary = Game.PostSecondary as Instant;
 
-                    nextSecondary.Origin = dungeonMap.GetCell(player.X, player.Y);
+                    nextSecondary.Source = player; // dungeonMap.GetCell(player.X, player.Y);
                     nextSecondary.Target = dungeonMap.GetCell(_newTarget.X, _newTarget.Y);
                 }
                 return true;
@@ -256,6 +258,11 @@ namespace RuneRogue.Systems
             if (Distance(_playerPosition, _newTarget) > _range)
             {
                 Game.MessageLog.Add("That target would be too far away.");
+                return false;
+            }
+            if (Distance(_playerPosition, _newTarget) < _minRange)
+            {
+                Game.MessageLog.Add("That target is too close by.");
                 return false;
             }
             Game.DungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);

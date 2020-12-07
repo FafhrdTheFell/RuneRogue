@@ -8,6 +8,7 @@ using RuneRogue.Core;
 using RuneRogue.Effects;
 using RuneRogue.Systems;
 using RuneRogue.Interfaces;
+using System.Collections.Generic;
 
 namespace RuneRogue
 {
@@ -528,6 +529,16 @@ namespace RuneRogue
 
                 _renderRequired = false;
             }
+        }
+
+        public static void PrintCellList(List<Cell> list)
+        {
+            string x = "";
+            foreach (Cell cell in list)
+            {
+                x += $"({cell.X}, {cell.Y})) ";
+            }
+            System.Console.WriteLine(x);
         }
     }
 }
