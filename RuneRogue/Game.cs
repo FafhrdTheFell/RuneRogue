@@ -9,6 +9,8 @@ using RuneRogue.Effects;
 using RuneRogue.Systems;
 using RuneRogue.Interfaces;
 using System.Collections.Generic;
+using System.Linq;
+using System.IO;
 
 namespace RuneRogue
 {
@@ -42,6 +44,8 @@ namespace RuneRogue
         private static InputSystem _inputSystem;
         private static bool _quittingGame;
 
+        private static string _highScoreFile = "scores.txt";
+
         public static int mapLevel = 1;
         private static bool _renderRequired = true;
 
@@ -58,9 +62,12 @@ namespace RuneRogue
         public static MonsterGenerator MonsterGenerator { get; private set; }
         public static Runes RuneSystem { get; private set; }
         public static SecondaryConsole CurrentSecondary { get; set; }
-        public static SecondaryConsole PostSecondary { get; set; }
-
+        public static SecondaryConsole PostSecondary { get; set; }           
         public static TargetingSystem TargetingSystem { get; set; }
+        public static string HighScoreFile
+        {
+            get { return _highScoreFile; }
+        }
 
         public static int MessageWidth
         {
@@ -372,6 +379,7 @@ namespace RuneRogue
                         }
                         else if (_inputSystem.QuitKeyPressed(keyPress))
                         {
+                            NewScore("quit on level " + Game.mapLevel.ToString());
                             QuitGame();
                             _renderRequired = true;
                         }
@@ -412,11 +420,12 @@ namespace RuneRogue
                                 }
                                 else if (!Game.RuneSystem.AllRunesOwned)
                                 {
-                                    MessageLog.Add("You must be possess every rune to ascendc the rune throne.");
+                                    MessageLog.Add("You must be possess every rune to ascend the rune throne.");
                                     didPlayerAct = true;
                                 }
                                 else
                                 {
+                                    NewScore("WON!");
                                     MessageLog.Add($"You have won RuneRogue! Your final score is {Player.LifetimeGold * 3}.");
                                     QuitGame();
                                     didPlayerAct = true;
@@ -450,7 +459,7 @@ namespace RuneRogue
                 }
 
             }
-            else
+            else if (Player.Health > 0)
             {
                 CommandSystem.ActivateMonsters();
                 _renderRequired = true;
@@ -529,6 +538,44 @@ namespace RuneRogue
 
                 _renderRequired = false;
             }
+        }
+
+        public static void NewScore(string fate)
+        {
+            string filename = "Resources/" + HighScoreFile;
+            List<string> scoreList;
+            string timestamp = DateTime.Now.ToString("g");
+            int score = Player.LifetimeGold;
+            if (fate == "WON!")
+            {
+                score *= 3;
+            }
+            if (File.Exists(filename))
+                scoreList = File.ReadAllLines(filename).ToList();
+            else
+                scoreList = new List<string>();
+            string record = Player.Name + " (" + fate + " on " + timestamp + "), score " + score.ToString();
+            scoreList.Add(record);
+            var sortedScoreList = scoreList.OrderByDescending(ss => int.Parse(ss.Substring(ss.LastIndexOf(" ") + 1)));
+            List<string> sortedList = sortedScoreList.ToList();
+            int rank = sortedList.IndexOf(record) + 1;
+            string rankth = rank.ToString() + "th";
+            if (rankth == "1th")
+            {
+                rankth = "1st";
+            }
+            else if (rankth == "2th")
+            {
+                rankth = "2nd";
+            }
+            MessageLog.Add("You came in " + rankth);
+            for (int row = Math.Max(1, rank - 1); row <= Math.Min(rank + 1, sortedList.Count); row++)
+            {
+                MessageLog.Add("(" + row.ToString() + ") " + sortedList[row - 1]);
+            }
+            MessageLog.Draw(_messageConsole);
+            RLConsole.Blit(_messageConsole, 0, 0, _messageWidth, _messageHeight, _rootConsole, 0, _screenHeight - _messageHeight);
+            File.WriteAllLines(filename, sortedScoreList.ToArray());
         }
 
         public static void PrintCellList(List<Cell> list)

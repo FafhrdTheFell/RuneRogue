@@ -73,6 +73,10 @@ namespace RuneRogue.Core
         // Returns true when able to place the Actor on the cell or false otherwise
         public bool SetActorPosition(Actor actor, int x, int y)
         {
+            if (actor.IsImmobile)
+            {
+                return false;
+            }
             // Don't open doors on acceleration.
             if (actor == Game.Player && Game.AcceleratePlayer && (GetDoor(x,y) != null))
             {

@@ -184,7 +184,7 @@ namespace RuneRogue.Systems
 
             int numberOfMonsters = Dice.Roll(numInRoomDice);
 
-            //monsterType = "minotaur";
+            //monsterType = "burningidol";
 
             for (int i = 0; i < numberOfMonsters; i++)
             {
@@ -245,6 +245,7 @@ namespace RuneRogue.Systems
             monster.SADoppelganger = _monsterManual[page].SADoppelganger;
             monster.SAHighImpact = _monsterManual[page].SAHighImpact;
             monster.IsUndead = _monsterManual[page].IsUndead;
+            monster.IsImmobile = _monsterManual[page].IsImmobile;
             monster.FollowerKinds = _monsterManual[page].FollowerKinds;
             monster.FollowerNumberAppearing = _monsterManual[page].FollowerNumberAppearing;
             monster.FollowerProbability = _monsterManual[page].FollowerProbability;

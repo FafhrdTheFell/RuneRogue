@@ -48,7 +48,7 @@ namespace RuneRogue.Core
 
         private readonly string[] _effectTypes =
         {
-            "Elements","Death","Iron","Arrow","Spit","Boulder","Ram"
+            "Arrow","Boulder","Death","Elements","Fire","Iron","Ram","Spit"
         };
 
         private readonly Dictionary<string, string> _projectile = new Dictionary<string, string>
@@ -59,11 +59,20 @@ namespace RuneRogue.Core
             ["Arrow"] = "missile",
             ["Spit"] = "missile",
             ["Boulder"] = "missile",
-            ["Ram"] = "missile"
+            ["Ram"] = "missile",
+            ["Fire"] = "line"
         };
 
         private readonly Dictionary<string, RLColor[]> _colorPattern = new Dictionary<string, RLColor[]>
         {
+            ["Arrow"] = new RLColor[]
+            {
+                Swatch.DbMetal
+            },
+            ["Boulder"] = new RLColor[]
+            {
+                Swatch.DbStone
+            },
             ["Death"] = new RLColor[]
             { 
                 Colors.Poisoncloud1,
@@ -77,25 +86,25 @@ namespace RuneRogue.Core
                 Swatch.DbSky,
                 Swatch.DbBlood
             },
+            ["Fire"] = new RLColor[]
+            {
+                Colors.Fire1,
+                Colors.Fire2,
+                Colors.Fire3,
+                Colors.Fire4,
+                Colors.Fire5
+            },
             ["Iron"] = new RLColor[]
             {
                 Swatch.DbBrightMetal
             },
-            ["Spit"] = new RLColor[]
-            {
-                Swatch.DbVegetation
-            },
-            ["Arrow"] = new RLColor[]
-            {
-                Swatch.DbMetal
-            },
-            ["Boulder"] = new RLColor[]
-            {
-                Swatch.DbStone
-            },
             ["Ram"] = new RLColor[]
             {
                 Swatch.ComplimentLightest
+            },
+            ["Spit"] = new RLColor[]
+            {
+                Swatch.DbVegetation
             }
         };
 
@@ -402,10 +411,32 @@ namespace RuneRogue.Core
                         else
                         {
                             attackMessage.AppendFormat(" {0} takes {1} damage, killing it. ", target.Name, damage);
-                            CommandSystem.ResolveDeath(target, attackMessage);
+                            CommandSystem.ResolveDeath("elemental blast", target, attackMessage);
                             break;
                         }
                     }
+                }
+            }
+            if (_effect == "Fire")
+            {
+                int damage;
+                foreach (Actor target in TargetActors())
+                {
+                    damage = Dice.Roll("2d10");
+                    target.Health -= damage;
+
+                    attackMessage.AppendFormat("Flames engulf {0}. ", target.Name);
+                    if (target.Health > 0)
+                    {
+                        attackMessage.AppendFormat(" {0} takes {1} damage. ", target.Name, damage);
+                    }
+                    else
+                    {
+                        attackMessage.AppendFormat(" {0} takes {1} damage, killing it. ", target.Name, damage);
+                        CommandSystem.ResolveDeath("fire", target, attackMessage);
+                        break;
+                    }
+                   
                 }
             }
             else if (_effect == "Death")
@@ -461,7 +492,7 @@ namespace RuneRogue.Core
                         else
                         {
                             attackMessage.AppendFormat(" {0} takes {1} damage, killing it. ", target.Name, damage);
-                            CommandSystem.ResolveDeath(target, attackMessage);
+                            CommandSystem.ResolveDeath("razor-spear of iron", target, attackMessage);
                         }
                     }
                     else

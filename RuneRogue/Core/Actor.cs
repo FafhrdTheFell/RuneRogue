@@ -38,6 +38,7 @@ namespace RuneRogue.Core
         private bool _highImpactAttack;
         private bool _senseThoughts;
         private bool _undead;
+        private bool _immobile;
         private bool _invisible;
         private bool _ferocious;
         private bool _venomous;
@@ -253,6 +254,11 @@ namespace RuneRogue.Core
         public bool IsPoisoned
         {
             get { return this.ExistingEffect("poison") != null; }
+        }
+        public bool IsImmobile
+        {
+            get { return _immobile; }
+            set { _immobile = value; }
         }
         public bool SAFerocious
         {

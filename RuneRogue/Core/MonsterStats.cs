@@ -38,6 +38,7 @@ namespace RuneRogue.Core
         public bool SAFerocious { get; set; }
         public bool SAVenomous { get; set; }
         public bool IsUndead { get; set; }
+        public bool IsImmobile { get; set; }
         public string[] FollowerKinds { get; set; }
         public string[] FollowerNumberAppearing { get; set; }
         public int[] FollowerProbability { get; set; }

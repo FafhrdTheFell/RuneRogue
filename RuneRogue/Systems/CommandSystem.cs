@@ -300,7 +300,7 @@ namespace RuneRogue.Systems
 
                 // activate next schedulable without returning to main loop:
                 // makes game faster and only need main loop for player input
-                if (!Game.SecondaryConsoleActive)
+                if (!Game.SecondaryConsoleActive && Game.Player.Health > 0)
                 {
                     ActivateMonsters();
                 }
@@ -382,7 +382,7 @@ namespace RuneRogue.Systems
                     Game.AutoMoveMonsterTarget = null;
                     Game.AutoMovePlayer = false;
                 }
-                ResolveDeath(defender, attackMessage);
+                ResolveDeath(attacker, defender, attackMessage);
             }
 
             if (!string.IsNullOrWhiteSpace(attackMessage.ToString()))
@@ -581,8 +581,9 @@ namespace RuneRogue.Systems
             }
         }
 
+
         // Remove the defender from the map and add some messages upon death.
-        public static void ResolveDeath(Actor defender, StringBuilder attackMessage)
+        public static void ResolveDeath(string deathSource, Actor defender, StringBuilder attackMessage)
         {
             if (defender is Player)
             {
@@ -603,6 +604,10 @@ namespace RuneRogue.Systems
                             attackMessage.Append(s + " ");
                         }
                     }
+                }
+                else
+                {
+                    Game.NewScore($"killed by {deathSource} on level " + Game.mapLevel.ToString());
                 }
                 
             }
@@ -629,8 +634,10 @@ namespace RuneRogue.Systems
                 }
                 Game.DungeonMap.RemoveMonster((Monster)defender);
             }
-
-
+        }
+        public static void ResolveDeath(Actor attacker, Actor defender, StringBuilder attackMessage)
+        {
+            ResolveDeath(attacker.Name, defender, attackMessage);
         }
     }
 }

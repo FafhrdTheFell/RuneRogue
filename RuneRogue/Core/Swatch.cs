@@ -56,5 +56,9 @@ namespace RuneRogue.Core
         public static RLColor DwBandages = new RLColor(255, 250, 230);
         public static RLColor DWDullGold = new RLColor(172, 164, 71);
         public static RLColor DWLighterRed = new RLColor(230, 110, 110);
+        public static RLColor DwRed = new RLColor(153,0,0);
+        public static RLColor DwBrightRed = new RLColor(255,0,0);
+        public static RLColor DwOrange = new RLColor(255,128,0);
+        public static RLColor DwYellow = new RLColor(255, 255, 0);
     }
 }

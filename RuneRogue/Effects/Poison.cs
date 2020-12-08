@@ -79,7 +79,7 @@ namespace RuneRogue.Effects
                 {
                     StringBuilder attackMessage = new StringBuilder();
                     attackMessage.AppendFormat("{0} dies from poisoning.", target.Name);
-                    CommandSystem.ResolveDeath(target, attackMessage);
+                    CommandSystem.ResolveDeath("poison", target, attackMessage);
                     if (!string.IsNullOrWhiteSpace(attackMessage.ToString()) && Game.DungeonMap.IsInFov(target.X, target.Y))
                     {
                         Game.MessageLog.Add(attackMessage.ToString());

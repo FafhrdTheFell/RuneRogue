@@ -72,7 +72,9 @@
     "numberAppearing": "1",
     "minLevel": 2,
     "maxLevel": 14,
-    "saHighImpact": true
+    "saHighImpact": true,
+    "specialAttackType": "Fire",
+    "specialAttackRange": 6
   },
   {
     "kind": "goblin",
@@ -239,7 +241,28 @@
     "maxLevel": 13,
     "saFerocious": true,
     "specialAttackType": "Ram",
-    "specialAttackRange":  6
+    "specialAttackRange": 6
+  },
+  {
+    "kind": "burningidol",
+    "attack": "16",
+    "attackChance": "25D4",
+    "awareness": 10,
+    "color": "DbSun",
+    "defense": "5D5k3",
+    "defenseChance": "0",
+    "gold": "12d10",
+    "maxHealth": "3D6k2",
+    "name": "Burning Idol",
+    "speed": 16,
+    "symbol": "8",
+    "numberAppearing": "1",
+    "minLevel": 3,
+    "maxLevel": 11,
+    "saHighImpact": true,
+    "specialAttackType": "Fire",
+    "specialAttackRange": 6,
+    "isImmobile":  true
   },
   {
     "kind": "bonehemoth",
