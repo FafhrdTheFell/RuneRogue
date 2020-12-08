@@ -15,12 +15,18 @@ namespace RuneRogue.Core
     {
         private readonly List<Monster> _monsters;
         private readonly List<Item> _items;
+        private int _dungeonLevel;
 
         public List<Rectangle> Rooms { get; set; }
         public List<Door> Doors { get; set; }
         public List<Shop> Shops { get; set; }
         public Stairs StairsUp { get; set; }
         public Stairs StairsDown { get; set; }
+        public int DungeonLevel { 
+            get { return _dungeonLevel; }
+            set { _dungeonLevel = value; }
+        }
+        public bool FinalLevel { get { return _dungeonLevel == Systems.MapGenerator.maxDungeonLevel; } }
 
         // PlayerPeril is true if player can see monster
         public bool PlayerPeril;

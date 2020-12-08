@@ -396,42 +396,7 @@ namespace RuneRogue
                         }
                         else if (_inputSystem.DescendStairs(keyPress))
                         {
-                            if (!FinalLevel() && DungeonMap.CanMoveDownToNextLevel())
-                            {
-                                // MapGenerator treats Game.MaxDungeonLevel differently
-                                MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, ++mapLevel);
-                                DungeonMap = mapGenerator.CreateMap();
-                                MessageLog = new MessageLog();
-                                MessageLog.Add("The stairs collapse behind you.");
-                                if (Game.FinalLevel())
-                                {
-                                    MessageLog.Add("Are you ready to ascend the throne of runes?");
-                                }
-                                CommandSystem = new CommandSystem();
-                                _rootConsole.Title = $"RuneRogue - Level {mapLevel}";
-                                didPlayerAct = true;
-                            }
-                            else if (FinalLevel() && DungeonMap.CanMoveDownToNextLevel())
-                            {
-                                if (DungeonMap.MonstersCount() > 0)
-                                {
-                                    MessageLog.Add("You must be the sole challenger for the rune throne.");
-                                    didPlayerAct = true;
-                                }
-                                else if (!Game.RuneSystem.AllRunesOwned)
-                                {
-                                    MessageLog.Add("You must be possess every rune to ascend the rune throne.");
-                                    didPlayerAct = true;
-                                }
-                                else
-                                {
-                                    NewScore("WON!");
-                                    MessageLog.Add($"You have won RuneRogue! Your final score is {Player.LifetimeGold * 3}.");
-                                    QuitGame();
-                                    didPlayerAct = true;
-                                }
-
-                            }
+                            didPlayerAct = NewLevel();
                         }
                         else if (_inputSystem.WaitKey(keyPress))
                         {
@@ -540,6 +505,44 @@ namespace RuneRogue
             }
         }
 
+        public static bool NewLevel()
+    {
+            if (!FinalLevel() && DungeonMap.CanMoveDownToNextLevel())
+            {
+                // MapGenerator treats Game.MaxDungeonLevel differently
+                MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, ++mapLevel);
+                DungeonMap = mapGenerator.CreateMap();
+                MessageLog = new MessageLog();
+                MessageLog.Add("The stairs collapse behind you.");
+                if (Game.FinalLevel())
+                {
+                    MessageLog.Add("Are you ready to ascend the throne of runes?");
+                }
+                CommandSystem = new CommandSystem();
+                _rootConsole.Title = $"RuneRogue - Level {mapLevel}";
+                return true;
+            }
+            else if (FinalLevel() && DungeonMap.CanMoveDownToNextLevel())
+            {
+                if (DungeonMap.MonstersCount() > 0)
+                {
+                    MessageLog.Add("You must be the sole challenger for the rune throne.");
+                    return false;
+                }
+                else
+                {
+                    NewScore("WON!");
+                    MessageLog.Add($"You have won RuneRogue! Your final score is {Player.LifetimeGold * 3}.");
+                    QuitGame();
+                    return true;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public static void NewScore(string fate)
         {
             string filename = "Resources/" + HighScoreFile;
@@ -590,5 +593,7 @@ namespace RuneRogue
             }
             System.Console.WriteLine(x);
         }
+
+        
     }
 }

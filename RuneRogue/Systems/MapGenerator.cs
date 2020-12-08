@@ -23,6 +23,29 @@ namespace RuneRogue.Systems
 
         private readonly DungeonMap _map;
 
+        public static int maxDungeonLevel = 1;
+
+        // random type of shop on _shopLevels
+        private static List<int> _shopLevels = new List<int>
+        {
+            1,3,6,9,12
+        };
+        private static List<int> _runeForgeLevels = new List<int>
+        {
+            4,8,12,14
+        };
+        private static List<int> _bookShopLevels = new List<int>
+        {
+            5,9
+        };
+        // dictionary from levels to (1) monster kind, (2) # appearing, (3) exclusive or additional
+        // exclusive = only monsters to spawn additional = spawn more monsters. Length 3 string
+        // arrays spawn 1 encounter, length 6 spawn two etc.
+        private static Dictionary<int, string[]> _levelMonsterAdds = new Dictionary<int, string[]>
+        {
+            [maxDungeonLevel] = new string[] { "corruptedtitan", "d3+1", "exclusive" }
+        };
+
         // Constructing a new MapGenerator requires the dimensions of the maps it will create
         // as well as the sizes and maximum number of rooms
         public MapGenerator(int width, int height, int maxRooms, int roomMaxSize, int roomMinSize, int mapLevel)
@@ -31,7 +54,7 @@ namespace RuneRogue.Systems
             _height = height;
             _maxRooms = maxRooms;
             _mapLevel = mapLevel;
-            if (!Game.FinalLevel())
+            if (mapLevel != maxDungeonLevel)
             {
                 _maxRooms = maxRooms;
                 _roomMaxSize = roomMaxSize;
@@ -39,6 +62,7 @@ namespace RuneRogue.Systems
             }
             else
             {
+                // lowest dungeon level is a single large room
                 _maxRooms = 1;
                 _roomMaxSize = 40;
                 _roomMinSize = 30;
@@ -51,6 +75,8 @@ namespace RuneRogue.Systems
         {
             // Set the properties of all cells to false
             _map.Initialize(_width, _height);
+
+            _map.DungeonLevel = _mapLevel;
 
             // Try to place as many rooms as the specified maxRooms
             for (int r = 0; r < _maxRooms; r++)
@@ -114,31 +140,40 @@ namespace RuneRogue.Systems
             }
 
             // generate a shop in a random room every Game.ShopEveryNLevels, starting at level 1
-            if ((_mapLevel % Game.ShopEveryNLevels) == 1)
+            if (_shopLevels.Contains(_mapLevel))
             {
-                int shopRoom = Dice.Roll("1d" + _map.Rooms.Count) - 1;
-                CreateShop(_map.Rooms[shopRoom], 100);
+                CreateShop(RandomRoom(), 100);
             }
 
-            if ((_mapLevel % Game.RuneForgeEveryNLevels) == 0 || Game.FinalLevel())
+            if (_runeForgeLevels.Contains(_mapLevel))
             {
-                int shopRoom = Dice.Roll("1d" + _map.Rooms.Count) - 1;
-                CreateShop(_map.Rooms[shopRoom], 100, "RuneForge");
+                CreateShop(RandomRoom(), 100, "RuneForge");
+            }
+
+            if (_bookShopLevels.Contains(_mapLevel))
+            {
+                CreateShop(RandomRoom(), 100, "BookShop");
             }
 
             CreateStairs();
 
             PlacePlayer();
 
+            bool spawnMoreMonsters = true;
+            if (_levelMonsterAdds.ContainsKey(_mapLevel))
+            {
+                string[] encounter = _levelMonsterAdds[_mapLevel]; 
+                List<Monster> monsters = Game.MonsterGenerator.CreateEncounter(_mapLevel, encounter[0], encounter[1]);
+                if (encounter[2] == "exclusive")
+                {
+                    spawnMoreMonsters = false;
+                }
+                AddMonstersToRoom(RandomRoom(), monsters);
+            }
             // Final level monsters already placed
-            if (!Game.FinalLevel())
+            if (spawnMoreMonsters)
             {
                 PlaceMonsters();
-            }
-            else
-            {
-                List<Monster> monsters = Game.MonsterGenerator.CreateEncounter(_mapLevel, "corruptedtitan", "2d4k1");
-                AddMonstersToRoom(_map.Rooms[0], monsters);
             }
 
             // for debugging:
@@ -366,6 +401,12 @@ namespace RuneRogue.Systems
             {
                 return false;
             }
+        }
+
+        public Rectangle RandomRoom()
+        {
+            int roomIndex = Dice.Roll("1d" + _map.Rooms.Count) - 1;
+            return _map.Rooms[roomIndex];
         }
 
         public void CreateItems(Rectangle room)
