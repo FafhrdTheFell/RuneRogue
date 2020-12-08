@@ -568,13 +568,16 @@ namespace RuneRogue
             {
                 rankth = "2nd";
             }
-            MessageLog.Add("You came in " + rankth);
-            for (int row = Math.Max(1, rank - 1); row <= Math.Min(rank + 1, sortedList.Count); row++)
+            if (sortedList.Count > 1)
             {
-                MessageLog.Add("(" + row.ToString() + ") " + sortedList[row - 1]);
+                MessageLog.Add($"You came in {rankth} out of {sortedList.Count} plays.");
+                for (int row = Math.Max(1, rank - 1); row <= Math.Min(rank + 1, sortedList.Count); row++)
+                {
+                    MessageLog.Add("(" + row.ToString() + ") " + sortedList[row - 1]);
+                }
+                MessageLog.Draw(_messageConsole);
+                RLConsole.Blit(_messageConsole, 0, 0, _messageWidth, _messageHeight, _rootConsole, 0, _screenHeight - _messageHeight);
             }
-            MessageLog.Draw(_messageConsole);
-            RLConsole.Blit(_messageConsole, 0, 0, _messageWidth, _messageHeight, _rootConsole, 0, _screenHeight - _messageHeight);
             File.WriteAllLines(filename, sortedScoreList.ToArray());
         }
 

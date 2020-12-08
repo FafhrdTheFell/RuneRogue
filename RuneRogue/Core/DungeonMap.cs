@@ -59,15 +59,10 @@ namespace RuneRogue.Core
 
         public List<Monster> MonstersInFOV()
         {
-            List<Monster> monsters = new List<Monster>();
-            foreach (Monster m in _monsters)
-            {
-                if (IsInFov(m.X, m.Y))
-                {
-                    monsters.Add(m);
-                }
-            }
-            return monsters;
+            List<Monster> monstersSeen = _monsters.Where(m => IsInFov(m.X, m.Y)).ToList();
+            // order monsters from left-most column and then by highest on screen
+            monstersSeen.Sort((x, y) => (100 * x.X + x.Y).CompareTo(100 * y.X + y.Y));
+            return monstersSeen;
         }
 
         // Returns true when able to place the Actor on the cell or false otherwise
@@ -344,7 +339,10 @@ namespace RuneRogue.Core
             // Keep an index so we know which position to draw monster stats at
             int i = 0;
             // Iterate through each monster on the map and draw it after drawing the Cells
-            foreach (Monster monster in _monsters)
+            List<Monster> monstersSeen = _monsters.Where(m => IsInFov(m.X, m.Y)).ToList();
+            monstersSeen.Sort((x, y) => (100 * x.X + x.Y).CompareTo(100 * y.X + y.Y));
+            //foreach (Monster monster in _monsters)
+            foreach (Monster monster in monstersSeen)
             {
                 monster.Draw(mapConsole, this);
                 // When the monster is in the field-of-view also draw their stats

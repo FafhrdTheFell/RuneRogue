@@ -345,12 +345,12 @@ namespace RuneRogue.Systems
 
             dungeonMap.ComputeFov(player.X, player.Y, Math.Min(_range, player.Awareness), true);
             List<Monster> monstersSeen = dungeonMap.MonstersInFOV();
-            monstersSeen.Sort((x, y) => (100*x.X+x.Y).CompareTo(100*y.X+y.Y));
             List<Actor> actorTargetable = new List<Actor>();
             foreach(Monster m in monstersSeen)
             {
                 actorTargetable.Add(m as Actor);
             }
+            dungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
 
             return actorTargetable;
         }
