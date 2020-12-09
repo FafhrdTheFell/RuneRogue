@@ -23,7 +23,7 @@ namespace RuneRogue.Systems
 
         private readonly DungeonMap _map;
 
-        public static int maxDungeonLevel = 1;
+        public static int maxDungeonLevel = 14;
 
         // random type of shop on _shopLevels
         private static List<int> _shopLevels = new List<int>
@@ -43,7 +43,7 @@ namespace RuneRogue.Systems
         // arrays spawn 1 encounter, length 6 spawn two etc.
         private static Dictionary<int, string[]> _levelMonsterAdds = new Dictionary<int, string[]>
         {
-            [maxDungeonLevel] = new string[] { "corruptedtitan", "d3+1", "exclusive" }
+            [maxDungeonLevel] = new string[] { "corruptedtitan", "1d3+1", "exclusive" }
         };
 
         // Constructing a new MapGenerator requires the dimensions of the maps it will create

@@ -274,138 +274,18 @@ namespace RuneRogue
                 _renderRequired = true;
             }
 
-            else if (CommandSystem.IsPlayerTurn)
+            if (CommandSystem.IsPlayerTurn)
             {
                 if (AcceleratePlayer && DungeonMap.PlayerPeril)
                 {
                     AcceleratePlayer = false;
                 }
 
-                // autopickup
-                if (DungeonMap.GetItemAt(Player.X, Player.Y) != null && DungeonMap.MonstersInFOV().Count == 0)
+                if (!didPlayerAct && !SecondaryConsoleActive)
                 {
-                    didPlayerAct = CommandSystem.PickupItemPlayer();
+                    didPlayerAct = AutoActionAndProcessInput(keyPress, rLMouse);
                 }
-                else if (AutoMovePlayer)
-                {
-                    if (AutoMoveMonsterTarget != null)
-                    {
-                        AutoMoveXTarget = AutoMoveMonsterTarget.X;
-                        AutoMoveYTarget = AutoMoveMonsterTarget.Y;
-                    }
-                    didPlayerAct = CommandSystem.AutoMovePlayer(AutoMoveXTarget, AutoMoveYTarget);
-                    if (!didPlayerAct)
-                    {
-                        if (Player.X == AutoMoveXTarget && Player.Y == AutoMoveYTarget &&
-                            DungeonMap.GetItemAt(AutoMoveXTarget, AutoMoveYTarget) != null)
-                        {
-                            didPlayerAct = CommandSystem.PickupItemPlayer();
-                        }
-                        AutoMovePlayer = false;
-                    }
-                    if (DungeonMap.GetShopAt(Player.X, Player.Y) != null)
-                    {
-         
-                        AutoMovePlayer = false;
-                    }
-                    if (rLMouse.GetLeftClick() || keyPress != null)
-                    {
-                        AutoMovePlayer = false;
-                    }
-                }
-                // if player requested acceleration, use the previous direction,
-                // but turn off acceleration if a key is pressed to stop it.
-                else if (AcceleratePlayer)
-                {
-                    if (rLMouse.GetLeftClick() || keyPress != null)
-                    {
-                        AcceleratePlayer = false;
-                        return;
-                    }
-                    else
-                    {
-                        Direction direction = AccelerateDirection;
-                        if (direction != Direction.None)
-                        {
-                            didPlayerAct = CommandSystem.MovePlayer(direction);
-                        }
-                        if (!didPlayerAct)
-                        {
-                            AcceleratePlayer = false;
-                        }
-                    }
-                }
-                else if (rLMouse.GetLeftClick())
-                {
-                    if (rLMouse.X <= MapWidth && rLMouse.Y <= MapHeight)
-                    {
-                        if (DungeonMap.GetCell(rLMouse.X, rLMouse.Y).IsExplored)
-                        {
-                            AutoMovePlayer = true;
-                            AutoMoveXTarget = rLMouse.X;
-                            AutoMoveYTarget = rLMouse.Y;
-                            if (DungeonMap.GetMonsterAt(rLMouse.X, rLMouse.Y) != null)
-                            {
-                                AutoMoveMonsterTarget = DungeonMap.GetMonsterAt(rLMouse.X, rLMouse.Y);
-                            }
-                            else
-                            {
-                                AutoMoveMonsterTarget = null;
-                            }
-                        }
-                    }
-                }
-                else if (keyPress != null)
-                {
-                    if (_quittingGame)
-                    {
-                        _rootConsole.Close();
-                    }
-                    else
-                    {
-                        Direction direction = _inputSystem.MoveDirection(keyPress);
-                        if (direction != Direction.None)
-                        {
-                            // the acceleration system is ugly. AcceleratePlayer sometimes
-                            // gets set in the Command System, so need to check shift before
-                            // carrying out move.
-                            AcceleratePlayer = _inputSystem.ShiftDown(keyPress);
-                            AccelerateDirection = direction;
-                            didPlayerAct = CommandSystem.MovePlayer(direction);
-                        }
-                        else if (_inputSystem.CloseDoorKeyPressed(keyPress))
-                        {
-                            didPlayerAct = CommandSystem.CloseDoorsNextTo(Player);
-                        }
-                        else if (_inputSystem.QuitKeyPressed(keyPress))
-                        {
-                            NewScore("quit on level " + Game.mapLevel.ToString());
-                            QuitGame();
-                            _renderRequired = true;
-                        }
-                        else if (_inputSystem.RuneKeyPressed(keyPress))
-                        {
-                            SecondaryConsoleActive = true;
-                            AcceleratePlayer = false;
-                            CurrentSecondary = RuneSystem;
-                            _renderRequired = true;
-                        }
-                        else if (_inputSystem.PickupKeyPressed(keyPress))
-                        {
-                            didPlayerAct = CommandSystem.PickupItemPlayer();
-                        }
-                        else if (_inputSystem.DescendStairs(keyPress))
-                        {
-                            didPlayerAct = NewLevel();
-                        }
-                        else if (_inputSystem.WaitKey(keyPress))
-                        {
-                            didPlayerAct = true;
-                        }
-                    }
-                }
-                //}
-
+                
                 if (CommandSystem.IsPlayerTurn && didPlayerAct && Game.XpOnAction)
                 {
                     Player.CheckAdvancementXP();
@@ -503,6 +383,140 @@ namespace RuneRogue
 
                 _renderRequired = false;
             }
+        }
+
+        // execute automatic actions -- automove, autopickup -- or execute action from
+        // keyboard or mouse input
+        public static bool AutoActionAndProcessInput(RLKeyPress keyPress, RLMouse rLMouse)
+        {
+            bool didPlayerAct = false;
+            // autopickup
+            if (DungeonMap.GetItemAt(Player.X, Player.Y) != null && DungeonMap.MonstersInFOV().Count == 0)
+            {
+                return CommandSystem.PickupItemPlayer();
+            }
+            else if (AutoMovePlayer)
+            {
+                if (AutoMoveMonsterTarget != null)
+                {
+                    AutoMoveXTarget = AutoMoveMonsterTarget.X;
+                    AutoMoveYTarget = AutoMoveMonsterTarget.Y;
+                }
+                didPlayerAct = CommandSystem.AutoMovePlayer(AutoMoveXTarget, AutoMoveYTarget);
+                if (!didPlayerAct)
+                {
+                    if (Player.X == AutoMoveXTarget && Player.Y == AutoMoveYTarget &&
+                        DungeonMap.GetItemAt(AutoMoveXTarget, AutoMoveYTarget) != null)
+                    {
+                        didPlayerAct = CommandSystem.PickupItemPlayer();
+                    }
+                    AutoMovePlayer = false;
+                }
+                if (DungeonMap.GetShopAt(Player.X, Player.Y) != null)
+                {
+
+                    AutoMovePlayer = false;
+                }
+                if (rLMouse.GetLeftClick() || keyPress != null)
+                {
+                    AutoMovePlayer = false;
+                }
+                return didPlayerAct;
+            }
+            // if player requested acceleration, use the previous direction,
+            // but turn off acceleration if a key is pressed to stop it.
+            else if (AcceleratePlayer)
+            {
+                if (rLMouse.GetLeftClick() || keyPress != null)
+                {
+                    AcceleratePlayer = false;
+                    return false;
+                }
+                else
+                {
+                    Direction direction = AccelerateDirection;
+                    if (direction != Direction.None)
+                    {
+                        didPlayerAct = CommandSystem.MovePlayer(direction);
+                    }
+                    if (!didPlayerAct)
+                    {
+                        AcceleratePlayer = false;
+                    }
+                }
+                return didPlayerAct;
+            }
+            else if (rLMouse.GetLeftClick())
+            {
+                if (rLMouse.X <= MapWidth && rLMouse.Y <= MapHeight)
+                {
+                    if (DungeonMap.GetCell(rLMouse.X, rLMouse.Y).IsExplored)
+                    {
+                        AutoMovePlayer = true;
+                        AutoMoveXTarget = rLMouse.X;
+                        AutoMoveYTarget = rLMouse.Y;
+                        if (DungeonMap.GetMonsterAt(rLMouse.X, rLMouse.Y) != null)
+                        {
+                            AutoMoveMonsterTarget = DungeonMap.GetMonsterAt(rLMouse.X, rLMouse.Y);
+                        }
+                        else
+                        {
+                            AutoMoveMonsterTarget = null;
+                        }
+                    }
+                }
+            }
+            else if (keyPress != null)
+            {
+                if (_quittingGame)
+                {
+                    _rootConsole.Close();
+                }
+                else
+                {
+                    Direction direction = _inputSystem.MoveDirection(keyPress);
+                    if (direction != Direction.None)
+                    {
+                        // the acceleration system is ugly. AcceleratePlayer sometimes
+                        // gets set in the Command System, so need to check shift before
+                        // carrying out move.
+                        AcceleratePlayer = _inputSystem.ShiftDown(keyPress);
+                        AccelerateDirection = direction;
+                        didPlayerAct = CommandSystem.MovePlayer(direction);
+                    }
+                    else if (_inputSystem.CloseDoorKeyPressed(keyPress))
+                    {
+                        didPlayerAct = CommandSystem.CloseDoorsNextTo(Player);
+                    }
+                    else if (_inputSystem.QuitKeyPressed(keyPress))
+                    {
+                        NewScore("quit on level " + Game.mapLevel.ToString());
+                        QuitGame();
+                        _renderRequired = true;
+                    }
+                    else if (_inputSystem.RuneKeyPressed(keyPress))
+                    {
+                        SecondaryConsoleActive = true;
+                        AcceleratePlayer = false;
+                        CurrentSecondary = RuneSystem;
+                        _renderRequired = true;
+                    }
+                    else if (_inputSystem.PickupKeyPressed(keyPress))
+                    {
+                        didPlayerAct = CommandSystem.PickupItemPlayer();
+                    }
+                    else if (_inputSystem.DescendStairs(keyPress))
+                    {
+                        didPlayerAct = NewLevel();
+                    }
+                    else if (_inputSystem.WaitKey(keyPress))
+                    {
+                        didPlayerAct = true;
+                    }
+                }
+                return didPlayerAct;
+            }
+            return false;
         }
 
         public static bool NewLevel()

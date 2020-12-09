@@ -326,7 +326,7 @@ namespace RuneRogue.Systems
             List<Cell> targetables = new List<Cell>();
 
             FieldOfView inPlayerRange = new FieldOfView(dungeonMap);
-            inPlayerRange.ComputeFov(player.X, player.Y, Math.Min(_range, player.Awareness), true);
+            inPlayerRange.ComputeFov(player.X, player.Y, player.Awareness, true);
             foreach (Cell cell in dungeonMap.GetCellsInArea(player.X, player.Y, _range + 1))
             {
                 if (inPlayerRange.IsInFov(cell.X, cell.Y))
@@ -343,14 +343,13 @@ namespace RuneRogue.Systems
             DungeonMap dungeonMap = Game.DungeonMap;
             Player player = Game.Player;
 
-            dungeonMap.ComputeFov(player.X, player.Y, Math.Min(_range, player.Awareness), true);
+            dungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
             List<Monster> monstersSeen = dungeonMap.MonstersInFOV();
             List<Actor> actorTargetable = new List<Actor>();
             foreach(Monster m in monstersSeen)
             {
                 actorTargetable.Add(m as Actor);
             }
-            dungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
 
             return actorTargetable;
         }
