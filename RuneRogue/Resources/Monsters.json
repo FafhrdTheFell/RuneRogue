@@ -235,7 +235,8 @@
     "minLevel": 4,
     "maxLevel": 8,
     "rarity": 40,
-    "saWordOfDeath":  true,
+    "specialAttackType": "Deathchant",
+    "specialAttackRange": 8,
     "followerKinds": [
       "boneClaws",
       "boneBarrager"

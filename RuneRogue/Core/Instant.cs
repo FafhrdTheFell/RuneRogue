@@ -48,7 +48,7 @@ namespace RuneRogue.Core
 
         private readonly string[] _effectTypes =
         {
-            "Arrow","Boulder","Death","Elements","Fire","Iron","Ram","Spit"
+            "Arrow","Boulder","Death","Elements","Fire","Iron","Ram","Spit","Deathchant"
         };
 
         private readonly Dictionary<string, string> _projectile = new Dictionary<string, string>
@@ -60,7 +60,8 @@ namespace RuneRogue.Core
             ["Spit"] = "missile",
             ["Boulder"] = "missile",
             ["Ram"] = "missile",
-            ["Fire"] = "line"
+            ["Fire"] = "line",
+            ["Deathchant"] = "ball"
         };
 
         private readonly Dictionary<string, RLColor[]> _colorPattern = new Dictionary<string, RLColor[]>
@@ -78,6 +79,14 @@ namespace RuneRogue.Core
                 Colors.Poisoncloud1,
                 Colors.Poisoncloud2,
                 Colors.Poisoncloud3
+            },
+            ["Deathchant"] = new RLColor[]
+            {
+                Swatch.Compliment,
+                Swatch.ComplimentDarker,
+                Swatch.ComplimentDarkest,
+                Swatch.ComplimentLighter,
+                Swatch.ComplimentLightest
             },
             ["Elements"] = new RLColor[]
             {
@@ -106,6 +115,11 @@ namespace RuneRogue.Core
             {
                 Swatch.DbVegetation
             }
+        };
+
+        private readonly List<string> _selfTargetingEffects = new List<string>
+        {
+            "Deathchant"
         };
 
         private readonly string[] _elements =
@@ -195,7 +209,16 @@ namespace RuneRogue.Core
                 _totalSteps = TargetCells().Count() * _animateSteps;
             }
 
-                DungeonMap dungeonMap = Game.DungeonMap;
+            if (_selfTargetingEffects.Contains(_effect))
+            {
+                _target = _origin;
+            }
+            if (_effect == "Deathchant")
+            {
+                _radius = 8;
+            }
+
+            DungeonMap dungeonMap = Game.DungeonMap;
             Player player = Game.Player;
 
             _console.Clear();
@@ -453,6 +476,35 @@ namespace RuneRogue.Core
                     {
                         int potency = Dice.Roll("1d3") + 4;
                         Poison poison = new Poison(target, potency);
+                    }
+                }
+            }
+            else if (_effect == "Deathchant")
+            {
+                attackMessage.AppendFormat("{0} chants a deathly dirge. ", Source.Name);
+                foreach (Actor target in TargetActors())
+                {
+                    if (target.IsUndead)
+                    {
+                        if (target.Health < target.MaxHealth)
+                        {
+                            target.Health += 1;
+                            attackMessage.AppendFormat("{0} reassembles. ", target.Name);
+                        }
+                    }
+                    else if (target != Source)
+                    {
+                        target.Health -= 1;
+
+                        if (target.Health > 0)
+                        {
+                            attackMessage.AppendFormat(" {0} takes 1 damage. ", target.Name);
+                        }
+                        else
+                        {
+                            attackMessage.AppendFormat(" {0} takes 1 damage, killing it. ", target.Name);
+                            CommandSystem.ResolveDeath("deathly dirge", target, attackMessage);
+                        }                    
                     }
                 }
             }
