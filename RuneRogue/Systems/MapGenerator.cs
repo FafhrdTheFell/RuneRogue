@@ -491,7 +491,7 @@ namespace RuneRogue.Systems
                 if (Dice.Roll("1D10") < 7)
                 {
                     // to spawn particular monsters for testing, uncomment the next line
-                    //List<Monster> monsters = Game.MonsterGenerator.CreateEncounter(_mapLevel, "dwarvenskullpriest", "1");
+                    //List<Monster> monsters = Game.MonsterGenerator.CreateEncounter(_mapLevel, "shockerant");
                     List<Monster> monsters = Game.MonsterGenerator.CreateEncounter(_mapLevel);
 
                     AddMonstersToRoom(room, monsters);

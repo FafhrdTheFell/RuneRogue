@@ -42,6 +42,7 @@ namespace RuneRogue.Core
         private bool _invisible;
         private bool _ferocious;
         private bool _venomous;
+        private bool _causesStun;
 
         private List<Effect> _currentEffects = new List<Effect>();
 
@@ -291,6 +292,11 @@ namespace RuneRogue.Core
         {
             get { return _venomous; }
             set { _venomous = value; }
+        }
+        public bool SACausesStun
+        {
+            get { return _causesStun; }
+            set { _causesStun = value; }
         }
         public bool SADoppelganger
         {

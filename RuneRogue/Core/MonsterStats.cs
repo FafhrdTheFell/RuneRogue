@@ -37,6 +37,7 @@ namespace RuneRogue.Core
         public bool SASenseThoughts { get; set; }
         public bool SAFerocious { get; set; }
         public bool SAVenomous { get; set; }
+        public bool SACausesStun { get; set; }
         public bool IsUndead { get; set; }
         public bool IsImmobile { get; set; }
         public string[] FollowerKinds { get; set; }

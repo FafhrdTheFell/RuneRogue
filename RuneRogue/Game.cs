@@ -212,6 +212,7 @@ namespace RuneRogue
 
             //RLKeyPress keyPress = _rootConsole.Keyboard.GetKeyPress();
 
+            //Stun stun = new Stun(Player, 3);
             //Poison poison = new Poison(Player,10,6,3);
             //bool isP = Player.ExistingEffect("poison") != null;
             //System.Console.WriteLine(isP);

@@ -548,10 +548,28 @@ namespace RuneRogue.Systems
             if (damage > 0)
             {
                 defender.Health -= damage;
-                if (attacker.SAVenomous && !missileAttack)
+
+                if (defender.Health > 0)
+                {
+                    attackMessage.AppendFormat(" {0} takes {1} damage. ", defender.Name, damage);
+                    //Game.MessageLog.Add($"  {defender.Name} takes {damage} damage");
+                }
+                if (defender.Health <= 0 && defender.Health + damage > 0)
+                {
+                    attackMessage.AppendFormat(" {0} kills {1} ({2} damage). ", attacker.Name, defender.Name, damage);
+                }
+
+                if (attacker.SAVenomous && !missileAttack && defender.Health > 0)
                 {
                     int poisonPotency = attacker.MaxHealth / 10 + 1;
                     Poison poison = new Poison(defender, poisonPotency);
+                    attackMessage.AppendFormat(" {0}'s venom courses through {1}. ", attacker.Name, defender.Name);
+                }
+                if (attacker.SACausesStun && defender.Health > 0)
+                {
+                    int stunPotency = attacker.MaxHealth / 15 + 1;
+                    Stun stun = new Stun(defender, stunPotency);
+                    attackMessage.AppendFormat(" {0}'s blow stuns {1}. ", attacker.Name, defender.Name);
                 }
                 if (attacker.SAVampiric && !missileAttack)
                 {
@@ -559,7 +577,7 @@ namespace RuneRogue.Systems
                     attacker.Health = Math.Min(attacker.Health + gain, attacker.MaxHealth);
                     attackMessage.AppendFormat(" {0} feeds on {1}'s life.", attacker.Name, defender.Name);
                 }
-                if (damage > 0 && attacker.SALifedrainOnDamage && !missileAttack)
+                if (attacker.SALifedrainOnDamage && !missileAttack && defender.Health > 0)
                 {
                     int drain = Math.Max(damage / 2, 1);
                     defender.MaxHealth -= drain;
@@ -568,15 +586,6 @@ namespace RuneRogue.Systems
                     {
                         Game.Player.XpHealth += drain * 3;
                     }
-                }
-                if (defender.Health > 0)
-                {
-                    attackMessage.AppendFormat(" {0} takes {1} damage.", defender.Name, damage);
-                    //Game.MessageLog.Add($"  {defender.Name} takes {damage} damage");
-                }
-                if (defender.Health <= 0 && defender.Health + damage > 0)
-                {
-                    attackMessage.AppendFormat(" {0} kills {1} ({2} damage). ", attacker.Name, defender.Name, damage);
                 }
             }
         }

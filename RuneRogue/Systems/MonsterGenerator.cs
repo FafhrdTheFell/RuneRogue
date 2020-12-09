@@ -243,6 +243,7 @@ namespace RuneRogue.Systems
             monster.SARegeneration = _monsterManual[page].SARegeneration;
             monster.SAVampiric = _monsterManual[page].SAVampiric;
             monster.SAVenomous = _monsterManual[page].SAVenomous;
+            monster.SACausesStun = _monsterManual[page].SACausesStun;
             monster.SADoppelganger = _monsterManual[page].SADoppelganger;
             monster.SAHighImpact = _monsterManual[page].SAHighImpact;
             monster.IsUndead = _monsterManual[page].IsUndead;

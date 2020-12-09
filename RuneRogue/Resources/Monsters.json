@@ -344,7 +344,26 @@
     "minLevel": 3,
     "maxLevel": 11,
     "saHighImpact": true,
-    "isUndead": true
+    "isUndead": true,
+    "saCausesStun": true
+  },
+  {
+    "kind": "shockerant",
+    "attack": "9",
+    "attackChance": "28D4",
+    "awareness": 10,
+    "color": "DwLighterRed",
+    "defense": "1+1D2",
+    "defenseChance": "5D10",
+    "gold": "0",
+    "maxHealth": "2D4",
+    "name": "Shocker Ant",
+    "speed": 8,
+    "symbol": "a",
+    "numberAppearing": "2d2",
+    "minLevel": 1,
+    "maxLevel": 12,
+    "saCausesStun":  true
   },
   {
     "kind": "giantwolfspider",
