@@ -345,8 +345,8 @@ namespace RuneRogue.Core
                 }
             }
 
-            // Don't draw actors in cells that haven't been explored
-            if (!map.GetCell(X, Y).IsExplored)
+            // Don't draw actors in cells that haven't been explored or aren't visible
+            if (!map.GetCell(X, Y).IsExplored || !map.GetCell(X, Y).IsInFov)
             {
                 return;
             }

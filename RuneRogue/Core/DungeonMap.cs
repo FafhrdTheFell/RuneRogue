@@ -388,7 +388,7 @@ namespace RuneRogue.Core
             // When a cell is outside of the field of view draw it with darker colors
             else
             {
-                if (cell.IsWalkable)
+                if (cell.IsWalkable || GetMonsterAt(cell.X, cell.Y) != null)
                 {
                     console.Set(cell.X, cell.Y, Colors.Floor, Colors.FloorBackground, '.');
                 }
