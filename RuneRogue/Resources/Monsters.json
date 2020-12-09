@@ -170,6 +170,37 @@
     "maxLevel": 10
   },
   {
+    "kind": "elvendarklord",
+    "attack": "14",
+    "attackChance": "45D3",
+    "awareness": 14,
+    "color": "DbWater",
+    "defense": "2D3",
+    "defenseChance": "24D6",
+    "gold": "8D8",
+    "maxHealth": "3D6",
+    "missileAttack": 18,
+    "missileRange": 12,
+    "missileType": "Arrow",
+    "name": "Elven Darklord",
+    "speed": 8,
+    "symbol": "e",
+    "numberAppearing": "1",
+    "minLevel": 4,
+    "maxLevel": 13,
+    "rarity": 40,
+    "saFerocious": true,
+    "followerKinds": [
+      "corruptedelf"
+    ],
+    "followerNumberAppearing": [
+      "1d4"
+    ],
+    "followerProbability": [
+      50
+    ]
+  },
+  {
     "kind": "corrupteddwarf",
     "attack": "11",
     "attackChance": "30D3",
@@ -185,7 +216,38 @@
     "numberAppearing": "4-2d3k1",
     "minLevel": 1,
     "maxLevel": 11,
-    "rarity": 40
+    "rarity": 60
+  },
+  {
+    "kind": "dwarvenskullpriest",
+    "attack": "13",
+    "attackChance": "40D3",
+    "awareness": 10,
+    "color": "DbMetal",
+    "defense": "3d5k2",
+    "defenseChance": "13D4",
+    "gold": "8D12",
+    "maxHealth": "3D7",
+    "name": "Dwarf Skullpriest",
+    "speed": 12,
+    "symbol": "d",
+    "numberAppearing": "1",
+    "minLevel": 4,
+    "maxLevel": 8,
+    "rarity": 40,
+    "saWordOfDeath":  true,
+    "followerKinds": [
+      "boneClaws",
+      "boneBarrager"
+    ],
+    "followerNumberAppearing": [
+      "1d4",
+      "1d4"
+    ],
+    "followerProbability": [
+      60,
+      60
+    ]
   },
   {
     "kind": "murdermoth",
@@ -262,7 +324,7 @@
     "saHighImpact": true,
     "specialAttackType": "Fire",
     "specialAttackRange": 6,
-    "isImmobile":  true
+    "isImmobile": true
   },
   {
     "kind": "bonehemoth",
