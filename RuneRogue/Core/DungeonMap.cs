@@ -17,8 +17,7 @@ namespace RuneRogue.Core
         private readonly List<Item> _items;
         private int _dungeonLevel;
 
-        // cells that are not adjacent to any non-explored accessible cell
-        private readonly List<Cell> _badExplorationCells;
+        // cells that are possibly adjacent to non-explored accessible cells
         private readonly List<Cell> _goodExplorationCells;
 
 
@@ -43,7 +42,6 @@ namespace RuneRogue.Core
             // Initialize all the lists when we create a new DungeonMap
             _monsters = new List<Monster>();
             _items = new List<Item>();
-            _badExplorationCells = new List<Cell>();
             _goodExplorationCells = new List<Cell>();
             Rooms = new List<Rectangle>();
             Doors = new List<Door>();
@@ -337,6 +335,7 @@ namespace RuneRogue.Core
                 //    Where(c => c.IsExplored).
                 //    OrderBy(c => Math.Abs(c.X - Game.Player.X) + Math.Abs(c.Y - Game.Player.Y)));
                 Cell nearest = null;
+                List<Cell> badExplorationCells = new List<Cell>();
                 foreach (Cell cell in _goodExplorationCells)
                 {
                     for (int dx = -1; dx <= 1; dx+=2)
@@ -361,10 +360,9 @@ namespace RuneRogue.Core
                             nearest = GetCell(cell.X, cell.Y + dy);
                         }
                     }
-                    _badExplorationCells.Add(cell);
+                    badExplorationCells.Add(cell);
                 }
-                _badExplorationCells.ForEach(c => _goodExplorationCells.Remove(c));
-                //_goodExplorationCells
+                badExplorationCells.ForEach(c => _goodExplorationCells.Remove(c));
                 if (nearest == null)
                 {
                     return nullCell;
