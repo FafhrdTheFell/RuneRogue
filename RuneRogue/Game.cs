@@ -277,9 +277,10 @@ namespace RuneRogue
 
             if (CommandSystem.IsPlayerTurn)
             {
-                if (AcceleratePlayer && DungeonMap.PlayerPeril)
+                if (DungeonMap.PlayerPeril)
                 {
                     AcceleratePlayer = false;
+                    AutoMovePlayer = false;
                 }
 
                 if (!didPlayerAct && !SecondaryConsoleActive)
