@@ -485,6 +485,36 @@ namespace RuneRogue
                         AccelerateDirection = direction;
                         didPlayerAct = CommandSystem.MovePlayer(direction);
                     }
+                    else if (keyPress.Key == RLKey.Number1)
+                    {
+                        Cell target = DungeonMap.GetNearestObject("item", true);
+                        if (target != null)
+                        {
+                            AutoMovePlayer = true;
+                            AutoMoveXTarget = target.X;
+                            AutoMoveYTarget = target.Y;
+                        }
+                    }
+                    else if (keyPress.Key == RLKey.Number2)
+                    {
+                        Cell target = DungeonMap.GetNearestObject("door", true);
+                        if (target != null)
+                        {
+                            AutoMovePlayer = true;
+                            AutoMoveXTarget = target.X;
+                            AutoMoveYTarget = target.Y;
+                        }
+                    }
+                    else if (keyPress.Key == RLKey.Number3)
+                    {
+                        Cell target = DungeonMap.GetNearestObject("explorable", true);
+                        if (target != null)
+                        {
+                            AutoMovePlayer = true;
+                            AutoMoveXTarget = target.X;
+                            AutoMoveYTarget = target.Y;
+                        }
+                    }
                     else if (_inputSystem.CloseDoorKeyPressed(keyPress))
                     {
                         didPlayerAct = CommandSystem.CloseDoorsNextTo(Player);

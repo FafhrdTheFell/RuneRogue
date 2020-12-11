@@ -17,6 +17,11 @@ namespace RuneRogue.Core
         private readonly List<Item> _items;
         private int _dungeonLevel;
 
+        // cells that are not adjacent to any non-explored accessible cell
+        private readonly List<Cell> _badExplorationCells;
+        private readonly List<Cell> _goodExplorationCells;
+
+
         public List<Rectangle> Rooms { get; set; }
         public List<Door> Doors { get; set; }
         public List<Shop> Shops { get; set; }
@@ -38,6 +43,8 @@ namespace RuneRogue.Core
             // Initialize all the lists when we create a new DungeonMap
             _monsters = new List<Monster>();
             _items = new List<Item>();
+            _badExplorationCells = new List<Cell>();
+            _goodExplorationCells = new List<Cell>();
             Rooms = new List<Rectangle>();
             Doors = new List<Door>();
             Shops = new List<Shop>();
@@ -56,8 +63,11 @@ namespace RuneRogue.Core
                 if (IsInFov(cell.X, cell.Y))
                 {
                     SetCellProperties(cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable, true);
-
                     // check for peril, plus, keypadplus
+                    if (!_goodExplorationCells.Contains(cell))
+                    {
+                        _goodExplorationCells.Add(cell);
+                    }
                 }
             }
             PlayerPeril = (MonstersInFOV().Count > 0);
@@ -260,6 +270,116 @@ namespace RuneRogue.Core
             return shotNotBlocked;
         }
 
+        public Cell GetNearestObject(string objectType, bool previouslySeen)
+        {
+            Cell nullCell = null;
+            if (objectType == "item")
+            {
+                Item nearest;
+                if (previouslySeen)
+                {
+                    nearest = _items.Where(item => GetCell(item.X, item.Y).IsExplored).
+                        OrderBy(item => Math.Abs(item.X - Game.Player.X) + Math.Abs(item.Y - Game.Player.Y)).FirstOrDefault();
+                }
+                else
+                {
+                    nearest = _items.
+                        OrderBy(item => Math.Abs(item.X - Game.Player.X) + Math.Abs(item.Y - Game.Player.Y)).FirstOrDefault();
+                }
+                if (nearest != null)
+                {
+                    return GetCell(nearest.X, nearest.Y);
+                }
+                else
+                {
+                    return nullCell;
+                }
+            }
+            else if (objectType == "door")
+            {
+                Door nearest;
+                if (previouslySeen)
+                {
+                    nearest = Doors.
+                        OrderBy(item => Math.Abs(item.X - Game.Player.X) + Math.Abs(item.Y - Game.Player.Y)).
+                        Where(d => GetCell(d.X, d.Y).IsExplored && !d.IsOpen).
+                        FirstOrDefault();
+                    if (nearest == null)
+                    {
+                        return nullCell;
+                    }
+                    else if (nearest.X == Game.Player.X && nearest.Y == Game.Player.Y)
+                    {
+                        nearest = Doors.
+                        OrderBy(item => Math.Abs(item.X - Game.Player.X) + Math.Abs(item.Y - Game.Player.Y)).
+                        Where(d => GetCell(d.X, d.Y).IsExplored && !d.IsOpen).
+                        ElementAtOrDefault(1);
+                    }
+                }
+                else
+                {
+                    nearest = Doors.Where(d => !d.IsOpen).
+                        OrderBy(item => Math.Abs(item.X - Game.Player.X) + Math.Abs(item.Y - Game.Player.Y)).FirstOrDefault();
+                }
+                if (nearest != null)
+                {
+                    return GetCell(nearest.X, nearest.Y);
+                }
+                else
+                {
+                    return nullCell;
+                }
+            }
+            else if (objectType == "explorable")
+            {
+                //IEnumerable<Cell> allCells = (GetAllCells().
+                //    Except(_badExplorationCells).
+                //    Where(c => c.IsExplored).
+                //    OrderBy(c => Math.Abs(c.X - Game.Player.X) + Math.Abs(c.Y - Game.Player.Y)));
+                Cell nearest = null;
+                foreach (Cell cell in _goodExplorationCells)
+                {
+                    for (int dx = -1; dx <= 1; dx+=2)
+                    {
+                        if (dx + cell.X < 0 || dx + cell.X > Game.MapWidth)
+                        {
+                            continue;
+                        }
+                        if (GetCell(cell.X+dx, cell.Y).IsWalkable && !GetCell(cell.X + dx, cell.Y).IsExplored)
+                        {
+                            nearest = GetCell(cell.X + dx, cell.Y);
+                        }
+                    }
+                    for (int dy = -1; dy <= 1; dy+=2)
+                    {
+                        if (dy + cell.Y < 0 || dy + cell.Y > Game.MapHeight)
+                        {
+                            continue;
+                        }
+                        if (GetCell(cell.X, cell.Y + dy).IsWalkable && !GetCell(cell.X, cell.Y + dy).IsExplored)
+                        {
+                            nearest = GetCell(cell.X, cell.Y + dy);
+                        }
+                    }
+                    _badExplorationCells.Add(cell);
+                }
+                _badExplorationCells.ForEach(c => _goodExplorationCells.Remove(c));
+                //_goodExplorationCells
+                if (nearest == null)
+                {
+                    return nullCell;
+                }
+                else
+                {
+                    return nearest;
+                }
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid objectType {objectType}.");
+            }
+        }
+
         public bool CanMoveDownToNextLevel()
         {
             Player player = Game.Player;
@@ -316,8 +436,6 @@ namespace RuneRogue.Core
         {
             // replace null list with empty one
             highlightContentsCells = highlightContentsCells ?? new List<Cell>();
-
-            //Console.WriteLine(highlightContentsCells.Count.ToString());
 
             foreach (Cell cell in GetAllCells())
             {
