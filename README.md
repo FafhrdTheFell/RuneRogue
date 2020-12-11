@@ -1,7 +1,7 @@
 # RuneRogue #
 Daring adventurers seek power and enlightenment in the Rune Master's abandoned palace. Their goal is to sit upon the Rune Throne on level 14 and be imbued with the power of a Rune Lord. None have yet succeeded.
 
-Will the Rune Master's monstrous lackeys and rival Rune Casters block your way as they have all that have proceeded you?
+Will the Rune Master's monstrous lackeys and rival Rune Lord aspirants block your way, as they have all that have preceded you?
 
 ## Adventurers
 
@@ -23,7 +23,7 @@ If you are lucky you will come across a rune forge. At a forge you can purchase 
 
 Be careful using your runes though. Since you are not a Rune Lord yet, your magic is imperfect, and when you use a rune, there is a chance it will disintegrate into dust.
 
-There are 10 runes:
+There are 9 runes:
 
 * The Rune of **Life** will resurrect you if you die.
 * The Rune of **Death** will create a poison cloud to bring death to mortal foes.
@@ -47,7 +47,7 @@ There are 10 runes:
 
 ## Sources and Inspiration
 
-I developed RuneRogue starting from the complete code of the RogueSharp v3.0 RLNet Tutorials  (see[Creating a Roguelike Game in C# | Game programming in .NET with RogueSharp (wordpress.com)](https://roguesharp.wordpress.com/)). Those tutorials, the RogueSharp library, and RLNet, are all excellent and absent them this game would not exist.
+I developed RuneRogue starting from the complete code of the RogueSharp v3.0 RLNet Tutorials  ([Creating a Roguelike Game in C#](https://roguesharp.wordpress.com/)). Those tutorials, the RogueSharp library, and RLNet, are all excellent and absent them this game would not exist.
 
 RuneRogue is loosely inspired by [Dungeon Crawl Stone Soup (develz.org)](https://crawl.develz.org/). Discussions on the subreddit [r/roguelikedev](https://www.reddit.com/r/roguelikedev/) and [Temple of The Roguelike](https://blog.roguetemple.com/) were also useful.
 
