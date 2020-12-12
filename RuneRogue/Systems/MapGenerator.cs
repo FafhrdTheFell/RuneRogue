@@ -412,7 +412,7 @@ namespace RuneRogue.Systems
         public void CreateItems(Rectangle room)
         {
             // 4% chance of gold
-            if (Dice.Roll("1d100") <= 20)
+            if (Dice.Roll("1d100") <= 4)
             {
                 Gold gold = new Gold();
                 gold.Amount = Dice.Roll("1d6+2d"+(_mapLevel*2).ToString());

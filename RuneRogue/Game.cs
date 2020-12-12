@@ -632,6 +632,11 @@ namespace RuneRogue
             File.WriteAllLines(filename, sortedScoreList.ToArray());
         }
 
+        public static void PrintDebugMessage(string message)
+        {
+            System.Console.WriteLine(message);
+        }
+
         public static void PrintCellList(List<Cell> list)
         {
             string x = "";

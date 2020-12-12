@@ -39,7 +39,7 @@ There are 9 runes:
 
 **Movement Keys:** WASD, HJKL-YU-BN, arrow keys, and Numpad all move you.
 
-**Action Keys:** 'g' picks up an item from your spot, '>' descends a downwards stairway.
+**Action Keys:** 'g' picks up an item from your spot, '>' descends a downwards stairway, and 'c' closes adjacent open doors.
 
 **Quick Action Keys:** 1 collects the nearest item on the ground, 2 opens the nearest closed door, and 3 moves to the nearest unexplored tile.
 

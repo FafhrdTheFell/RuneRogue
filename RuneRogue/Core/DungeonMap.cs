@@ -20,6 +20,7 @@ namespace RuneRogue.Core
         // cells that are possibly adjacent to non-explored accessible cells
         private readonly List<Cell> _goodExplorationCells;
 
+        private Map _exploredMap;
 
         public List<Rectangle> Rooms { get; set; }
         public List<Door> Doors { get; set; }
@@ -31,6 +32,11 @@ namespace RuneRogue.Core
             set { _dungeonLevel = value; }
         }
         public bool FinalLevel { get { return _dungeonLevel == Systems.MapGenerator.maxDungeonLevel; } }
+
+        public Map ExploredMap
+        {
+            get { return _exploredMap; }
+        }
 
         // PlayerPeril is true if player can see monster
         public bool PlayerPeril;
@@ -46,6 +52,8 @@ namespace RuneRogue.Core
             Rooms = new List<Rectangle>();
             Doors = new List<Door>();
             Shops = new List<Shop>();
+            _exploredMap = new Map();
+            _exploredMap.Initialize(Game.MapWidth, Game.MapHeight);
             PlayerPeril = false;
         }
 
@@ -61,8 +69,10 @@ namespace RuneRogue.Core
                 if (IsInFov(cell.X, cell.Y))
                 {
                     SetCellProperties(cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable, true);
+                    _exploredMap.SetCellProperties(cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable, true);
+
                     // check for peril, plus, keypadplus
-                    if (!_goodExplorationCells.Contains(cell))
+                    if (!_goodExplorationCells.Contains(cell) && cell.IsWalkable)
                     {
                         _goodExplorationCells.Add(cell);
                     }
@@ -158,6 +168,7 @@ namespace RuneRogue.Core
                 var cell = GetCell(x, y);
                 // Once the door is opened it should be marked as transparent and no longer block field-of-view
                 SetCellProperties(x, y, true, cell.IsWalkable, cell.IsExplored);
+                _exploredMap.SetCellProperties(x, y, cell.IsTransparent, cell.IsWalkable, true);
                 UpdatePlayerFieldOfView();
             }
         }
@@ -378,6 +389,7 @@ namespace RuneRogue.Core
                 }
                 else
                 {
+                    _exploredMap.SetCellProperties(nearest.X, nearest.Y, nearest.IsTransparent, nearest.IsWalkable, nearest.IsExplored);
                     return nearest;
                 }
             }
@@ -399,6 +411,7 @@ namespace RuneRogue.Core
         {
             Cell cell = GetCell(x, y);
             SetCellProperties(cell.X, cell.Y, cell.IsTransparent, isWalkable, cell.IsExplored);
+            _exploredMap.SetCellProperties(cell.X, cell.Y, cell.IsTransparent, isWalkable, cell.IsExplored);
         }
 
         // Look for a random location in the room that is walkable.

@@ -131,7 +131,7 @@ namespace RuneRogue.Systems
                 dungeonMap.SetIsWalkable(targetX, targetY, true);
             }
 
-            PathFinder pathFinder = new PathFinder(dungeonMap);
+            PathFinder pathFinder = new PathFinder(dungeonMap.ExploredMap);
             Path path = null;
 
             try
