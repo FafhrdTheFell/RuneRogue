@@ -239,15 +239,6 @@ namespace RuneRogue
             RLKeyPress keyPress = _rootConsole.Keyboard.GetKeyPress();
             RLMouse rLMouse = _rootConsole.Mouse;
 
-            if (_quittingGame)
-            {
-                if (keyPress != null || rLMouse.GetLeftClick() || rLMouse.GetRightClick())
-                {
-                    _rootConsole.Close();
-                }
-                
-            }
-
             if (SecondaryConsoleActive)
             {
                 AcceleratePlayer = false;
@@ -273,6 +264,15 @@ namespace RuneRogue
                     }
                 }
                 _renderRequired = true;
+            }
+
+            if (_quittingGame)
+            {
+                if (keyPress != null || rLMouse.GetLeftClick() || rLMouse.GetRightClick())
+                {
+                    _rootConsole.Close();
+                }
+
             }
 
             if (CommandSystem.IsPlayerTurn)
@@ -313,8 +313,9 @@ namespace RuneRogue
             }
             if (Game.Player.Health <= 0 && !_quittingGame)
             {
-                QuitGame();
                 MessageLog.Add($"{Player.Name} has died. Game over! Final score {Player.LifetimeGold}.");
+                //NewScore("quit on level " + Game.mapLevel.ToString());
+                QuitGame();
                 _renderRequired = true;
                 AcceleratePlayer = false;
                 AutoMovePlayer = false;
@@ -397,7 +398,7 @@ namespace RuneRogue
             {
                 return CommandSystem.PickupItemPlayer();
             }
-            else if (AutoMovePlayer)
+            if (AutoMovePlayer)
             {
                 if (AutoMoveMonsterTarget != null)
                 {
@@ -494,6 +495,7 @@ namespace RuneRogue
                             AutoMovePlayer = true;
                             AutoMoveXTarget = target.X;
                             AutoMoveYTarget = target.Y;
+
                         }
                     }
                     else if (keyPress.Key == RLKey.Number2)

@@ -203,6 +203,9 @@ namespace RuneRogue.Core
             // After removing the monster from the map, make sure the cell is walkable again
             SetIsWalkable(monster.X, monster.Y, true);
             Game.SchedulingSystem.Remove(monster);
+            ComputeFov(Game.Player.X, Game.Player.Y, Game.Player.Awareness, true);
+            PlayerPeril = (MonstersInFOV().Count > 0);
+
         }
 
         public void AddItem(Item item)
@@ -276,8 +279,11 @@ namespace RuneRogue.Core
                 Item nearest;
                 if (previouslySeen)
                 {
-                    nearest = _items.Where(item => GetCell(item.X, item.Y).IsExplored).
-                        OrderBy(item => Math.Abs(item.X - Game.Player.X) + Math.Abs(item.Y - Game.Player.Y)).FirstOrDefault();
+                    nearest = _items.
+                        OrderBy(item => Math.Abs(item.X - Game.Player.X) + Math.Abs(item.Y - Game.Player.Y)).
+                        Where(item => GetCell(item.X, item.Y).IsExplored).
+                        FirstOrDefault();
+
                 }
                 else
                 {
@@ -360,7 +366,10 @@ namespace RuneRogue.Core
                             nearest = GetCell(cell.X, cell.Y + dy);
                         }
                     }
-                    badExplorationCells.Add(cell);
+                    if (nearest == null)
+                    {
+                        badExplorationCells.Add(cell);
+                    }
                 }
                 badExplorationCells.ForEach(c => _goodExplorationCells.Remove(c));
                 if (nearest == null)

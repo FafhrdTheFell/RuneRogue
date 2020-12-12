@@ -148,6 +148,7 @@ namespace RuneRogue.Core
                         }
                         break;
                     case "health":
+                        Health = MaxHealth; // always at least heal fully
                         if (Dice.Roll("1d60") >= MaxHealth)
                         {
                             MaxHealth += Dice.Roll("1d2");
@@ -176,7 +177,8 @@ namespace RuneRogue.Core
             statConsole.Print(1, 21, $"Gold:", Colors.Gold);
             statConsole.Print(1, 23, $"    {Gold}", Colors.Gold);
             statConsole.Print(1, 24, $"    {LifetimeGold} (lifetime)", Colors.Gold);
-            
+
+            statConsole.Print(13, Game.MapHeight - 2, $"({X}, {Y})", Colors.TextInactive);
 
             // print health bar
             // Begin the line by printing the health numbers 

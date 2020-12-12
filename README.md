@@ -1,7 +1,7 @@
 # RuneRogue #
 Daring adventurers seek power and enlightenment in the Rune Master's abandoned palace. Their goal is to sit upon the Rune Throne on level 14 and be imbued with the power of a Rune Lord. None have yet succeeded.
 
-Will the Rune Master's monstrous lackeys and rival Rune Lord aspirants block your way, as they have all that have preceded you?
+Will the Rune Master's monstrous lackeys and rival Rune Lord aspirants block your way, as they have all who have preceded you?
 
 ## Adventurers
 
