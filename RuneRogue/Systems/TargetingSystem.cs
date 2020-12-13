@@ -31,7 +31,8 @@ namespace RuneRogue.Systems
             "line",
             "ball",
             "point",
-            "missile"
+            "missile",
+            "travel-info"
         };
 
         public RLConsole StatConsole
@@ -265,17 +266,17 @@ namespace RuneRogue.Systems
             {
                 return false;
             }
-            Game.DungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
-            if (!Game.DungeonMap.IsInFov(_newTarget.X, _newTarget.Y) ||
-                !Game.DungeonMap.IsTransparent(_newTarget.X, _newTarget.Y))
+            if (_projectileType != "travel-info")
             {
-                Game.MessageLog.Add("You would not be able to see that target.");
-                return false;
+                Game.DungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
+                if (!Game.DungeonMap.IsInFov(_newTarget.X, _newTarget.Y) ||
+                    !Game.DungeonMap.IsTransparent(_newTarget.X, _newTarget.Y))
+                {
+                    Game.MessageLog.Add("You would not be able to see that target.");
+                    return false;
+                }
             }
-            else
-            {
-                _currentTarget = _newTarget;
-            }
+            _currentTarget = _newTarget;
             return false;
         }
 

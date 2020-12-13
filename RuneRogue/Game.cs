@@ -47,6 +47,7 @@ namespace RuneRogue
         private static bool _gameOver;
         private static bool _quittingGame;
         private static string _highScoreFile = "scores.txt";
+        private static string _nameFile = "prior_name.txt";
 
         public static int mapLevel = 1;
         private static bool _renderRequired = true;
@@ -68,7 +69,11 @@ namespace RuneRogue
         public static TargetingSystem TargetingSystem { get; set; }
         public static string HighScoreFile
         {
-            get { return _highScoreFile; }
+            get { return "Resources/" + _highScoreFile; }
+        }
+        public static string NameFile
+        {
+            get { return "Resources/" + _nameFile; }
         }
 
         public static int MessageWidth
@@ -191,8 +196,11 @@ namespace RuneRogue
             MonsterGenerator.ReadMonsterData("Resources/Monsters.json");
 
             RuneSystem = new Runes();
-            CurrentSecondary = RuneSystem;
-            SecondaryConsoleActive = false;
+
+            InputConsole NameInput = new InputConsole();
+
+            CurrentSecondary = NameInput;
+            SecondaryConsoleActive = true;
 
             MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, mapLevel);
             DungeonMap = mapGenerator.CreateMap();
@@ -244,7 +252,7 @@ namespace RuneRogue
                 if (finished)
                 {
                     SecondaryConsoleActive = false;
-                    if (completionMessage != "Cancelled")
+                    if (completionMessage != "Cancelled" && !(CurrentSecondary is InputConsole))
                     {
                         if (CurrentSecondary is TargetingSystem)
                         {
@@ -258,6 +266,10 @@ namespace RuneRogue
                                 didPlayerAct = true;
                             }
                         }
+                    }
+                    if (CurrentSecondary is InputConsole)
+                    {
+                        Game.Player.Name = completionMessage;
                     }
                 }
                 _renderRequired = true;
@@ -604,7 +616,6 @@ namespace RuneRogue
         public static void NewScore()
         {
             string fate = _playerFate;
-            string filename = "Resources/" + HighScoreFile;
             List<string> scoreList;
             string timestamp = DateTime.Now.ToString("g");
             int score = Player.LifetimeGold;
@@ -612,8 +623,8 @@ namespace RuneRogue
             {
                 score *= 3;
             }
-            if (File.Exists(filename))
-                scoreList = File.ReadAllLines(filename).ToList();
+            if (File.Exists(HighScoreFile))
+                scoreList = File.ReadAllLines(HighScoreFile).ToList();
             else
                 scoreList = new List<string>();
             string record = Player.Name + " (" + fate + " on " + timestamp + "), score " + score.ToString();
@@ -642,7 +653,7 @@ namespace RuneRogue
                 RLConsole.Blit(_messageConsole, 0, 0, _messageWidth, _messageHeight, _rootConsole, 0, _screenHeight - _messageHeight);
             }
             MessageLog.Add("");
-            File.WriteAllLines(filename, sortedScoreList.ToArray());
+            File.WriteAllLines(HighScoreFile, sortedScoreList.ToArray());
             Game.MessageLog.Add($"Goodbye! Press any key to exit.");
             _renderRequired = true;
             AcceleratePlayer = false;

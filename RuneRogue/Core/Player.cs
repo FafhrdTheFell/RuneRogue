@@ -104,7 +104,7 @@ namespace RuneRogue.Core
             XpTotalReceived = 0;
             Health = 30;
             MaxHealth = 30;
-            Name = "Rogue";
+            Name = "";
             Speed = 10;
             Symbol = '@';
         }
