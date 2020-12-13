@@ -616,7 +616,8 @@ namespace RuneRogue.Systems
                 }
                 else
                 {
-                    Game.NewScore($"killed by {deathSource} on level " + Game.mapLevel.ToString());
+                    attackMessage.Append($"{defender.Name} has died. Game over!");
+                    Game.GameOver($"killed by {deathSource} on level " + Game.mapLevel.ToString());
                 }
                 
             }

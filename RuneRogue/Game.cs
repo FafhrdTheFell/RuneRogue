@@ -42,8 +42,10 @@ namespace RuneRogue
         private static RLConsole _statConsole;
 
         private static InputSystem _inputSystem;
-        private static bool _quittingGame;
 
+        private static string _playerFate;
+        private static bool _gameOver;
+        private static bool _quittingGame;
         private static string _highScoreFile = "scores.txt";
 
         public static int mapLevel = 1;
@@ -179,7 +181,8 @@ namespace RuneRogue
             AcceleratePlayer = false;
             
             _inputSystem = new InputSystem();
-            
+
+            _gameOver = false;
             _quittingGame = false;
 
             SchedulingSystem = new SchedulingSystem();
@@ -224,12 +227,6 @@ namespace RuneRogue
         public static bool FinalLevel()
         {
             return MaxDungeonLevel == mapLevel;
-        }
-
-        public static void QuitGame()
-        {
-            Game.MessageLog.Add($"Goodbye! Press any key to exit.");
-            _quittingGame = true;
         }
 
         // Event handler for RLNET's Update event
@@ -311,15 +308,20 @@ namespace RuneRogue
                 CommandSystem.ActivateMonsters();
                 _renderRequired = true;
             }
-            if (Game.Player.Health <= 0 && !_quittingGame)
+            //if (Game.Player.Health <= 0 && !_quittingGame)
+            //{
+            //    MessageLog.Add($"{Player.Name} has died. Game over! Final score {Player.LifetimeGold}.");
+            //    //NewScore("quit on level " + Game.mapLevel.ToString());
+            //    QuitGame();
+            //    _renderRequired = true;
+            //    AcceleratePlayer = false;
+            //    AutoMovePlayer = false;
+            //    _quittingGame = true;
+            //}
+            if (_gameOver && !_quittingGame)
             {
-                MessageLog.Add($"{Player.Name} has died. Game over! Final score {Player.LifetimeGold}.");
-                //NewScore("quit on level " + Game.mapLevel.ToString());
-                QuitGame();
-                _renderRequired = true;
-                AcceleratePlayer = false;
-                AutoMovePlayer = false;
-                _quittingGame = true;
+                //MessageLog.Add($"{Player.Name} has died. Game over! Final score {Player.LifetimeGold}.");
+                NewScore();
             }
         }
 
@@ -524,8 +526,7 @@ namespace RuneRogue
                     }
                     else if (_inputSystem.QuitKeyPressed(keyPress))
                     {
-                        NewScore("quit on level " + Game.mapLevel.ToString());
-                        QuitGame();
+                        GameOver("quit on level " + Game.mapLevel.ToString());
                         _renderRequired = true;
                     }
                     else if (_inputSystem.RuneKeyPressed(keyPress))
@@ -579,9 +580,8 @@ namespace RuneRogue
                 }
                 else
                 {
-                    NewScore("WON!");
-                    MessageLog.Add($"You have won RuneRogue! Your final score is {Player.LifetimeGold * 3}.");
-                    QuitGame();
+                    GameOver("WON!");
+                    //MessageLog.Add($"You have won RuneRogue! Your final score is {Player.LifetimeGold * 3}.");
                     return true;
                 }
             }
@@ -591,8 +591,19 @@ namespace RuneRogue
             }
         }
 
-        public static void NewScore(string fate)
+        // GameOver triggers the end game sequence and takes as a parameter the reason
+        // the game ended.
+        public static void GameOver(string fate)
         {
+            _playerFate = fate;
+            _gameOver = true;
+        }
+
+        // NewScore follows GameOver. It records the score in the file HighScoreFile and
+        // then displays the score and comparable scores from the file.
+        public static void NewScore()
+        {
+            string fate = _playerFate;
             string filename = "Resources/" + HighScoreFile;
             List<string> scoreList;
             string timestamp = DateTime.Now.ToString("g");
@@ -619,6 +630,7 @@ namespace RuneRogue
             {
                 rankth = "2nd";
             }
+            MessageLog.Add("");
             if (sortedList.Count > 1)
             {
                 MessageLog.Add($"You came in {rankth} out of {sortedList.Count} plays.");
@@ -629,7 +641,13 @@ namespace RuneRogue
                 MessageLog.Draw(_messageConsole);
                 RLConsole.Blit(_messageConsole, 0, 0, _messageWidth, _messageHeight, _rootConsole, 0, _screenHeight - _messageHeight);
             }
+            MessageLog.Add("");
             File.WriteAllLines(filename, sortedScoreList.ToArray());
+            Game.MessageLog.Add($"Goodbye! Press any key to exit.");
+            _renderRequired = true;
+            AcceleratePlayer = false;
+            AutoMovePlayer = false;
+            _quittingGame = true;
         }
 
         public static void PrintDebugMessage(string message)

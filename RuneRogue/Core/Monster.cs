@@ -92,6 +92,10 @@ namespace RuneRogue.Core
             {
                 healthBarColor = Swatch.DbGrass;
             }
+            else if (this.SARegeneration && Health < MaxHealth)
+            {
+                healthBarColor = Swatch.DbVegetation;
+            }
             statConsole.SetBackColor(3, yPosition, width, 1, healthBarColor);
             statConsole.SetBackColor(3 + width, yPosition, remainingWidth, 1, Swatch.PrimaryDarkest);
             // Print the monsters name over top of the health bar
