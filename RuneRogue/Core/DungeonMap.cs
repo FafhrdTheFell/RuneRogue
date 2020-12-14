@@ -19,6 +19,8 @@ namespace RuneRogue.Core
 
         // cells that are possibly adjacent to non-explored accessible cells
         private readonly List<Cell> _goodExplorationCells;
+        // cells that are known not to be adjacent to those cells
+        private readonly List<Cell> _badExplorationCells;
 
         private Map _exploredMap;
 
@@ -49,6 +51,7 @@ namespace RuneRogue.Core
             _monsters = new List<Monster>();
             _items = new List<Item>();
             _goodExplorationCells = new List<Cell>();
+            _badExplorationCells = new List<Cell>();
             Rooms = new List<Rectangle>();
             Doors = new List<Door>();
             Shops = new List<Shop>();
@@ -71,8 +74,9 @@ namespace RuneRogue.Core
                     SetCellProperties(cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable, true);
                     _exploredMap.SetCellProperties(cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable, true);
 
-                    // check for peril, plus, keypadplus
-                    if (!_goodExplorationCells.Contains(cell) && cell.IsWalkable)
+                    if (!_goodExplorationCells.Contains(cell) && 
+                        !_badExplorationCells.Contains(cell) && 
+                        (cell.IsWalkable || GetDoor(cell.X, cell.Y) != null))
                     {
                         _goodExplorationCells.Add(cell);
                     }
@@ -282,8 +286,15 @@ namespace RuneRogue.Core
             return shotNotBlocked;
         }
 
-        public Cell GetNearestObject(string objectType, bool previouslySeen)
+        public Cell GetNearestObject(string objectType, bool previouslySeen, Cell targetCell = null)
         {
+            int targetX = Game.Player.X;
+            int targetY = Game.Player.Y;
+            if (targetCell != null)
+            {
+                targetX = targetCell.X;
+                targetY = targetCell.Y;
+            }
             Cell nullCell = null;
             if (objectType == "item")
             {
@@ -291,7 +302,7 @@ namespace RuneRogue.Core
                 if (previouslySeen)
                 {
                     nearest = _items.
-                        OrderBy(item => Math.Abs(item.X - Game.Player.X) + Math.Abs(item.Y - Game.Player.Y)).
+                        OrderBy(item => Math.Abs(item.X - targetX) + Math.Abs(item.Y - targetY)).
                         Where(item => GetCell(item.X, item.Y).IsExplored).
                         FirstOrDefault();
 
@@ -299,7 +310,7 @@ namespace RuneRogue.Core
                 else
                 {
                     nearest = _items.
-                        OrderBy(item => Math.Abs(item.X - Game.Player.X) + Math.Abs(item.Y - Game.Player.Y)).FirstOrDefault();
+                        OrderBy(item => Math.Abs(item.X - targetX) + Math.Abs(item.Y - targetY)).FirstOrDefault();
                 }
                 if (nearest != null)
                 {
@@ -316,17 +327,17 @@ namespace RuneRogue.Core
                 if (previouslySeen)
                 {
                     nearest = Doors.
-                        OrderBy(item => Math.Abs(item.X - Game.Player.X) + Math.Abs(item.Y - Game.Player.Y)).
+                        OrderBy(item => Math.Abs(item.X - targetX) + Math.Abs(item.Y - targetY)).
                         Where(d => GetCell(d.X, d.Y).IsExplored && !d.IsOpen).
                         FirstOrDefault();
                     if (nearest == null)
                     {
                         return nullCell;
                     }
-                    else if (nearest.X == Game.Player.X && nearest.Y == Game.Player.Y)
+                    else if (nearest.X == targetX && nearest.Y == targetY)
                     {
                         nearest = Doors.
-                        OrderBy(item => Math.Abs(item.X - Game.Player.X) + Math.Abs(item.Y - Game.Player.Y)).
+                        OrderBy(item => Math.Abs(item.X - targetX) + Math.Abs(item.Y - targetY)).
                         Where(d => GetCell(d.X, d.Y).IsExplored && !d.IsOpen).
                         ElementAtOrDefault(1);
                     }
@@ -334,7 +345,7 @@ namespace RuneRogue.Core
                 else
                 {
                     nearest = Doors.Where(d => !d.IsOpen).
-                        OrderBy(item => Math.Abs(item.X - Game.Player.X) + Math.Abs(item.Y - Game.Player.Y)).FirstOrDefault();
+                        OrderBy(item => Math.Abs(item.X - targetX) + Math.Abs(item.Y - targetY)).FirstOrDefault();
                 }
                 if (nearest != null)
                 {
@@ -347,13 +358,10 @@ namespace RuneRogue.Core
             }
             else if (objectType == "explorable")
             {
-                //IEnumerable<Cell> allCells = (GetAllCells().
-                //    Except(_badExplorationCells).
-                //    Where(c => c.IsExplored).
-                //    OrderBy(c => Math.Abs(c.X - Game.Player.X) + Math.Abs(c.Y - Game.Player.Y)));
                 Cell nearest = null;
                 List<Cell> badExplorationCells = new List<Cell>();
-                foreach (Cell cell in _goodExplorationCells)
+                foreach (Cell cell in _goodExplorationCells.
+                        OrderBy(c => Math.Abs(c.X - targetX) + Math.Abs(c.Y - targetY)))
                 {
                     for (int dx = -1; dx <= 1; dx+=2)
                     {
@@ -377,12 +385,17 @@ namespace RuneRogue.Core
                             nearest = GetCell(cell.X, cell.Y + dy);
                         }
                     }
-                    if (nearest == null)
+                    if (nearest != null)
+                    {
+                        break;
+                    }
+                    else
                     {
                         badExplorationCells.Add(cell);
                     }
                 }
                 badExplorationCells.ForEach(c => _goodExplorationCells.Remove(c));
+                badExplorationCells.ForEach(c => _badExplorationCells.Add(c));
                 if (nearest == null)
                 {
                     return nullCell;

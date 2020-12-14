@@ -35,6 +35,11 @@ namespace RuneRogue.Systems
             "travel-info"
         };
 
+        public Cell Target
+        {
+            get { return Game.DungeonMap.GetCell(_currentTarget.X, _currentTarget.Y); }
+        }
+
         public RLConsole StatConsole
         {
             get { return _statConsole; }
@@ -87,7 +92,7 @@ namespace RuneRogue.Systems
 
             foreach (Cell point in targetCells)
             {
-                if (!dungeonMap.IsInFov(point.X, point.Y))
+                if (!dungeonMap.IsInFov(point.X, point.Y) && _projectileType != "travel-info")
                 {
                     continue;
                 }
@@ -102,6 +107,10 @@ namespace RuneRogue.Systems
                 if (point.X == player.X && point.Y == player.Y)
                 {
                     player.Draw(_console, dungeonMap);
+                }
+                else if (!dungeonMap.IsInFov(point.X, point.Y))
+                {
+                    _console.Set(point.X, point.Y, Colors.WallFov, highlightColor, 'X');
                 }
                 else if (Game.DungeonMap.GetMonsterAt(point.X, point.Y) != null)
                 {
@@ -122,6 +131,21 @@ namespace RuneRogue.Systems
                 else
                 {
                     _console.Set(point.X, point.Y, Colors.WallFov, highlightColor, '#');
+                }
+                if (Game.DungeonMap.GetShopAt(point.X, point.Y) != null && dungeonMap.GetCell(point.X, point.Y).IsExplored)
+                {
+                    Shop shop = Game.DungeonMap.GetShopAt(point.X, point.Y);
+                    _console.Set(point.X, point.Y, shop.Color, highlightColor, shop.Symbol);
+                }
+                else if (Game.DungeonMap.StairsDown.X == point.X && Game.DungeonMap.StairsDown.Y == point.Y
+                    && dungeonMap.GetCell(point.X, point.Y).IsExplored)
+                {
+                    _console.Set(point.X, point.Y, Colors.FloorFov, highlightColor, '>');
+                }
+                else if (Game.DungeonMap.StairsUp.X == point.X && Game.DungeonMap.StairsUp.Y == point.Y
+                    && dungeonMap.GetCell(point.X, point.Y).IsExplored)
+                {
+                    _console.Set(point.X, point.Y, Colors.FloorFov, highlightColor, '<');
                 }
             }
         }
@@ -225,7 +249,11 @@ namespace RuneRogue.Systems
                 }
                 _console.Clear();
                 dungeonMap.Draw(_console, _statConsole);
-                if (Game.PostSecondary is Instant)
+                if (_projectileType == "travel-info")
+                {
+                    message = "travel";
+                }
+                else if (Game.PostSecondary is Instant)
                 {
                     Instant nextSecondary = Game.PostSecondary as Instant;
 
@@ -246,7 +274,15 @@ namespace RuneRogue.Systems
             }
             else if (tabPressed)
             {
-                int targetsAvailable = TargetableActors().Count();
+                int targetsAvailable;
+                if (_projectileType == "travel-info")
+                {
+                    targetsAvailable = TargetableLandmarks().Count(); 
+                }
+                else
+                {
+                    targetsAvailable = TargetableActors().Count();
+                }
                 if (targetsAvailable == 0)
                 {
                     return false;
@@ -258,8 +294,16 @@ namespace RuneRogue.Systems
                 }
 
                 _newTarget = new Point();
-                _newTarget.X = TargetableActors()[TargetNumber].X;
-                _newTarget.Y = TargetableActors()[TargetNumber].Y;
+                if (_projectileType == "travel-info")
+                {
+                    _newTarget.X = TargetableLandmarks()[TargetNumber].X;
+                    _newTarget.Y = TargetableLandmarks()[TargetNumber].Y;
+                }
+                else
+                {
+                    _newTarget.X = TargetableActors()[TargetNumber].X;
+                    _newTarget.Y = TargetableActors()[TargetNumber].Y;
+                }
             }
             if (_newTarget.X < 1 || _newTarget.X > Game.MapWidth ||
                 _newTarget.Y < 1 || _newTarget.Y > Game.MapHeight)
@@ -307,7 +351,7 @@ namespace RuneRogue.Systems
                     }
                 }
             }
-            else if (_projectileType == "point")
+            else if (_projectileType == "point" || _projectileType == "travel-info")
             {
                 cellsTargeted.Add(dungeonMap.GetCell(_currentTarget.X, _currentTarget.Y));
             }
@@ -336,6 +380,25 @@ namespace RuneRogue.Systems
                 }
             }
             return targetables;
+        }
+
+        public List<Cell> TargetableLandmarks()
+        {
+            DungeonMap dungeonMap = Game.DungeonMap;
+            List<Cell> exploredLandmarks = new List<Cell>();
+            exploredLandmarks.Add(dungeonMap.GetCell(dungeonMap.StairsUp.X, dungeonMap.StairsUp.Y));
+            if (dungeonMap.GetCell(dungeonMap.StairsDown.X, dungeonMap.StairsDown.Y).IsExplored)
+            {
+                exploredLandmarks.Add(dungeonMap.GetCell(dungeonMap.StairsDown.X, dungeonMap.StairsDown.Y));
+            }
+            foreach(Shop shop in dungeonMap.Shops.
+                Where(s => dungeonMap.GetCell(s.X, s.Y).IsExplored))
+            {
+                exploredLandmarks.Add(dungeonMap.GetCell(shop.X, shop.Y));
+            }
+            exploredLandmarks.Sort((x, y) => (100 * x.X + x.Y).CompareTo(100 * y.X + y.Y));
+            return exploredLandmarks;
+
         }
 
         // returns all actors that are valid targets

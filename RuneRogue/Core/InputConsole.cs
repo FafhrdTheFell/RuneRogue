@@ -17,7 +17,7 @@ namespace RuneRogue.Core
         {
             _console = new RLConsole(Game.MapWidth, Game.MapHeight);
             _name = ReadPreviousName();
-            _maxChars = Game.StatWidth - 2;
+            _maxChars = Game.StatWidth - 6;
 
         }
 
@@ -54,12 +54,18 @@ namespace RuneRogue.Core
                 {
                     _name = _name.Substring(0, _name.Length - 1);
                 }
-                else if (rLKeyPress.Key == RLKey.Enter)
+                else if (rLKeyPress.Key == RLKey.Enter && _name.Length > 0)
                 {
                     WriteCurrentName(_name);
                     message = _name;
                     return true;
                 }
+            }
+            else if (rLMouse.GetLeftClick() && _name.Length > 0)
+            {
+                WriteCurrentName(_name);
+                message = _name;
+                return true;
             }
             return false;
         }

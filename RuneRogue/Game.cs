@@ -256,8 +256,29 @@ namespace RuneRogue
                     {
                         if (CurrentSecondary is TargetingSystem)
                         {
-                            CurrentSecondary = PostSecondary;
-                            SecondaryConsoleActive = true;
+                            if (completionMessage != "travel")
+                            {
+                                CurrentSecondary = PostSecondary;
+                                SecondaryConsoleActive = true;
+                            }
+                            else
+                            {
+                                AutoMovePlayer = true;
+                                TargetingSystem targetingSystem = CurrentSecondary as TargetingSystem;
+                                AutoMoveXTarget = targetingSystem.Target.X;
+                                AutoMoveYTarget = targetingSystem.Target.Y;
+                                if (!DungeonMap.GetCell(AutoMoveXTarget, AutoMoveYTarget).IsExplored)
+                                {
+                                    Cell target = DungeonMap.GetNearestObject("explorable", true,
+                            targetCell: DungeonMap.GetCell(AutoMoveXTarget, AutoMoveYTarget));
+                                    if (target != null)
+                                    {
+                                        AutoMoveXTarget = target.X;
+                                        AutoMoveYTarget = target.Y;
+                                    }
+                                }
+                                return;
+                            }
                         }
                         else if (CurrentSecondary is Instant)
                         {
@@ -320,19 +341,8 @@ namespace RuneRogue
                 CommandSystem.ActivateMonsters();
                 _renderRequired = true;
             }
-            //if (Game.Player.Health <= 0 && !_quittingGame)
-            //{
-            //    MessageLog.Add($"{Player.Name} has died. Game over! Final score {Player.LifetimeGold}.");
-            //    //NewScore("quit on level " + Game.mapLevel.ToString());
-            //    QuitGame();
-            //    _renderRequired = true;
-            //    AcceleratePlayer = false;
-            //    AutoMovePlayer = false;
-            //    _quittingGame = true;
-            //}
             if (_gameOver && !_quittingGame)
             {
-                //MessageLog.Add($"{Player.Name} has died. Game over! Final score {Player.LifetimeGold}.");
                 NewScore();
             }
         }
@@ -481,6 +491,17 @@ namespace RuneRogue
                             AutoMoveMonsterTarget = null;
                         }
                     }
+                    else
+                    {
+                        Cell target = DungeonMap.GetNearestObject("explorable", true, 
+                            targetCell: DungeonMap.GetCell(rLMouse.X, rLMouse.Y));
+                        if (target != null)
+                        {
+                            AutoMovePlayer = true;
+                            AutoMoveXTarget = target.X;
+                            AutoMoveYTarget = target.Y;
+                        }
+                    }
                 }
             }
             else if (keyPress != null)
@@ -531,6 +552,15 @@ namespace RuneRogue
                             AutoMoveXTarget = target.X;
                             AutoMoveYTarget = target.Y;
                         }
+                    }
+                    else if (keyPress.Key == RLKey.T)
+                    {
+                        Game.SecondaryConsoleActive = true;
+                        Game.AcceleratePlayer = false;
+                        Game.CurrentSecondary = new TargetingSystem("travel-info", Math.Max(MapWidth, MapHeight));
+                        //Game.PostSecondary = new Instant(rune, radius:
+                        //    _offensiveRadius[rune], special: "Rune");
+                        //Game.MessageLog.Add("Select your target (TAB to cycle).");
                     }
                     else if (_inputSystem.CloseDoorKeyPressed(keyPress))
                     {

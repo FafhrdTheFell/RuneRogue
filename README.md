@@ -41,9 +41,11 @@ There are 9 runes:
 
 **Action Keys:** 'g' picks up an item from your spot, '>' descends a downwards stairway, and 'c' closes adjacent open doors.
 
-**Quick Action Keys:** 1 collects the nearest item on the ground, 2 opens the nearest closed door, and 3 moves to the nearest unexplored tile.
+**Quick Action Keys:** 1 collects the nearest item on the ground, 2 opens the nearest closed door, 3 moves to the nearest unexplored tile, and 't' allows you to target a square to auto-travel towards.
 
 **Targeting Keys:** When choosing a target, you can select the target by your moving the aim square using movement keys, or Tab will cycle through available targets. X or Esc cancels the targeting.
+
+**Mouse:** Left clicking on a square auto-travels you towards that square. Likewise in targeting mode, double-clicking on a square targets that square.
 
 ## Sources and Inspiration
 
