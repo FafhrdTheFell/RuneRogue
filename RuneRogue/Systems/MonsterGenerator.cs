@@ -184,6 +184,8 @@ namespace RuneRogue.Systems
 
             int numberOfMonsters = Dice.Roll(numInRoomDice);
 
+            //monsterType = "beetle";
+
             for (int i = 0; i < numberOfMonsters; i++)
             {
 

@@ -64,28 +64,30 @@ namespace RuneRogue.Effects
         {
             Player player = Game.Player;
             target.Health -= ActivationDamage;
-            if (target == Game.Player)
+
+            Game.DungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
+            bool isVisible = Game.DungeonMap.IsInFov(target.X, target.Y);
+            if (target.Health > 0)
             {
-                Game.MessageLog.Add($"{target.Name} takes {ActivationDamage} poison damage.");
-            }
-            else
-            {
-                Game.DungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
-                if (target.Health > 0 && Game.DungeonMap.IsInFov(target.X, target.Y))
+                if (target == Game.Player)
+                {
+                    Game.MessageLog.Add($"{target.Name} takes {ActivationDamage} poison damage.");
+                }
+                else if (isVisible)
                 {
                     Game.MessageLog.Add($"{target.Name} looks ill.");
                 }
-                else
+            }
+            else
+            {
+                StringBuilder attackMessage = new StringBuilder();
+                attackMessage.AppendFormat("{0} succumbs to poison. ", target.Name);
+                CommandSystem.ResolveDeath("poison", target, attackMessage);
+                if (!string.IsNullOrWhiteSpace(attackMessage.ToString()) && isVisible)
                 {
-                    StringBuilder attackMessage = new StringBuilder();
-                    attackMessage.AppendFormat("{0} dies from poisoning.", target.Name);
-                    CommandSystem.ResolveDeath("poison", target, attackMessage);
-                    if (!string.IsNullOrWhiteSpace(attackMessage.ToString()) && Game.DungeonMap.IsInFov(target.X, target.Y))
-                    {
-                        Game.MessageLog.Add(attackMessage.ToString());
-                    }
-                    FinishEffect();
+                    Game.MessageLog.Add(attackMessage.ToString());
                 }
+                FinishEffect();
             }
 
         }
