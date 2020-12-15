@@ -429,6 +429,7 @@ namespace RuneRogue.Core
                         attackMessage.AppendFormat("{0} is blasted by {1}.", target.Name, element);
                         if (target.Health > 0)
                         {
+                            CommandSystem.WakeMonster(target);
                             attackMessage.AppendFormat(" {0} takes {1} damage. ", target.Name, damage);
                         }
                         else
@@ -451,6 +452,7 @@ namespace RuneRogue.Core
                     attackMessage.AppendFormat("Flames engulf {0}. ", target.Name);
                     if (target.Health > 0)
                     {
+                        CommandSystem.WakeMonster(target);
                         attackMessage.AppendFormat(" {0} takes {1} damage. ", target.Name, damage);
                     }
                     else
@@ -474,6 +476,7 @@ namespace RuneRogue.Core
                     }
                     else
                     {
+                        CommandSystem.WakeMonster(target);
                         int potency = Dice.Roll("1d3") + 4;
                         Poison poison = new Poison(target, potency);
                     }
@@ -484,6 +487,7 @@ namespace RuneRogue.Core
                 attackMessage.AppendFormat("{0} chants a deathly dirge. ", Source.Name);
                 foreach (Actor target in TargetActors())
                 {
+                    CommandSystem.WakeMonster(target);
                     if (target.IsUndead)
                     {
                         if (target.Health < target.MaxHealth)
@@ -539,6 +543,7 @@ namespace RuneRogue.Core
                         attackMessage.AppendFormat("{0} is perforated.", target.Name);
                         if (target.Health > 0)
                         {
+                            CommandSystem.WakeMonster(target);
                             attackMessage.AppendFormat(" {0} takes {1} damage. ", target.Name, damage);
                         }
                         else

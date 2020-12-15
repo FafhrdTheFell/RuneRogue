@@ -349,6 +349,16 @@ namespace RuneRogue.Systems
             Game.CurrentSecondary = shot;
         }
 
+        public static void WakeMonster(Actor actor)
+        {
+            if (actor is Monster)
+            {
+                Monster monster = actor as Monster;
+                monster.TurnsAlerted = 1;
+                monster.LastLocationPlayerSeen = Game.DungeonMap.GetCell(Game.Player.X, Game.Player.Y);
+            }
+        }
+
         public static void Attack(Actor attacker, Actor defender, bool missileAttack = false, 
             int hitBonus = 0, int damageBonus = 0)
         {

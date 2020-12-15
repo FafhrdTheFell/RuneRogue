@@ -18,15 +18,15 @@ namespace RuneRogue.Systems
 
         private Point _currentTarget;
         private Point _playerPosition;
-        private RLConsole _statConsole;
+        private readonly RLConsole _statConsole;
         private string _projectileType;
         private int _range;
         private int _minRange;
         private int _radius;
         private int _targetNumber = -1;
-        private List<Cell> _targetableCells;
+        private readonly List<Cell> _targetableCells;
 
-        private string[] _projectileTypes =
+        private static string[] _projectileTypes =
         {
             "line",
             "ball",
@@ -77,6 +77,7 @@ namespace RuneRogue.Systems
             {
                 dungeonMap.Draw(_console, _statConsole);
                 player.Draw(_console, dungeonMap);
+                _console.Set(player.X, player.Y, player.Color, Colors.FloorTarget, player.Symbol);
                 return;
             }
 
@@ -87,6 +88,13 @@ namespace RuneRogue.Systems
 
             RLColor highlightColor = Colors.Gold;
             List<Cell> targetCells = TargetCells();
+            // if target cells does not extend to current  target the line has
+            // gone through a wall. add current target to target cells so that it
+            // gets drawn
+            if (!targetCells.Contains(dungeonMap.GetCell(_currentTarget.X, _currentTarget.Y)))
+            {
+                targetCells.Add(dungeonMap.GetCell(_currentTarget.X, _currentTarget.Y));
+            }
 
             List<Monster> monstersSeen = dungeonMap.MonstersInFOV();
 
@@ -107,6 +115,7 @@ namespace RuneRogue.Systems
                 if (point.X == player.X && point.Y == player.Y)
                 {
                     player.Draw(_console, dungeonMap);
+                    _console.Set(point.X, point.Y, player.Color, highlightColor, player.Symbol);
                 }
                 else if (!dungeonMap.IsInFov(point.X, point.Y))
                 {
@@ -335,6 +344,16 @@ namespace RuneRogue.Systems
             {
                 cellsTargeted = dungeonMap.GetCellsAlongLine(_playerPosition.X, _playerPosition.Y,
                     _currentTarget.X, _currentTarget.Y).ToList();
+                // check for first wall
+                int i;
+                for (i = 0; i < cellsTargeted.Count; i++)
+                {
+                    if (!cellsTargeted[i].IsTransparent)
+                    {
+                        break;
+                    }
+                }
+                cellsTargeted.RemoveRange(i, cellsTargeted.Count - i);
                 // Contains player cell, drop it.
                 cellsTargeted.RemoveAt(0);
             }
@@ -385,8 +404,10 @@ namespace RuneRogue.Systems
         public List<Cell> TargetableLandmarks()
         {
             DungeonMap dungeonMap = Game.DungeonMap;
-            List<Cell> exploredLandmarks = new List<Cell>();
-            exploredLandmarks.Add(dungeonMap.GetCell(dungeonMap.StairsUp.X, dungeonMap.StairsUp.Y));
+            List<Cell> exploredLandmarks = new List<Cell>
+            {
+                dungeonMap.GetCell(dungeonMap.StairsUp.X, dungeonMap.StairsUp.Y)
+            };
             if (dungeonMap.GetCell(dungeonMap.StairsDown.X, dungeonMap.StairsDown.Y).IsExplored)
             {
                 exploredLandmarks.Add(dungeonMap.GetCell(dungeonMap.StairsDown.X, dungeonMap.StairsDown.Y));
