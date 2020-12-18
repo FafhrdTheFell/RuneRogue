@@ -422,23 +422,23 @@ namespace RuneRogue.Core
                 {
                     for (int i = 0; i < 4; i++)
                     {
-                        damage = Dice.Roll("1d10");
                         string element = (string)Game.RandomArrayValue(_elements);
-                        target.Health -= damage;
-
                         attackMessage.AppendFormat("{0} is blasted by {1}.", target.Name, element);
-                        if (target.Health > 0)
-                        {
-                            CommandSystem.WakeMonster(target);
-                            attackMessage.AppendFormat(" {0} takes {1} damage. ", target.Name, damage);
-                        }
-                        else
-                        {
-                            attackMessage.AppendFormat(" {0} takes {1} damage, killing it. ", target.Name, damage);
-                            CommandSystem.ResolveDeath("elemental blast", target, attackMessage);
-                            break;
-                        }
                     }
+                    damage = Dice.Roll("4d10");
+                    CommandSystem.ResolveDamage("elemental blast", target, damage, false, attackMessage);
+                    //    if (target.Health > 0)
+                    //    {
+                    //        CommandSystem.WakeMonster(target);
+                    //        attackMessage.AppendFormat(" {0} takes {1} damage. ", target.Name, damage);
+                    //    }
+                    //    else
+                    //    {
+                    //        attackMessage.AppendFormat(" {0} takes {1} damage, killing it. ", target.Name, damage);
+                    //        CommandSystem.ResolveDeath("elemental blast", target, attackMessage);
+                    //        break;
+                    //    }
+                    //}
                 }
             }
             if (_effect == "Fire")
@@ -450,17 +450,19 @@ namespace RuneRogue.Core
                     target.Health -= damage;
 
                     attackMessage.AppendFormat("Flames engulf {0}. ", target.Name);
-                    if (target.Health > 0)
-                    {
-                        CommandSystem.WakeMonster(target);
-                        attackMessage.AppendFormat(" {0} takes {1} damage. ", target.Name, damage);
-                    }
-                    else
-                    {
-                        attackMessage.AppendFormat(" {0} takes {1} damage, killing it. ", target.Name, damage);
-                        CommandSystem.ResolveDeath("fire", target, attackMessage);
-                        break;
-                    }
+                    CommandSystem.WakeMonster(target);
+                    CommandSystem.ResolveDamage("fire", target, damage, false, attackMessage);
+                    //if (target.Health > 0)
+                    //{
+                    //    CommandSystem.WakeMonster(target);
+                    //    attackMessage.AppendFormat(" {0} takes {1} damage. ", target.Name, damage);
+                    //}
+                    //else
+                    //{
+                    //    attackMessage.AppendFormat(" {0} takes {1} damage, killing it. ", target.Name, damage);
+                    //    CommandSystem.ResolveDeath("fire", target, attackMessage);
+                    //    break;
+                    //}
                    
                 }
             }
@@ -498,17 +500,18 @@ namespace RuneRogue.Core
                     }
                     else if (target != Source)
                     {
-                        target.Health -= 1;
+                        CommandSystem.ResolveDamage("deathly dirge", target, 1, false, attackMessage);
+                        //target.Health -= 1;
 
-                        if (target.Health > 0)
-                        {
-                            attackMessage.AppendFormat(" {0} takes 1 damage. ", target.Name);
-                        }
-                        else
-                        {
-                            attackMessage.AppendFormat(" {0} takes 1 damage, killing it. ", target.Name);
-                            CommandSystem.ResolveDeath("deathly dirge", target, attackMessage);
-                        }                    
+                        //if (target.Health > 0)
+                        //{
+                        //    attackMessage.AppendFormat(" {0} takes 1 damage. ", target.Name);
+                        //}
+                        //else
+                        //{
+                        //    attackMessage.AppendFormat(" {0} takes 1 damage, killing it. ", target.Name);
+                        //    CommandSystem.ResolveDeath("deathly dirge", target, attackMessage);
+                        //}                    
                     }
                 }
             }
@@ -536,22 +539,27 @@ namespace RuneRogue.Core
                 {
                     StringBuilder discardMessage = new StringBuilder();
                     damage = CommandSystem.ResolveArmor(target, source, Runes.BonusToDamageIron, false, discardMessage);
-                    target.Health -= damage;
+                    //target.Health -= damage;
+                    CommandSystem.WakeMonster(target);
 
                     if (damage > 0)
                     {
-                        attackMessage.AppendFormat("{0} is perforated.", target.Name);
-                        if (target.Health > 0)
-                        {
-                            CommandSystem.WakeMonster(target);
-                            attackMessage.AppendFormat(" {0} takes {1} damage. ", target.Name, damage);
-                        }
-                        else
-                        {
-                            attackMessage.AppendFormat(" {0} takes {1} damage, killing it. ", target.Name, damage);
-                            CommandSystem.ResolveDeath("razor-spear of iron", target, attackMessage);
-                        }
+                        attackMessage.AppendFormat("{0} is perforated. ", target.Name);
+                        CommandSystem.ResolveDamage("razor-spear of iron", target, damage, false, attackMessage);
                     }
+                    
+                    
+                        //if (target.Health > 0)
+                        //{
+                        //    CommandSystem.WakeMonster(target);
+                        //    attackMessage.AppendFormat(" {0} takes {1} damage. ", target.Name, damage);
+                        //}
+                        //else
+                        //{
+                        //    attackMessage.AppendFormat(" {0} takes {1} damage, killing it. ", target.Name, damage);
+                        //    CommandSystem.ResolveDeath("razor-spear of iron", target, attackMessage);
+                        //}
+                    //}
                     else
                     {
                         attackMessage.AppendFormat("The dart bounces off {0}'s armor.", target.Name);

@@ -37,7 +37,7 @@ There are 9 runes:
 
 ## Key Bindings and Mouse Controls
 
-**Movement Keys:** WASD, HJKL-YU-BN, arrow keys, and Numpad all move you.
+**Movement Keys:** WASD, HJKL-YU-BN, arrow keys, and Numpad all move you. Pressing shift at the same time as a movement key will move you as far as possible in the direction chosen.
 
 **Action Keys:** 'g' picks up an item from your spot, '>' descends a downwards stairway, and 'c' closes adjacent open doors.
 

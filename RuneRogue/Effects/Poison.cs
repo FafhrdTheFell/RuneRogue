@@ -63,32 +63,46 @@ namespace RuneRogue.Effects
         public override void PerformEffectOn(Actor target)
         {
             Player player = Game.Player;
-            target.Health -= ActivationDamage;
+            StringBuilder attackMessage = new StringBuilder(); 
+            //target.Health -= ActivationDamage;
 
             Game.DungeonMap.ComputeFov(player.X, player.Y, player.Awareness, true);
             bool isVisible = Game.DungeonMap.IsInFov(target.X, target.Y);
-            if (target.Health > 0)
+            if (target is Player)
             {
-                if (target == Game.Player)
-                {
-                    Game.MessageLog.Add($"{target.Name} takes {ActivationDamage} poison damage.");
-                }
-                else if (isVisible)
-                {
-                    Game.MessageLog.Add($"{target.Name} looks ill.");
-                }
+                attackMessage.AppendFormat("{0} feels ill. ", target.Name);
             }
-            else
+            else if (isVisible)
             {
-                StringBuilder attackMessage = new StringBuilder();
-                attackMessage.AppendFormat("{0} succumbs to poison. ", target.Name);
-                CommandSystem.ResolveDeath("poison", target, attackMessage);
-                if (!string.IsNullOrWhiteSpace(attackMessage.ToString()) && isVisible)
-                {
-                    Game.MessageLog.Add(attackMessage.ToString());
-                }
+                attackMessage.AppendFormat("{0} looks ill. ", target.Name);
+            }
+            CommandSystem.ResolveDamage("poison", target, ActivationDamage, false, attackMessage);
+            if (target.Health <= 0)
+            {
                 FinishEffect();
             }
+            //if (target.Health > 0)
+            //{
+            //    if (target == Game.Player)
+            //    {
+            //        Game.MessageLog.Add($"{target.Name} takes {ActivationDamage} poison damage.");
+            //    }
+            //    else if (isVisible)
+            //    {
+            //        Game.MessageLog.Add($"{target.Name} looks ill.");
+            //    }
+            //}
+            //else
+            //{
+            //    attackMessage.AppendFormat("{0} succumbs to poison. ", target.Name);
+            //    CommandSystem.ResolveDeath("poison", target, attackMessage);
+            //    FinishEffect();
+            //}
+            if (!string.IsNullOrWhiteSpace(attackMessage.ToString()) && isVisible)
+            {
+                Game.MessageLog.Add(attackMessage.ToString());
+            }
+
 
         }
     }

@@ -392,7 +392,7 @@ namespace RuneRogue.Systems
                     Game.AutoMoveMonsterTarget = null;
                     Game.AutoMovePlayer = false;
                 }
-                ResolveDeath(attacker, defender, attackMessage);
+                //ResolveDeath(attacker, defender, attackMessage);
             }
 
             if (!string.IsNullOrWhiteSpace(attackMessage.ToString()))
@@ -410,9 +410,10 @@ namespace RuneRogue.Systems
             // criticals only on backstab
             critical = false;
             int diff;
+            // missile attacks use 1/2 defense skill
             if (missileAttack)
             {
-                diff = attacker.AttackSkill - 5;
+                diff = attacker.AttackSkill - 3 - defender.DefenseSkill / 2;
             }
             else
             {
@@ -553,21 +554,11 @@ namespace RuneRogue.Systems
 
 
         // Apply any damage that wasn't blocked to the defender
-        private static void ResolveDamage(Actor attacker, Actor defender, int damage, bool missileAttack, StringBuilder attackMessage)
+        public static void ResolveDamage(Actor attacker, Actor defender, int damage, bool missileAttack, StringBuilder attackMessage)
         {
             if (damage > 0)
             {
-                defender.Health -= damage;
-
-                if (defender.Health > 0)
-                {
-                    attackMessage.AppendFormat(" {0} takes {1} damage. ", defender.Name, damage);
-                    //Game.MessageLog.Add($"  {defender.Name} takes {damage} damage");
-                }
-                if (defender.Health <= 0 && defender.Health + damage > 0)
-                {
-                    attackMessage.AppendFormat(" {0} kills {1} ({2} damage). ", attacker.Name, defender.Name, damage);
-                }
+                ResolveDamage(attacker.Name, defender, damage, missileAttack, attackMessage);
 
                 if (attacker.SAVenomous && !missileAttack && defender.Health > 0)
                 {
@@ -577,9 +568,13 @@ namespace RuneRogue.Systems
                 }
                 if (attacker.SACausesStun && defender.Health > 0)
                 {
-                    int stunPotency = attacker.MaxHealth / 15 + 1;
-                    Stun stun = new Stun(defender, stunPotency);
-                    attackMessage.AppendFormat(" {0}'s blow stuns {1}. ", attacker.Name, defender.Name);
+                    // stun with 1/2 probability
+                    if (Dice.Roll("1d10") < 6)
+                    {
+                        int stunPotency = attacker.MaxHealth / 15 + 1;
+                        Stun stun = new Stun(defender, stunPotency);
+                        attackMessage.AppendFormat(" {0}'s blow stuns {1}. ", attacker.Name, defender.Name);
+                    }
                 }
                 if (attacker.SAVampiric && !missileAttack)
                 {
@@ -600,8 +595,26 @@ namespace RuneRogue.Systems
             }
         }
 
+        public static void ResolveDamage(string damageSource, Actor defender, int damage, bool missileAttack, StringBuilder attackMessage)
+        {
+            if (damage > 0)
+            {
+                defender.Health -= damage;
 
-        // Remove the defender from the map and add some messages upon death.
+                if (defender.Health > 0)
+                {
+                    attackMessage.AppendFormat(" {0} takes {1} damage. ", defender.Name, damage);
+                    //Game.MessageLog.Add($"  {defender.Name} takes {damage} damage");
+                }
+                if (defender.Health <= 0 && defender.Health + damage > 0)
+                {
+                    attackMessage.AppendFormat(" {0} takes {1} damage, killing it. ", defender.Name, damage);
+                    ResolveDeath(damageSource, defender, attackMessage);
+                }
+            }
+        }
+
+                // Remove the defender from the map and add some messages upon death.
         public static void ResolveDeath(string deathSource, Actor defender, StringBuilder attackMessage)
         {
             if (defender is Player)
