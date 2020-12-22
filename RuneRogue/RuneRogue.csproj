@@ -114,6 +114,7 @@
     <Compile Include="Behaviors\StandardMoveAndAttack.cs" />
     <Compile Include="Core\Actor.cs" />
     <Compile Include="Core\InputConsole.cs" />
+    <Compile Include="Core\ChoiceConsole.cs" />
     <Compile Include="Core\SecondaryConsole.cs" />
     <Compile Include="Core\Runes.cs" />
     <Compile Include="Core\Effect.cs" />

@@ -155,6 +155,9 @@ namespace RuneRogue.Systems
                 CreateShop(RandomRoom(), 100, "BookShop");
             }
 
+
+            CreateShop(_map.Rooms[0], 100, "RuneForge");
+
             CreateStairs();
 
             PlacePlayer();

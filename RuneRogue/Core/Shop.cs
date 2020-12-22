@@ -6,22 +6,19 @@ using System.Collections.Generic;
 
 namespace RuneRogue.Core
 {
-    public class Shop : SecondaryConsole, IDrawable 
+    // a shop is a set of descriptions of goods, _goods,
+    // a cost for each, _costs, and a set of _targets,
+    // descriptions of what ReceivePurchase should do
+    // for each good purchase
+    public class Shop : ChoiceConsole, IDrawable 
     {
 
-        protected string _storeDescription;
         protected List<string> _goods;
         protected List<int> _costs;
         protected List<string> _targets;
 
         //private RLConsole Console;
 
-
-        public string StoreDescription
-        {
-            get { return _storeDescription; }
-            set { _storeDescription = value; }
-        }
 
         public List<string> Goods
         {
@@ -47,15 +44,29 @@ namespace RuneRogue.Core
             Color = Colors.Door;
             BackgroundColor = Colors.Gold;
 
-            _storeDescription = "";
             _goods = new List<string>();
             _costs = new List<int>();
 
-            _goods.Add("Increase atttack!");
+            _goods.Add("Increase attack!");
             _goods.Add("No.");
             _goods.Add("longer still");
 
             _costs.Add(0);
+        }
+        public override List<string> MenuOptions()
+        {
+            return Goods;
+        }
+        public override List<string> AdditionalDetails()
+        {
+            List<string> costString = new List<string>();
+            Costs.ForEach(c => costString.Add(c.ToString()));
+            return costString;
+        }
+
+        public override List<int> OptionsInactive()
+        {
+            return new List<int>();
         }
         public RLColor Color
         {
@@ -90,11 +101,7 @@ namespace RuneRogue.Core
             return Convert.ToInt32(number + 2.5 - rem);
         }
 
-        public bool HasDescription()
-        {
-            return _storeDescription != "";
-        }
-
+        // updates available goods and prices
         public virtual void UpdateInventory()
         {
 
@@ -103,10 +110,10 @@ namespace RuneRogue.Core
         public override bool ProcessChoice(int choiceIndex)
         {
             UpdateInventory();
-            int[] costs = _costs.ToArray();
-            if (Game.Player.Gold >= costs[choiceIndex])
+            //int[] costs = _costs.ToArray();
+            if (Game.Player.Gold >= _costs[choiceIndex])
             {
-                Game.Player.Gold -= costs[choiceIndex];
+                Game.Player.Gold -= _costs[choiceIndex];
                 ReceivePurchase(choiceIndex);
                 return false;
             }
@@ -155,37 +162,37 @@ namespace RuneRogue.Core
 
         // DrawConsole draws secondary console displaying shop
         // items and prices
-        public override void DrawConsole()
-        {
-            int displayNumber;
-            string nameOfGood;
-            string costString;
+        //public override void DrawConsole()
+        //{
+        //    int displayNumber;
+        //    string nameOfGood;
+        //    string costString;
 
-            Console.Clear();
-            Console.SetBackColor(0, 0, Game.MapWidth, Game.MapHeight, Swatch.Compliment);
+        //    Console.Clear();
+        //    Console.SetBackColor(0, 0, Game.MapWidth, Game.MapHeight, Swatch.Compliment);
 
-            UpdateInventory();
+        //    UpdateInventory();
 
-            int descriptionOffset = 0;
-            if (HasDescription())
-            {
-                Console.Print(_horizontalOffset, _verticalOffset, StoreDescription, Colors.TextHeading);
-                descriptionOffset += 4;
-            }
-            for (int i = 0; i < _goods.Count; i++)
-            {
-                displayNumber = i + 1;
-                nameOfGood = Goods[i];
-                // trailing spaces so when costs drop from 10 to 1, the 0 gets overwritten
-                costString = Costs[i].ToString() + "   ";
-                Console.Print(_horizontalOffset, descriptionOffset + _verticalOffset + 2 * i, 
-                    "(" + displayNumber.ToString() + ")", Colors.Text);
-                Console.Print(_horizontalOffset + 4, descriptionOffset + _verticalOffset + 2 * i, nameOfGood, Colors.Text);
-                Console.Print(_horizontalOffset + 72, descriptionOffset + _verticalOffset + 2 * i, costString, Colors.Text);
-            }
-            Console.Print(_horizontalOffset, descriptionOffset + 1 + _verticalOffset + 2 * _goods.Count,
-                "( X ) Exit shop.", Colors.Text);
-        }
+        //    int descriptionOffset = 0;
+        //    if (HasDescription())
+        //    {
+        //        Console.Print(_horizontalOffset, _verticalOffset, StoreDescription, Colors.TextHeading);
+        //        descriptionOffset += 4;
+        //    }
+        //    for (int i = 0; i < _goods.Count; i++)
+        //    {
+        //        displayNumber = i + 1;
+        //        nameOfGood = Goods[i];
+        //        // trailing spaces so when costs drop from 10 to 1, the 0 gets overwritten
+        //        costString = Costs[i].ToString() + "   ";
+        //        Console.Print(_horizontalOffset, descriptionOffset + _verticalOffset + 2 * i, 
+        //            "(" + displayNumber.ToString() + ")", Colors.Text);
+        //        Console.Print(_horizontalOffset + 4, descriptionOffset + _verticalOffset + 2 * i, nameOfGood, Colors.Text);
+        //        Console.Print(_horizontalOffset + 72, descriptionOffset + _verticalOffset + 2 * i, costString, Colors.Text);
+        //    }
+        //    Console.Print(_horizontalOffset, descriptionOffset + 1 + _verticalOffset + 2 * _goods.Count,
+        //        "( X ) Exit shop.", Colors.Text);
+        //}
 
     }
 }

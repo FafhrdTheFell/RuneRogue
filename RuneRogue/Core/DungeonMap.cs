@@ -7,6 +7,7 @@ using RLNET;
 using RogueSharp;
 using RogueSharp.DiceNotation;
 using RuneRogue.Items;
+using RuneRogue.Interfaces;
 
 namespace RuneRogue.Core
 {
@@ -29,7 +30,8 @@ namespace RuneRogue.Core
         public List<Shop> Shops { get; set; }
         public Stairs StairsUp { get; set; }
         public Stairs StairsDown { get; set; }
-        public int DungeonLevel { 
+        public int DungeonLevel
+        {
             get { return _dungeonLevel; }
             set { _dungeonLevel = value; }
         }
@@ -74,8 +76,8 @@ namespace RuneRogue.Core
                     SetCellProperties(cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable, true);
                     _exploredMap.SetCellProperties(cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable, true);
 
-                    if (!_goodExplorationCells.Contains(cell) && 
-                        !_badExplorationCells.Contains(cell) && 
+                    if (!_goodExplorationCells.Contains(cell) &&
+                        !_badExplorationCells.Contains(cell) &&
                         (cell.IsWalkable || GetDoor(cell.X, cell.Y) != null))
                     {
                         _goodExplorationCells.Add(cell);
@@ -101,9 +103,9 @@ namespace RuneRogue.Core
                 return false;
             }
             // Don't open doors on acceleration.
-            if (actor == Game.Player && Game.AcceleratePlayer && (GetDoor(x,y) != null))
+            if (actor == Game.Player && Game.AcceleratePlayer && (GetDoor(x, y) != null))
             {
-                if (!GetDoor(x,y).IsOpen)
+                if (!GetDoor(x, y).IsOpen)
                 {
                     return false;
                 }
@@ -112,7 +114,7 @@ namespace RuneRogue.Core
             if (GetDoor(x, y) != null)
             {
                 if (!GetDoor(x, y).IsOpen)
-                    {
+                {
                     OpenDoor(actor, x, y);
                     return true;
                 }
@@ -286,6 +288,8 @@ namespace RuneRogue.Core
             return shotNotBlocked;
         }
 
+        // finds object of a particular type closest to player or targetCell
+        // 
         public Cell GetNearestObject(string objectType, bool previouslySeen, Cell targetCell = null)
         {
             int targetX = Game.Player.X;
@@ -296,6 +300,31 @@ namespace RuneRogue.Core
                 targetY = targetCell.Y;
             }
             Cell nullCell = null;
+            //List<Cell> cellsWithObject = new List<Cell>();
+            //IOrderedEnumerable<IDrawable> cellsList = null;
+
+            //IDrawable nearestD;
+            //Item nearestI;
+            //nearestI = _items.
+            //    OrderBy(item => Math.Abs(item.X - targetX) + Math.Abs(item.Y - targetY)).
+            //    Where(item => GetCell(item.X, item.Y).IsExplored).
+            //    FirstOrDefault();
+            //nearestD = (IDrawable)nearestI;
+            //return GetCell(nearestD.X, nearestD.Y);
+            //if (objectType == "item")
+            //{
+            //    cellsList = _items.
+            //            OrderBy(item => Math.Abs(item.X - targetX) + Math.Abs(item.Y - targetY));
+            //}
+            //else if (objectType == "door")
+            //{
+            //    cellsList = Doors.
+            //            OrderBy(item => Math.Abs(item.X - targetX) + Math.Abs(item.Y - targetY)).
+            //            Where(d => GetCell(d.X, d.Y).IsExplored && !d.IsOpen).
+            //            Where(d => !(d.X == targetX && d.Y == targetY)).
+            //            FirstOrDefault();
+            //}
+
             if (objectType == "item")
             {
                 Item nearest;
@@ -310,6 +339,31 @@ namespace RuneRogue.Core
                 else
                 {
                     nearest = _items.
+                        OrderBy(item => Math.Abs(item.X - targetX) + Math.Abs(item.Y - targetY)).FirstOrDefault();
+                }
+                if (nearest != null)
+                {
+                    return GetCell(nearest.X, nearest.Y);
+                }
+                else
+                {
+                    return nullCell;
+                }
+            }
+            else if (objectType == "shop")
+            {
+                Shop nearest;
+                if (previouslySeen)
+                {
+                    nearest = Shops.
+                        OrderBy(item => Math.Abs(item.X - targetX) + Math.Abs(item.Y - targetY)).
+                        Where(item => GetCell(item.X, item.Y).IsExplored).
+                        FirstOrDefault();
+
+                }
+                else
+                {
+                    nearest = Shops.
                         OrderBy(item => Math.Abs(item.X - targetX) + Math.Abs(item.Y - targetY)).FirstOrDefault();
                 }
                 if (nearest != null)
@@ -363,18 +417,18 @@ namespace RuneRogue.Core
                 foreach (Cell cell in _goodExplorationCells.
                         OrderBy(c => Math.Abs(c.X - targetX) + Math.Abs(c.Y - targetY)))
                 {
-                    for (int dx = -1; dx <= 1; dx+=2)
+                    for (int dx = -1; dx <= 1; dx += 2)
                     {
                         if (dx + cell.X < 0 || dx + cell.X > Game.MapWidth)
                         {
                             continue;
                         }
-                        if (GetCell(cell.X+dx, cell.Y).IsWalkable && !GetCell(cell.X + dx, cell.Y).IsExplored)
+                        if (GetCell(cell.X + dx, cell.Y).IsWalkable && !GetCell(cell.X + dx, cell.Y).IsExplored)
                         {
                             nearest = GetCell(cell.X + dx, cell.Y);
                         }
                     }
-                    for (int dy = -1; dy <= 1; dy+=2)
+                    for (int dy = -1; dy <= 1; dy += 2)
                     {
                         if (dy + cell.Y < 0 || dy + cell.Y > Game.MapHeight)
                         {
@@ -462,7 +516,7 @@ namespace RuneRogue.Core
             }
             return false;
         }
-        
+
         // The Draw method will be called each time the map is updated
         // It will render all of the symbols/colors for each cell to the map sub console
         public void Draw(RLConsole mapConsole, RLConsole statConsole, List<Cell> highlightContentsCells = null)
@@ -507,7 +561,7 @@ namespace RuneRogue.Core
                 {
                     // Pass in the index to DrawStats and increment it afterwards
                     bool highlightMonster = highlightContentsCells.Contains(GetCell(monster.X, monster.Y));
-                    monster.DrawStats(statConsole, i, 
+                    monster.DrawStats(statConsole, i,
                         highlight: highlightMonster);
                     i++;
                 }

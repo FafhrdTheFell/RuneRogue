@@ -7,7 +7,7 @@ using RuneRogue.Systems;
 
 namespace RuneRogue.Core
 {
-    public class Runes : SecondaryConsole
+    public class Runes : ChoiceConsole
     {
 
         private static readonly string[] _runeNames =
@@ -107,6 +107,8 @@ namespace RuneRogue.Core
             _numOptions = _runeNames.Length;
             _runesOwned = new List<string>();
             _runesActive = new List<string>();
+            // game.player not initialized yet...
+            _choiceDescription = String.Format("{0}'s Necklace of Runes", Game.Player.Name);
 
             //AcquireRune("Elements");
             //AcquireRune("Death");
@@ -310,38 +312,114 @@ namespace RuneRogue.Core
             return new List<string>(_runesOwned);
         }
 
-        public override void DrawConsole()
+        public override List<string> MenuOptions()
         {
-            _console.Clear();
-            _console.SetBackColor(0, 0, Game.MapWidth, Game.MapHeight, Swatch.Compliment);
+            List<string> options = new List<string>(_runeNames);
+            options.ForEach(s => s = "Rune of " + s);
+            return options;
+        }
 
-            int descriptionOffset = 0;
-            _console.Print(_horizontalOffset, _verticalOffset, $"{Game.Player.Name}'s Necklace of Runes", Colors.TextHeading);
-            descriptionOffset += 4;
-
-            for (int i = 0; i < _runeNames.Count(); i++)
+        public override List<string> AdditionalDetails()
+        {
+            List<string> details = new List<string>();
+            foreach (string rune in _runeNames)
             {
-                int displayNumber = i + 1;
-                string longNameOfRune = "Rune of " + _runeNames[i];
-                string nameOfRune = _runeNames[i];
-                _console.Print(_horizontalOffset, descriptionOffset + _verticalOffset + 2 * i,
-                    "(" + displayNumber.ToString() + ")", Colors.Text);
-                if (_runesOwned.Contains(nameOfRune))
+                if (_runesActive.Contains(rune))
                 {
-                    _console.Print(_horizontalOffset + 4, descriptionOffset + _verticalOffset + 2 * i, longNameOfRune, Colors.Text);
-                    if (_runesActive.Contains(nameOfRune))
-                    {
-                        _console.Print(_horizontalOffset + 72, descriptionOffset + _verticalOffset + 2 * i, "ACTIVE", Colors.TextHeading);
-                    }
+                    details.Add("ACTIVE");
                 }
                 else
                 {
-                    _console.Print(_horizontalOffset + 4, descriptionOffset + _verticalOffset + 2 * i, longNameOfRune, Colors.TextInactive);
+                    details.Add("");
                 }
             }
-            _console.Print(_horizontalOffset, descriptionOffset + 1 + _verticalOffset + 2 * _runeNames.Count(),
-                "( X ) Cancel.", Colors.Text);
+            return details;
         }
+
+        public override List<int> OptionsInactive()
+        {
+            List<int> inactive = new List<int>();
+            foreach (string rune in _runeNames)
+            {
+                if (!_runesOwned.Contains(rune))
+                {
+                    inactive.Add(Array.IndexOf(_runeNames, rune));
+                }
+            }
+            return inactive;
+        }
+
+        //private readonly int _leftSelectButtonOffset = 6;
+        //private readonly int _detailsColumnOffset = 72;
+        //private int _descriptionOffset = 4;
+        //private int _selection = 9;
+
+        //public void DrawOption(int option)
+        //{
+        //    string keyChoice = (option + 1).ToString();
+        //    string atoz = "ABCDEFGHIJKLMNOPQRSTUVW";
+        //    if (option > 9)
+        //    {
+        //        keyChoice = atoz[option - 10].ToString();
+        //    }
+        //    RLColor textColor = Colors.Text;
+        //    if (OptionsInactive().Contains(option))
+        //    {
+        //        textColor = Colors.TextInactive;
+        //    }
+        //    if (_selection == option)
+        //    {
+        //        _console.Print(_horizontalOffset, _descriptionOffset + _verticalOffset + 2 * option,
+        //       ">", Colors.TextHeading);
+        //    }
+        //    _console.Print(_horizontalOffset + 2, _descriptionOffset + _verticalOffset + 2 * option,
+        //        "(" + keyChoice + ")", textColor);
+        //    _console.Print(_horizontalOffset + _leftSelectButtonOffset, _descriptionOffset + _verticalOffset + 2 * option, 
+        //        MenuOptions()[option], textColor);
+        //    _console.Print(_detailsColumnOffset, _descriptionOffset + _verticalOffset + 2 * option,
+        //        AdditionalDetails()[option], textColor);
+        //}
+
+        //public override void DrawConsole()
+        //{
+        //    _console.Clear();
+        //    _console.SetBackColor(0, 0, Game.MapWidth, Game.MapHeight, Swatch.Compliment);
+
+        //    NumOptions = _runeNames.Count();
+
+        //    int descriptionOffset = 0;
+        //    _console.Print(_horizontalOffset, _verticalOffset, $"{Game.Player.Name}'s Necklace of Runes", Colors.TextHeading);
+        //    descriptionOffset += 4;
+
+        //    for (int i = 0; i < NumOptions; i++)
+        //    {
+        //        DrawOption(i);
+        //        //int displayNumber = i + 1;
+        //        //string longNameOfRune = "Rune of " + _runeNames[i];
+        //        //string nameOfRune = _runeNames[i];
+        //        //_console.Print(_horizontalOffset, descriptionOffset + _verticalOffset + 2 * i,
+        //        //    "(" + displayNumber.ToString() + ")", Colors.Text);
+        //        //if (_runesOwned.Contains(nameOfRune))
+        //        //{
+        //        //    _console.Print(_horizontalOffset + 4, descriptionOffset + _verticalOffset + 2 * i, longNameOfRune, Colors.Text);
+        //        //    if (_runesActive.Contains(nameOfRune))
+        //        //    {
+        //        //        _console.Print(_horizontalOffset + 72, descriptionOffset + _verticalOffset + 2 * i, "ACTIVE", Colors.TextHeading);
+        //        //    }
+        //        //}
+        //        //else
+        //        //{
+        //        //    _console.Print(_horizontalOffset + 4, descriptionOffset + _verticalOffset + 2 * i, longNameOfRune, Colors.TextInactive);
+        //        //}
+        //    }
+        //    if (_selection == NumOptions)
+        //    {
+        //        _console.Print(_horizontalOffset, _descriptionOffset + 1 + _verticalOffset + 2 * _runeNames.Count(),
+        //        ">", Colors.TextHeading);
+        //    }
+        //    _console.Print(_horizontalOffset + 2, _descriptionOffset + 1 + _verticalOffset + 2 * _runeNames.Count(),
+        //        "(X) Cancel.", Colors.Text);
+        //}
 
         public override bool ProcessChoice(int choiceIndex)
         {

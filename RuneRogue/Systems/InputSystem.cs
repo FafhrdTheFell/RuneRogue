@@ -10,8 +10,16 @@ using System.Threading.Tasks;
 
 namespace RuneRogue.Systems
 {
-    class InputSystem
+    public class InputSystem
     {
+
+        public static Dictionary<RLKey, string> autoKeys = new Dictionary<RLKey, string>
+        {
+            [RLKey.Number1] = "item",
+            [RLKey.Number2] = "shop",
+            [RLKey.Number3] = "door",
+            [RLKey.Number4] = "explorable"
+        };
 
         public InputSystem()
         {

@@ -41,8 +41,6 @@ namespace RuneRogue
         private static int _statHeight = 70;
         private static RLConsole _statConsole;
 
-        private static InputSystem _inputSystem;
-
         private static string _playerFate;
         private static bool _gameOver;
         private static bool _quittingGame;
@@ -58,15 +56,16 @@ namespace RuneRogue
         public const int RuneForgeEveryNLevels = 4;
 
         public static Player Player { get; set; }
+        public static InputSystem InputSystem { get; private set; }
         public static DungeonMap DungeonMap { get; private set; }
         public static MessageLog MessageLog { get; private set; }
         public static CommandSystem CommandSystem { get; private set; }
         public static SchedulingSystem SchedulingSystem { get; private set; }
         public static MonsterGenerator MonsterGenerator { get; private set; }
         public static Runes RuneSystem { get; private set; }
-        public static SecondaryConsole CurrentSecondary { get; set; }
-        public static SecondaryConsole PostSecondary { get; set; }           
-        public static TargetingSystem TargetingSystem { get; set; }
+        public static ISecondaryConsole CurrentSecondary { get; set; }
+        public static ISecondaryConsole PostSecondary { get; set; }           
+
         public static string HighScoreFile
         {
             get { return "Resources/" + _highScoreFile; }
@@ -185,7 +184,7 @@ namespace RuneRogue
             AutoMovePlayer = false;
             AcceleratePlayer = false;
             
-            _inputSystem = new InputSystem();
+            InputSystem = new InputSystem();
 
             _gameOver = false;
             _quittingGame = false;
@@ -195,12 +194,14 @@ namespace RuneRogue
             MonsterGenerator = new MonsterGenerator();
             MonsterGenerator.ReadMonsterData("Resources/Monsters.json");
 
-            RuneSystem = new Runes();
-
             InputConsole NameInput = new InputConsole();
 
             CurrentSecondary = NameInput;
             SecondaryConsoleActive = true;
+
+            Player = new Player();
+
+            RuneSystem = new Runes();
 
             MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, mapLevel);
             DungeonMap = mapGenerator.CreateMap();
@@ -291,6 +292,7 @@ namespace RuneRogue
                     if (CurrentSecondary is InputConsole)
                     {
                         Game.Player.Name = completionMessage;
+                        RuneSystem = new Runes();
                     }
                 }
                 _renderRequired = true;
@@ -416,6 +418,7 @@ namespace RuneRogue
         // keyboard or mouse input
         public static bool AutoActionAndProcessInput(RLKeyPress keyPress, RLMouse rLMouse)
         {
+            
             bool didPlayerAct = false;
             // autopickup
             if (DungeonMap.GetItemAt(Player.X, Player.Y) != null && DungeonMap.MonstersInFOV().Count == 0)
@@ -506,25 +509,42 @@ namespace RuneRogue
             }
             else if (keyPress != null)
             {
+                PrintDebugMessage(keyPress.Key.ToString());
                 if (_quittingGame)
                 {
                     _rootConsole.Close();
                 }
                 else
                 {
-                    Direction direction = _inputSystem.MoveDirection(keyPress);
+                    Direction direction = InputSystem.MoveDirection(keyPress);
                     if (direction != Direction.None)
                     {
                         // the acceleration system is ugly. AcceleratePlayer sometimes
                         // gets set in the Command System, so need to check shift before
                         // carrying out move.
-                        AcceleratePlayer = _inputSystem.ShiftDown(keyPress);
+                        AcceleratePlayer = InputSystem.ShiftDown(keyPress);
                         AccelerateDirection = direction;
                         didPlayerAct = CommandSystem.MovePlayer(direction);
                     }
-                    else if (keyPress.Key == RLKey.Number1)
+                    else if (InputSystem.autoKeys.ContainsKey(keyPress.Key))
                     {
-                        Cell target = DungeonMap.GetNearestObject("item", true);
+                        Cell target = null;
+                        target = DungeonMap.GetNearestObject(InputSystem.autoKeys[keyPress.Key], true);
+                        //switch (keyPress.Key)
+                        //{
+                        //    case RLKey.Number1:
+                        //        target = DungeonMap.GetNearestObject("item", true);
+                        //        break;
+                        //    case RLKey.Number2:
+                        //        target = DungeonMap.GetNearestObject("door", true);
+                        //        break;
+                        //    case RLKey.Number3:
+                        //        target = DungeonMap.GetNearestObject("shop", true);
+                        //        break;
+                        //    case RLKey.Number4:
+                        //        target = DungeonMap.GetNearestObject("explorable", true);
+                        //        break;
+                        //}
                         if (target != null)
                         {
                             AutoMovePlayer = true;
@@ -533,26 +553,26 @@ namespace RuneRogue
 
                         }
                     }
-                    else if (keyPress.Key == RLKey.Number2)
-                    {
-                        Cell target = DungeonMap.GetNearestObject("door", true);
-                        if (target != null)
-                        {
-                            AutoMovePlayer = true;
-                            AutoMoveXTarget = target.X;
-                            AutoMoveYTarget = target.Y;
-                        }
-                    }
-                    else if (keyPress.Key == RLKey.Number3)
-                    {
-                        Cell target = DungeonMap.GetNearestObject("explorable", true);
-                        if (target != null)
-                        {
-                            AutoMovePlayer = true;
-                            AutoMoveXTarget = target.X;
-                            AutoMoveYTarget = target.Y;
-                        }
-                    }
+                    //else if (keyPress.Key == RLKey.Number2)
+                    //{
+                        
+                    //    if (target != null)
+                    //    {
+                    //        AutoMovePlayer = true;
+                    //        AutoMoveXTarget = target.X;
+                    //        AutoMoveYTarget = target.Y;
+                    //    }
+                    //}
+                    //else if (keyPress.Key == RLKey.Number3)
+                    //{
+                        
+                    //    if (target != null)
+                    //    {
+                    //        AutoMovePlayer = true;
+                    //        AutoMoveXTarget = target.X;
+                    //        AutoMoveYTarget = target.Y;
+                    //    }
+                    //}
                     else if (keyPress.Key == RLKey.T)
                     {
                         Game.SecondaryConsoleActive = true;
@@ -562,31 +582,31 @@ namespace RuneRogue
                         //    _offensiveRadius[rune], special: "Rune");
                         //Game.MessageLog.Add("Select your target (TAB to cycle).");
                     }
-                    else if (_inputSystem.CloseDoorKeyPressed(keyPress))
+                    else if (InputSystem.CloseDoorKeyPressed(keyPress))
                     {
                         didPlayerAct = CommandSystem.CloseDoorsNextTo(Player);
                     }
-                    else if (_inputSystem.QuitKeyPressed(keyPress))
+                    else if (InputSystem.QuitKeyPressed(keyPress))
                     {
                         GameOver("quit on level " + Game.mapLevel.ToString());
                         _renderRequired = true;
                     }
-                    else if (_inputSystem.RuneKeyPressed(keyPress))
+                    else if (InputSystem.RuneKeyPressed(keyPress))
                     {
                         SecondaryConsoleActive = true;
                         AcceleratePlayer = false;
                         CurrentSecondary = RuneSystem;
                         _renderRequired = true;
                     }
-                    else if (_inputSystem.PickupKeyPressed(keyPress))
+                    else if (InputSystem.PickupKeyPressed(keyPress))
                     {
                         didPlayerAct = CommandSystem.PickupItemPlayer();
                     }
-                    else if (_inputSystem.DescendStairs(keyPress))
+                    else if (InputSystem.DescendStairs(keyPress))
                     {
                         didPlayerAct = NewLevel();
                     }
-                    else if (_inputSystem.WaitKey(keyPress))
+                    else if (InputSystem.WaitKey(keyPress))
                     {
                         didPlayerAct = true;
                     }

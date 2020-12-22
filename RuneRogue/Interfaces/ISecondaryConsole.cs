@@ -16,6 +16,10 @@ namespace RuneRogue.Interfaces
         // do something additional based on interaction with secondary
         bool ProcessInput(RLKeyPress rLKeyPress, RLMouse rLMouse, out string message);
 
+        // whether the choice the player makes in the console uses his or
+        // her turn (unless cancelled with message "Cancelled")
+        bool UsesTurn();
+
         RLConsole Console { get;  }
     }
 }

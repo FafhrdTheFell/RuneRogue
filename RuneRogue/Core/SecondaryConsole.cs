@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RLNET;
+using RuneRogue.Interfaces;
+
 
 namespace RuneRogue.Core
 {
-    public class SecondaryConsole
+    public class SecondaryConsole : ISecondaryConsole
     {
         protected RLConsole _console;
         protected int _numOptions;
@@ -18,7 +20,7 @@ namespace RuneRogue.Core
         public int NumOptions
         {
             get { return _numOptions; }
-            private set { _numOptions = value; }
+            protected set { _numOptions = value; }
         }
 
         public SecondaryConsole()

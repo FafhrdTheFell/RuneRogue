@@ -24,7 +24,8 @@ namespace RuneRogue.Shops
                 "Pamphlet of secrets to increase ",
                 "Crazy diagrams about increasing ",
                 "Tattered scroll praising ",
-                "Hand-written letters describing the benefits of "
+                "Hand-written letters describing the benefits of ",
+                "Cartoon images regarding "
             };
 
         protected readonly string[] targetOptions =
@@ -45,7 +46,7 @@ namespace RuneRogue.Shops
 
             //int levelBookCost = 25 + 25 * (Game.mapLevel / 4);
             int levelBookCost = RoundFive(25.0 * DungeonLevelFactor(Game.mapLevel));
-            _storeDescription = "This bookstore has a few how-to books for sale.";
+            _choiceDescription = "This bookstore has a few how-to books for sale.";
 
             for (int i = 0; i < numBooks; i++)
             {

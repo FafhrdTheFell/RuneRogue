@@ -19,32 +19,32 @@ namespace RuneRogue.Shops
         public RuneForge()
         {
             Symbol = 'F';
-            _goods = new List<string>();
-            _costs = new List<int>();
-            _targets = new List<string>();
 
             _runeCost = RoundFive(55.0 * DungeonLevelFactor(Game.mapLevel));
-            _storeDescription = "This forge will let you work a rune, but you will have to pay for the orichalcum bars yourself.";
+            _choiceDescription = "This forge will let you work a rune, but you will have to pay for the orichalcum bars yourself.";
 
             UpdateInventory();
 
         }
 
+        // update runes available
         public override void UpdateInventory()
         {
             List<string> runeList = Game.RuneSystem.RunesNotOwned();
             _goods = new List<string>();
             _costs = new List<int>();
-            _targets = new List<string>();
+            //_targets = new List<string>();
 
-            for (int i = 0; i < runeList.Count; i++)
-            {
-                _goods.Add("Forge a Rune of " + runeList[i]);
-                _costs.Add(_runeCost);
-                _targets.Add(runeList[i]);
-            }
+            runeList.ForEach(r => _goods.Add("Forge a Rune of " + r));
+            runeList.ForEach(r => _costs.Add(_runeCost));
+            _targets = runeList;
 
-            _numOptions = runeList.Count;
+            //for (int i = 0; i < runeList.Count; i++)
+            //{
+            //    _goods.Add("Forge a Rune of " + runeList[i]);
+            //    _costs.Add(_runeCost);
+            //    _targets.Add(runeList[i]);
+            //}
         }
 
         public override void ReceivePurchase(int purchaseIndex)

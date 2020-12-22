@@ -1,21 +1,16 @@
-﻿using Microsoft.SqlServer.Server;
-using OpenTK.Input;
-using RLNET;
+﻿using RLNET;
 using RogueSharp;
-using RogueSharp.DiceNotation;
 using RuneRogue.Core;
-using RuneRogue.Effects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization.Formatters;
-using System.Text;
+using RuneRogue.Interfaces;
 
 namespace RuneRogue.Systems
 {
-    public class TargetingSystem : SecondaryConsole
+    public class TargetingSystem : ISecondaryConsole
     {
-
+        private RLConsole _console;
         private Point _currentTarget;
         private Point _playerPosition;
         private readonly RLConsole _statConsole;
@@ -40,6 +35,17 @@ namespace RuneRogue.Systems
             get { return Game.DungeonMap.GetCell(_currentTarget.X, _currentTarget.Y); }
         }
 
+        public RLConsole Console
+        {
+            get { return _console; }
+        }
+
+        public bool UsesTurn()
+        {
+            return false;
+        }
+
+
         public RLConsole StatConsole
         {
             get { return _statConsole; }
@@ -61,7 +67,7 @@ namespace RuneRogue.Systems
             InitializeNewTarget(projectiletype, range, radius, minRange);
         }
 
-        public override void DrawConsole()
+        public void DrawConsole()
         {
             DungeonMap dungeonMap = Game.DungeonMap;
             Player player = Game.Player;
@@ -200,7 +206,7 @@ namespace RuneRogue.Systems
 
 
         // process key press and return true iff finished with console
-        public override bool ProcessInput(RLKeyPress rLKeyPress, RLMouse rLMouse, out string message)
+        public bool ProcessInput(RLKeyPress rLKeyPress, RLMouse rLMouse, out string message)
         {
             message = "";
             Player player = Game.Player;
@@ -225,8 +231,8 @@ namespace RuneRogue.Systems
             }
             if (rLKeyPress != null)
             {
-                InputSystem _inputSystem = new InputSystem();
-                Direction direction = _inputSystem.MoveDirection(rLKeyPress);
+                InputSystem InputSystem = Game.InputSystem;
+                Direction direction = InputSystem.MoveDirection(rLKeyPress);
                 if (direction != Direction.None)
                 {
                     _newTarget.X += Game.CommandSystem.DirectionToCoordinates(direction)[0];
@@ -240,7 +246,7 @@ namespace RuneRogue.Systems
                 {
                     tabPressed = true;
                 }
-                cancelPressed = _inputSystem.CancelKeyPressed(rLKeyPress);
+                cancelPressed = InputSystem.CancelKeyPressed(rLKeyPress);
             }
             bool playerTargeted = (_newTarget.X == player.X && _newTarget.Y == player.Y);
             if (_newTarget == _currentTarget && !playerTargeted &&

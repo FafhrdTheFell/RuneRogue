@@ -10,31 +10,13 @@ using RuneRogue.Core;
 
 namespace RuneRogue.Shops
 {
-    //public class Ref<T> where T : struct
-    //{ 
-    //    public T Value { get; set; }
-    //}
-
-    //public class ValueWrapper<T>
-    //where T : struct
-    //{
-    //    public ValueWrapper(T item)
-    //    {
-    //        this.Item = item;
-    //    }
-
-    //    public T Item { get; set; }
-    //}
 
     public class EquipmentShop : Shop
     {
 
-
-
-
         public EquipmentShop()
         {
-            _storeDescription = "This market has stalls with various weapons and armor, as well as food.";
+            _choiceDescription = "This market has stalls with various weapons and armor, as well as food.";
             _goods = new List<string>();
             _costs = new List<int>();
             _targets = new List<string>();
@@ -51,23 +33,16 @@ namespace RuneRogue.Shops
             _targets.Add("Defense");
             _targets.Add("Health");
 
-            _numOptions = 3;
-
+            UpdateInventory();
         }
 
-
+        // updates prices
         public override void UpdateInventory()
         {
-            // deactivate rune of iron bonuses when calculating cost
             double newAttack = Convert.ToDouble(Game.Player.Attack + 1);
             double newDefense = Convert.ToDouble(Game.Player.Defense + 1);
-            if (Game.RuneSystem.RuneActive("Iron"))
-            {
-                newAttack -= 7;
-                newDefense -= 4;
-            }
             Costs[0] = RoundFive(1.5 * Math.Pow(newAttack, 1.35) * DungeonLevelFactor(Game.mapLevel));
-            Costs[1] = RoundFive(2.5 * Math.Pow(newDefense, 1.55) * DungeonLevelFactor(Game.mapLevel));
+            Costs[1] = RoundFive(2.0 * Math.Pow(newDefense, 1.55) * DungeonLevelFactor(Game.mapLevel));
             if (Game.Player.Health == Game.Player.MaxHealth)
             {
                 Costs[2] = Convert.ToInt32(8.0 * DungeonLevelFactor(Game.mapLevel));
