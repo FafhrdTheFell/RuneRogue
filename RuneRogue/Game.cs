@@ -509,42 +509,24 @@ namespace RuneRogue
             }
             else if (keyPress != null)
             {
-                PrintDebugMessage(keyPress.Key.ToString());
                 if (_quittingGame)
                 {
                     _rootConsole.Close();
                 }
                 else
                 {
-                    Direction direction = InputSystem.MoveDirection(keyPress);
-                    if (direction != Direction.None)
+                    if (InputSystem.directionKeys.ContainsKey(keyPress.Key))
                     {
-                        // the acceleration system is ugly. AcceleratePlayer sometimes
-                        // gets set in the Command System, so need to check shift before
-                        // carrying out move.
-                        AcceleratePlayer = InputSystem.ShiftDown(keyPress);
-                        AccelerateDirection = direction;
-                        didPlayerAct = CommandSystem.MovePlayer(direction);
+                    Direction direction = InputSystem.directionKeys[keyPress.Key];
+                    AcceleratePlayer = InputSystem.ShiftDown(keyPress);
+                    AccelerateDirection = direction;
+                    didPlayerAct = CommandSystem.MovePlayer(direction);
                     }
                     else if (InputSystem.autoKeys.ContainsKey(keyPress.Key))
                     {
                         Cell target = null;
                         target = DungeonMap.GetNearestObject(InputSystem.autoKeys[keyPress.Key], true);
-                        //switch (keyPress.Key)
-                        //{
-                        //    case RLKey.Number1:
-                        //        target = DungeonMap.GetNearestObject("item", true);
-                        //        break;
-                        //    case RLKey.Number2:
-                        //        target = DungeonMap.GetNearestObject("door", true);
-                        //        break;
-                        //    case RLKey.Number3:
-                        //        target = DungeonMap.GetNearestObject("shop", true);
-                        //        break;
-                        //    case RLKey.Number4:
-                        //        target = DungeonMap.GetNearestObject("explorable", true);
-                        //        break;
-                        //}
+
                         if (target != null)
                         {
                             AutoMovePlayer = true;
@@ -553,27 +535,7 @@ namespace RuneRogue
 
                         }
                     }
-                    //else if (keyPress.Key == RLKey.Number2)
-                    //{
-                        
-                    //    if (target != null)
-                    //    {
-                    //        AutoMovePlayer = true;
-                    //        AutoMoveXTarget = target.X;
-                    //        AutoMoveYTarget = target.Y;
-                    //    }
-                    //}
-                    //else if (keyPress.Key == RLKey.Number3)
-                    //{
-                        
-                    //    if (target != null)
-                    //    {
-                    //        AutoMovePlayer = true;
-                    //        AutoMoveXTarget = target.X;
-                    //        AutoMoveYTarget = target.Y;
-                    //    }
-                    //}
-                    else if (keyPress.Key == RLKey.T)
+                    else if (InputSystem.TravelKeyPressed(keyPress))
                     {
                         Game.SecondaryConsoleActive = true;
                         Game.AcceleratePlayer = false;

@@ -220,7 +220,8 @@ namespace RuneRogue.Systems
             bool enterPressed = false;
             bool cancelPressed = false;
             bool tabPressed = false;
-            
+            bool playerTargeted = (_newTarget.X == player.X && _newTarget.Y == player.Y);
+
             if (leftClick)
             {
                 _newTarget = new Point
@@ -232,9 +233,9 @@ namespace RuneRogue.Systems
             if (rLKeyPress != null)
             {
                 InputSystem InputSystem = Game.InputSystem;
-                Direction direction = InputSystem.MoveDirection(rLKeyPress);
-                if (direction != Direction.None)
+                if (InputSystem.directionKeys.ContainsKey(rLKeyPress.Key))
                 {
+                    Direction direction = InputSystem.directionKeys[rLKeyPress.Key];
                     _newTarget.X += Game.CommandSystem.DirectionToCoordinates(direction)[0];
                     _newTarget.Y += Game.CommandSystem.DirectionToCoordinates(direction)[1];
                 }
@@ -248,9 +249,8 @@ namespace RuneRogue.Systems
                 }
                 cancelPressed = InputSystem.CancelKeyPressed(rLKeyPress);
             }
-            bool playerTargeted = (_newTarget.X == player.X && _newTarget.Y == player.Y);
-            if (_newTarget == _currentTarget && !playerTargeted &&
-                (leftClick || enterPressed))
+            if ((leftClick || enterPressed) &&
+                _newTarget == _currentTarget && !playerTargeted)
             {
                 if (Distance(_playerPosition, _newTarget) > _range)
                 {

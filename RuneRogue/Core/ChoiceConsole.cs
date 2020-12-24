@@ -133,44 +133,34 @@ namespace RuneRogue.Core
             else if (rLKeyPress != null)
             {
                 InputSystem InputSystem = Game.InputSystem;
-                Direction direction = InputSystem.MoveDirection(rLKeyPress);
-                if (direction == Direction.Up)
+                
+                if (InputSystem.directionKeys.TryGetValue(rLKeyPress.Key, out Direction direction) ||
+                    rLKeyPress.Key == RLKey.Tab)
                 {
                     if (OptionsInactive().Count == MenuOptions().Count)
                     {
                         // no active options
                         return false;
                     }
-                    bool cycle = true;
-                    while (cycle)
+                    int delta;
+                    if (direction == Direction.Up)
                     {
-                        _selection -= 1;
-                        if (_selection < -1)
-                        {
-                            _selection += NumOptions + 1;
-                        }
-                        if (!OptionsInactive().Contains(_selection))
-                        {
-                            cycle = false;
-                        }
+                        delta = -1;
                     }
-                    return false;
-                }
-                else if (direction == Direction.Down || rLKeyPress.Key == RLKey.Tab)
-                {
-                    if (OptionsInactive().Count == MenuOptions().Count)
+                    else if (direction == Direction.Down || rLKeyPress.Key == RLKey.Tab)
                     {
-                        // no active options
+                        delta = 1;
+                    }
+                    else
+                    {
                         return false;
                     }
                     bool cycle = true;
                     while (cycle)
                     {
-                        _selection = (_selection + 1) % (NumOptions + 1);
-                        if (_selection == NumOptions)
-                        {
-                            _selection = -1;
-                        }    
+                        _selection += delta;
+                        if (_selection == NumOptions) _selection = -1;
+                        else if (_selection < -1) _selection += NumOptions + 1;
                         if (!OptionsInactive().Contains(_selection))
                         {
                             cycle = false;

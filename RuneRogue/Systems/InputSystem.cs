@@ -21,102 +21,37 @@ namespace RuneRogue.Systems
             [RLKey.Number4] = "explorable"
         };
 
+        public static Dictionary<RLKey, Direction> directionKeys = new Dictionary<RLKey, Direction>
+        {
+            [RLKey.Up] = Direction.Up,
+            [RLKey.Keypad8] = Direction.Up,
+            [RLKey.Down] = Direction.Down,
+            [RLKey.Keypad2] = Direction.Down,
+            [RLKey.Left] = Direction.Left,
+            [RLKey.Keypad4] = Direction.Left,
+            [RLKey.Right] = Direction.Right,
+            [RLKey.Keypad6] = Direction.Right,
+            [RLKey.Keypad7] = Direction.UpLeft,
+            [RLKey.Keypad9] = Direction.UpRight,
+            [RLKey.Keypad1] = Direction.DownLeft,
+            [RLKey.Keypad3] = Direction.DownRight,
+            [RLKey.H] = Direction.Left,
+            [RLKey.J] = Direction.Down,
+            [RLKey.K] = Direction.Up,
+            [RLKey.L] = Direction.Right,
+            [RLKey.Y] = Direction.UpLeft,
+            [RLKey.U] = Direction.UpRight,
+            [RLKey.B] = Direction.DownLeft,
+            [RLKey.N] = Direction.DownRight,
+            [RLKey.W] = Direction.Up,
+            [RLKey.A] = Direction.Left,
+            [RLKey.S] = Direction.Down,
+            [RLKey.D] = Direction.Right
+        };
+
         public InputSystem()
         {
 
-        }
-
-        // returns the movement direction indicated by key press, or
-        // Direction.None if no direction indicated.
-        public Direction MoveDirection(RLNET.RLKeyPress keyPress)
-        {
-            Direction direction;
-            if (keyPress == null)
-            {
-                throw new ArgumentException("keypress is null", "keyPress");
-            }
-            else
-            {
-                switch (keyPress.Key)
-                {
-                    case RLKey.Up:
-                        direction = Direction.Up;
-                        break;
-                    case RLKey.Keypad8:
-                        direction = Direction.Up;
-                        break;
-                    case RLKey.Down:
-                        direction = Direction.Down;
-                        break;
-                    case RLKey.Keypad2:
-                        direction = Direction.Down;
-                        break;
-                    case RLKey.Left:
-                        direction = Direction.Left;
-                        break;
-                    case RLKey.Keypad4:
-                        direction = Direction.Left;
-                        break;
-                    case RLKey.Right:
-                        direction = Direction.Right;
-                        break;
-                    case RLKey.Keypad6:
-                        direction = Direction.Right;
-                        break;
-                    case RLKey.Keypad7:
-                        direction = Direction.UpLeft;
-                        break;
-                    case RLKey.Keypad9:
-                        direction = Direction.UpRight;
-                        break;
-                    case RLKey.Keypad1:
-                        direction = Direction.DownLeft;
-                        break;
-                    case RLKey.Keypad3:
-                        direction = Direction.DownRight;
-                        break;
-                    case RLKey.H:
-                        direction = Direction.Left;
-                        break;
-                    case RLKey.J:
-                        direction = Direction.Down;
-                        break;
-                    case RLKey.K:
-                        direction = Direction.Up;
-                        break;
-                    case RLKey.L:
-                        direction = Direction.Right;
-                        break;
-                    case RLKey.Y:
-                        direction = Direction.UpLeft;
-                        break;
-                    case RLKey.U:
-                        direction = Direction.UpRight;
-                        break;
-                    case RLKey.B:
-                        direction = Direction.DownLeft;
-                        break;
-                    case RLKey.N:
-                        direction = Direction.DownRight;
-                        break;
-                    case RLKey.W:
-                        direction = Direction.Up;
-                        break;
-                    case RLKey.A:
-                        direction = Direction.Left;
-                        break;
-                    case RLKey.S:
-                        direction = Direction.Down;
-                        break;
-                    case RLKey.D:
-                        direction = Direction.Right;
-                        break;
-                    default:
-                        direction = Direction.None;
-                        break;
-                }
-            }
-            return (Direction)direction;
         }
 
         public bool ShiftDown(RLKeyPress keyPress)
@@ -124,6 +59,11 @@ namespace RuneRogue.Systems
             return keyPress.Shift;
         }
  
+        public bool TravelKeyPressed(RLKeyPress keyPress)
+        {
+            return keyPress.Key == RLKey.T;
+        }
+
         public bool RuneKeyPressed(RLKeyPress keyPress)
         {
             return keyPress.Key == RLKey.R;
