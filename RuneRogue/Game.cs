@@ -253,6 +253,8 @@ namespace RuneRogue
                 if (finished)
                 {
                     SecondaryConsoleActive = false;
+                    keyPress = null;
+                    rLMouse = null;
                     if (completionMessage != "Cancelled" && !(CurrentSecondary is InputConsole))
                     {
                         if (CurrentSecondary is TargetingSystem)
@@ -418,8 +420,8 @@ namespace RuneRogue
         // keyboard or mouse input
         public static bool AutoActionAndProcessInput(RLKeyPress keyPress, RLMouse rLMouse)
         {
-            
             bool didPlayerAct = false;
+            bool leftClick = rLMouse != null ? rLMouse.GetLeftClick() : false;
             // autopickup
             if (DungeonMap.GetItemAt(Player.X, Player.Y) != null && DungeonMap.MonstersInFOV().Count == 0)
             {
@@ -447,7 +449,7 @@ namespace RuneRogue
 
                     AutoMovePlayer = false;
                 }
-                if (rLMouse.GetLeftClick() || keyPress != null)
+                if (leftClick || keyPress != null)
                 {
                     AutoMovePlayer = false;
                 }
@@ -457,7 +459,7 @@ namespace RuneRogue
             // but turn off acceleration if a key is pressed to stop it.
             else if (AcceleratePlayer)
             {
-                if (rLMouse.GetLeftClick() || keyPress != null)
+                if (leftClick || keyPress != null)
                 {
                     AcceleratePlayer = false;
                     return false;
@@ -476,7 +478,7 @@ namespace RuneRogue
                 }
                 return didPlayerAct;
             }
-            else if (rLMouse.GetLeftClick())
+            else if (leftClick)
             {
                 if (rLMouse.X <= MapWidth && rLMouse.Y <= MapHeight)
                 {

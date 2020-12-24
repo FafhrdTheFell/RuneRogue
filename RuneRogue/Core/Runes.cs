@@ -98,6 +98,7 @@ namespace RuneRogue.Core
         public const int BonusToDamageIron = 18;
         public const int BonusToRamAttack = 9;
         public const int BonusToSpeedTime = 4;
+        public const int DistanceSenseThoughts = 18;
 
         private List<string> _runesOwned;
         private List<string> _runesActive;
@@ -110,11 +111,12 @@ namespace RuneRogue.Core
             // game.player not initialized yet...
             _choiceDescription = String.Format("{0}'s Necklace of Runes", Game.Player.Name);
 
+            AcquireRune("Thought");
             //AcquireRune("Elements");
             //AcquireRune("Death");
             //AcquireRune("Time");
             AcquireRune("Iron");
-            //AcquireRune("Magic");
+            AcquireRune("Magic");
             //AcquireRune("Life");
             //AcquireRune("Ram");
             //AcquireRune("Darkness");

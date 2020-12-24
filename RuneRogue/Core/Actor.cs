@@ -317,7 +317,17 @@ namespace RuneRogue.Core
             set { _senseThoughts = value; }
         }
 
+        public bool WithinDistance(Actor actor, int distance)
+        {
+            return ((this.X - actor.X) * (this.X - actor.X) + (this.Y - actor.Y) * (this.Y - actor.Y) <= 
+                distance * distance + distance);
+        }
 
+        public bool WithinDistance(Cell cell, int distance)
+        {
+            return ((this.X - cell.X) * (this.X - cell.X) + (this.Y - cell.Y) * (this.Y - cell.Y) <=
+                distance * distance + distance);
+        }
 
         public void DoppelgangTransform()
         {
@@ -340,11 +350,9 @@ namespace RuneRogue.Core
         public int Y { get; set; }
         public void Draw(RLConsole console, IMap map)
         {
-            // ESP radius 16
             if(Game.Player.SASenseThoughts)
             {
-                double dist = Math.Pow((Math.Pow((double)(Game.Player.X - X), 2.0) + Math.Pow((double)(Game.Player.X - X), 2.0)), 0.5);
-                if (dist <= 16.0)
+                if (WithinDistance(Game.Player, Runes.DistanceSenseThoughts))
                 {
                     console.Set(X, Y, Color, Colors.FloorBackgroundFov, Symbol);
                     return;

@@ -550,7 +550,9 @@ namespace RuneRogue.Core
             // Keep an index so we know which position to draw monster stats at
             int i = 0;
             // Iterate through each monster on the map and draw it after drawing the Cells
-            List<Monster> monstersSeen = _monsters.Where(m => IsInFov(m.X, m.Y)).ToList();
+            List<Monster> monstersSeen = (Game.Player.SASenseThoughts) ? 
+                _monsters.Where(m => m.WithinDistance(Game.Player, Runes.DistanceSenseThoughts)).ToList() : 
+                _monsters.Where(m => IsInFov(m.X, m.Y)).ToList();
             monstersSeen.Sort((x, y) => (100 * x.X + x.Y).CompareTo(100 * y.X + y.Y));
             //foreach (Monster monster in _monsters)
             foreach (Monster monster in monstersSeen)
