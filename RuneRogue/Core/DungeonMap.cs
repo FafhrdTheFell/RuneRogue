@@ -7,7 +7,7 @@ using RLNET;
 using RogueSharp;
 using RogueSharp.DiceNotation;
 using RuneRogue.Items;
-using RuneRogue.Interfaces;
+using RuneRogue.Systems;
 
 namespace RuneRogue.Core
 {
@@ -555,7 +555,7 @@ namespace RuneRogue.Core
             int i = 0;
             // Iterate through each monster on the map and draw it after drawing the Cells
             List<Monster> monstersSeen = (player.SASenseThoughts) ? 
-                _monsters.Where(m => m.WithinDistance(player, Runes.DistanceSenseThoughts)).ToList() : 
+                _monsters.Where(m => m.WithinDistance(player, RunesSystem.DistanceSenseThoughts)).ToList() : 
                 MonstersInFOV();
             monstersSeen.Sort((x, y) => (100 * x.X + x.Y).CompareTo(100 * y.X + y.Y));
             //foreach (Monster monster in _monsters)

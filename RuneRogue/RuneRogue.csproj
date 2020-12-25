@@ -116,7 +116,7 @@
     <Compile Include="Core\InputConsole.cs" />
     <Compile Include="Core\ChoiceConsole.cs" />
     <Compile Include="Core\SecondaryConsole.cs" />
-    <Compile Include="Core\Runes.cs" />
+    <Compile Include="Systems\RunesSystem.cs" />
     <Compile Include="Core\Effect.cs" />
     <Compile Include="Core\Shop.cs" />
     <Compile Include="Core\MonsterStats.cs" />
@@ -146,6 +146,7 @@
     <Compile Include="Shops\RuneForge.cs" />
     <Compile Include="Shops\BookShop.cs" />
     <Compile Include="Shops\EquipmentShop.cs" />
+    <Compile Include="Core\RunesConsole.cs" />
     <Compile Include="Systems\TargetingSystem.cs" />
     <Compile Include="Systems\InputSystem.cs" />
     <Compile Include="Systems\MonsterGenerator.cs" />

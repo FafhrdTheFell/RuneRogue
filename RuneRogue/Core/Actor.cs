@@ -2,6 +2,7 @@
 using RogueSharp;
 using RogueSharp.DiceNotation;
 using RuneRogue.Interfaces;
+using RuneRogue.Systems;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -358,7 +359,7 @@ namespace RuneRogue.Core
         {
             if(Game.Player.SASenseThoughts)
             {
-                if (WithinDistance(Game.Player, Runes.DistanceSenseThoughts))
+                if (WithinDistance(Game.Player, RunesSystem.DistanceSenseThoughts))
                 {
                     console.Set(X, Y, Color, Colors.FloorBackgroundFov, Symbol);
                     return;

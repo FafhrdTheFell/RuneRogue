@@ -538,7 +538,7 @@ namespace RuneRogue.Core
                 foreach (Actor target in TargetActors())
                 {
                     StringBuilder discardMessage = new StringBuilder();
-                    damage = CommandSystem.ResolveArmor(target, source, Runes.BonusToDamageIron, false, discardMessage);
+                    damage = CommandSystem.ResolveArmor(target, source, RunesSystem.BonusToDamageIron, false, discardMessage);
                     //target.Health -= damage;
                     CommandSystem.WakeMonster(target);
 
@@ -576,8 +576,8 @@ namespace RuneRogue.Core
                 int damageBonus = 0;
                 if (_specialOption == "Rune")
                 {
-                    hitBonus = Runes.BonusToRamAttack;
-                    damageBonus = Runes.BonusToRamAttack;
+                    hitBonus = RunesSystem.BonusToRamAttack;
+                    damageBonus = RunesSystem.BonusToRamAttack;
                 }
                 else if (source is Monster)
                 {

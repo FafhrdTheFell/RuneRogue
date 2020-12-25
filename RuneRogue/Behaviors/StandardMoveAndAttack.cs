@@ -52,7 +52,7 @@ namespace RuneRogue.Behaviors
 
             if (monster.SASenseThoughts)
             {
-                if (monster.WithinDistance(player, Runes.DistanceSenseThoughts))
+                if (monster.WithinDistance(player, RunesSystem.DistanceSenseThoughts))
                 {
                     canSeePlayer = true;
                 }

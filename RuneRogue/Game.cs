@@ -62,7 +62,7 @@ namespace RuneRogue
         public static CommandSystem CommandSystem { get; private set; }
         public static SchedulingSystem SchedulingSystem { get; private set; }
         public static MonsterGenerator MonsterGenerator { get; private set; }
-        public static Runes RuneSystem { get; private set; }
+        public static RunesSystem RuneSystem { get; private set; }
         public static ISecondaryConsole CurrentSecondary { get; set; }
         public static ISecondaryConsole PostSecondary { get; set; }           
 
@@ -201,7 +201,7 @@ namespace RuneRogue
 
             Player = new Player();
 
-            RuneSystem = new Runes();
+            RuneSystem = new RunesSystem();
 
             MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, mapLevel);
             DungeonMap = mapGenerator.CreateMap();
@@ -294,7 +294,6 @@ namespace RuneRogue
                     if (CurrentSecondary is InputConsole)
                     {
                         Game.Player.Name = completionMessage;
-                        RuneSystem = new Runes();
                     }
                 }
                 _renderRequired = true;
@@ -557,7 +556,7 @@ namespace RuneRogue
                     {
                         SecondaryConsoleActive = true;
                         AcceleratePlayer = false;
-                        CurrentSecondary = RuneSystem;
+                        CurrentSecondary = new RunesConsole();
                         _renderRequired = true;
                     }
                     else if (InputSystem.PickupKeyPressed(keyPress))
