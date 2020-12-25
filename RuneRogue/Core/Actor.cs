@@ -38,8 +38,9 @@ namespace RuneRogue.Core
         private bool _highImpactAttack;
         private bool _senseThoughts;
         private bool _undead;
-        private bool _immobile;
         private bool _invisible;
+        private bool _immobile;
+        private bool _stealthy;
         private bool _ferocious;
         private bool _venomous;
         private bool _causesStun;
@@ -241,6 +242,11 @@ namespace RuneRogue.Core
             {
                 _speed = value;
             }
+        }
+        public bool SAStealthy
+        {
+            get { return _stealthy; }
+            set { _stealthy = value; }
         }
         public bool IsInvisible
         {

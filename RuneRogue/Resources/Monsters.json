@@ -97,6 +97,48 @@
     "maxLevel": 5
   },
   {
+    "kind": "goblintracker",
+    "attack": "7",
+    "attackChance": "25D3",
+    "awareness": 10,
+    "color": "DbWood",
+    "defense": "2D2",
+    "defenseChance": "10D4",
+    "missileAttack": 10,
+    "missileRange": 10,
+    "missileType": "Arrow",
+    "gold": "5D5",
+    "maxHealth": "2D5",
+    "name": "Goblin Tracker",
+    "speed": 14,
+    "symbol": "g",
+    "numberAppearing": "5-2d4k1",
+    "minLevel": 1,
+    "maxLevel": 10,
+    "saSenseThoughts": true
+  },
+  {
+    "kind": "goblinsneak",
+    "attack": "9",
+    "attackChance": "30D3",
+    "awareness": 12,
+    "color": "DbWood",
+    "defense": "2D2",
+    "defenseChance": "14D4",
+    "missileAttack": 8,
+    "missileRange": 8,
+    "missileType": "Arrow",
+    "gold": "7D5",
+    "maxHealth": "2D5",
+    "name": "Goblin Sneak",
+    "speed": 12,
+    "symbol": "g",
+    "numberAppearing": "5-2d4k1",
+    "minLevel": 1,
+    "maxLevel": 8,
+    "saStealthy": true
+  },
+  {
     "kind": "terrorbird",
     "attack": "10",
     "attackChance": "18D3",
@@ -363,7 +405,7 @@
     "numberAppearing": "2d2",
     "minLevel": 1,
     "maxLevel": 12,
-    "saCausesStun":  true
+    "saCausesStun": true
   },
   {
     "kind": "giantwolfspider",

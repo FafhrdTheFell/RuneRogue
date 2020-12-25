@@ -250,7 +250,7 @@ namespace RuneRogue.Core
                     break;
                 case "Darkness":
                     Game.MessageLog.Add($"{Game.Player.Name} fades into the shadows.");
-                    Game.Player.IsInvisible = true;
+                    Game.Player.SAStealthy = true;
                     break;
                 //case "Law":
                 //    Game.MessageLog.Add("not implemented");
@@ -278,7 +278,7 @@ namespace RuneRogue.Core
                     break;
                 case "Darkness":
                     Game.MessageLog.Add($"{Game.Player.Name} is no longer hidden by darkness.");
-                    Game.Player.IsInvisible = false;
+                    Game.Player.SAStealthy = false;
                     break;
                 default:
                     throw new ArgumentException($"Rune {rune} stop does not exist.");

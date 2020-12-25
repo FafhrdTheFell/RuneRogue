@@ -239,7 +239,7 @@ namespace RuneRogue.Core
             dungeonMap.Draw(_console, _nullConsole);
             player.Draw(_console, dungeonMap);
 
-            List<Monster> monstersSeen = dungeonMap.MonstersInFOV();
+            List<Monster> monstersSeen = dungeonMap.MonstersInFOV(skipInvisible: false);
 
             RLColor highlightColor = Colors.Gold;
             List<Cell> targetCells = TargetCells();

@@ -184,7 +184,7 @@ namespace RuneRogue.Systems
 
             int numberOfMonsters = Dice.Roll(numInRoomDice);
 
-            //monsterType = "beetle";
+            //monsterType = "goblintracker";
 
             for (int i = 0; i < numberOfMonsters; i++)
             {
@@ -240,6 +240,8 @@ namespace RuneRogue.Systems
             monster.SALifedrainOnHit = _monsterManual[page].SALifedrainOnHit;
             monster.SALifedrainOnDamage = _monsterManual[page].SALifedrainOnDamage; 
             monster.SARegeneration = _monsterManual[page].SARegeneration;
+            monster.SASenseThoughts = _monsterManual[page].SASenseThoughts;
+            monster.SAStealthy = _monsterManual[page].SAStealthy;
             monster.SAVampiric = _monsterManual[page].SAVampiric;
             monster.SAVenomous = _monsterManual[page].SAVenomous;
             monster.SACausesStun = _monsterManual[page].SACausesStun;

@@ -87,9 +87,11 @@ namespace RuneRogue.Core
             PlayerPeril = (MonstersInFOV().Count > 0);
         }
 
-        public List<Monster> MonstersInFOV()
+        public List<Monster> MonstersInFOV(bool skipInvisible = true)
         {
-            List<Monster> monstersSeen = _monsters.Where(m => IsInFov(m.X, m.Y)).ToList();
+            List<Monster> monstersSeen = (skipInvisible) ?
+                _monsters.Where(m => IsInFov(m.X, m.Y) && !m.IsInvisible).ToList() :
+                _monsters.Where(m => IsInFov(m.X, m.Y)).ToList();
             // order monsters from left-most column and then by highest on screen
             monstersSeen.Sort((x, y) => (100 * x.X + x.Y).CompareTo(100 * y.X + y.Y));
             return monstersSeen;
@@ -524,6 +526,8 @@ namespace RuneRogue.Core
             // replace null list with empty one
             highlightContentsCells = highlightContentsCells ?? new List<Cell>();
 
+            Player player = Game.Player;
+
             foreach (Cell cell in GetAllCells())
             {
                 SetConsoleSymbolForCell(mapConsole, cell);
@@ -550,23 +554,27 @@ namespace RuneRogue.Core
             // Keep an index so we know which position to draw monster stats at
             int i = 0;
             // Iterate through each monster on the map and draw it after drawing the Cells
-            List<Monster> monstersSeen = (Game.Player.SASenseThoughts) ? 
-                _monsters.Where(m => m.WithinDistance(Game.Player, Runes.DistanceSenseThoughts)).ToList() : 
-                _monsters.Where(m => IsInFov(m.X, m.Y)).ToList();
+            List<Monster> monstersSeen = (player.SASenseThoughts) ? 
+                _monsters.Where(m => m.WithinDistance(player, Runes.DistanceSenseThoughts)).ToList() : 
+                MonstersInFOV();
             monstersSeen.Sort((x, y) => (100 * x.X + x.Y).CompareTo(100 * y.X + y.Y));
             //foreach (Monster monster in _monsters)
             foreach (Monster monster in monstersSeen)
             {
-                monster.Draw(mapConsole, this);
-                // When the monster is in the field-of-view also draw their stats
-                if (IsInFov(monster.X, monster.Y))
-                {
-                    // Pass in the index to DrawStats and increment it afterwards
-                    bool highlightMonster = highlightContentsCells.Contains(GetCell(monster.X, monster.Y));
-                    monster.DrawStats(statConsole, i,
-                        highlight: highlightMonster);
-                    i++;
-                }
+                //if (!monster.IsInvisible || player.SASenseThoughts)
+                //{
+                    monster.Draw(mapConsole, this);
+
+                    // When the monster is in the field-of-view also draw their stats
+                    if (IsInFov(monster.X, monster.Y))
+                    {
+                        // Pass in the index to DrawStats and increment it afterwards
+                        bool highlightMonster = highlightContentsCells.Contains(GetCell(monster.X, monster.Y));
+                        monster.DrawStats(statConsole, i,
+                            highlight: highlightMonster);
+                        i++;
+                    }
+                //}
             }
         }
 
@@ -582,8 +590,9 @@ namespace RuneRogue.Core
             if (IsInFov(cell.X, cell.Y))
             {
                 // Choose the symbol to draw based on if the cell is walkable or not
-                // '.' for floor and '#' for walls
-                if (cell.IsWalkable)
+                // '.' for floor and '#' for walls. Cells with monsters get written over
+                // later in the draw process
+                if (cell.IsWalkable || GetMonsterAt(cell.X, cell.Y) != null)
                 {
                     console.Set(cell.X, cell.Y, Colors.FloorFov, Colors.FloorBackgroundFov, '.');
                 }

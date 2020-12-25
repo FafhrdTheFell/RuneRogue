@@ -156,8 +156,6 @@ namespace RuneRogue.Systems
             }
 
 
-            CreateShop(_map.Rooms[0], 100, "RuneForge");
-
             CreateStairs();
 
             PlacePlayer();
@@ -417,8 +415,7 @@ namespace RuneRogue.Systems
             // 4% chance of gold
             if (Dice.Roll("1d100") <= 4)
             {
-                Gold gold = new Gold();
-                gold.Amount = Dice.Roll("1d6+2d"+(_mapLevel*2).ToString());
+                Gold gold = new Gold(Dice.Roll("1d6+2d" + (_mapLevel * 2).ToString()));
 
                 Point randomRoomLocation = _map.GetRandomWalkableLocationInRoom(room);
                 if (randomRoomLocation != null)

@@ -27,19 +27,16 @@ namespace RuneRogue.Behaviors
             {
                 canSeePlayer = true;
                 monster.LastLocationPlayerSeen = dungeonMap.GetCell(player.X, player.Y);
-                if (player.IsInvisible)
+                if (player.SAStealthy)
                 {
-                    string dieSize = (distFromPlayer + 5).ToString();
-                    int stealthRoll = Dice.Roll("1d" + dieSize); // higher roll = more stealthy
-                    if (stealthRoll > 2)
+                    if (Game.CommandSystem.CheckStealth(player, monster))
                     {
                         // player unseen
                         canSeePlayer = false;
-                        //monster.TurnsAlerted = null;
-                        if (stealthRoll > 3)
+                        // check if monster extra confused and loses awareness of player's last location
+                        if (Game.CommandSystem.CheckStealth(player, monster))
                         {
-                            // lose awareness of player's last location
-                            monster.TurnsAlerted = null;
+                            // monster.TurnsAlerted = null;
                             int dx = Dice.Roll("2d3k1") - Dice.Roll("2d3k1");
                             int dy = Dice.Roll("2d3k1") - Dice.Roll("2d3k1");
                             monster.LastLocationPlayerSeen = dungeonMap.GetCell(
@@ -53,11 +50,41 @@ namespace RuneRogue.Behaviors
                 }
             }
 
+            if (monster.SASenseThoughts)
+            {
+                if (monster.WithinDistance(player, Runes.DistanceSenseThoughts))
+                {
+                    canSeePlayer = true;
+                }
+            }
+
             if (canSeePlayer)
             {
                 // update memory
                 monster.TurnsAlerted = 1;
                 monster.LastLocationPlayerSeen = dungeonMap.GetCell(player.X, player.Y);
+                // hide from player
+                if (monster.SAStealthy)
+                {
+                    if (Game.CommandSystem.CheckStealth(monster, player))
+                    {
+                        monster.IsInvisible = true;
+                        if (dungeonMap.MonstersInFOV().Contains(monster))
+                        {
+                            Game.MessageLog.Add($"{monster.Name} hides in the shadows.");
+
+                        }
+                    }
+                    else if (monster.IsInvisible)
+                    {
+                        monster.IsInvisible = false;
+                        if (dungeonMap.MonstersInFOV().Contains(monster))
+                        {
+                            Game.MessageLog.Add($"{player.Name} spots {monster.Name}.");
+                        }
+                    }
+
+                }
             }
 
             // 50% chance to use special abilities

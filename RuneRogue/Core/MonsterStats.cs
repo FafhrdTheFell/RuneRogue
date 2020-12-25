@@ -36,6 +36,7 @@ namespace RuneRogue.Core
         public bool SAHighImpact { get; set; }
         public bool SASenseThoughts { get; set; }
         public bool SAFerocious { get; set; }
+        public bool SAStealthy { get; set; }
         public bool SAVenomous { get; set; }
         public bool SACausesStun { get; set; }
         public bool IsUndead { get; set; }

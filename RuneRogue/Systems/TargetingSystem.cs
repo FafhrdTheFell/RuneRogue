@@ -136,7 +136,8 @@ namespace RuneRogue.Systems
                     }
                     else
                     {
-                        _console.Set(point.X, point.Y, monster.Color, highlightColor, monster.Symbol);
+                        //_console.Set(point.X, point.Y, monster.Color, highlightColor, monster.Symbol);
+                        _console.Set(point.X, point.Y, Colors.FloorFov, highlightColor, '.');
                     }
                 }
                 else if (point.IsWalkable)

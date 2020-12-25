@@ -331,6 +331,19 @@ namespace RuneRogue.Systems
             }
         }
 
+        public bool CheckStealth(Actor sneak, Actor observer)
+        {
+            if (observer.SASenseThoughts)
+            {
+                return false;
+            }
+            int distance = (int)(Math.Pow((sneak.X - observer.X) * (sneak.X - observer.X) +
+                (sneak.Y - observer.Y) * (sneak.Y - observer.Y), 0.5) + 0.5);
+            string dieSize = (distance + 5).ToString();
+            int stealthRoll = Dice.Roll("1d" + dieSize); // higher roll = more stealthy
+            return (stealthRoll > 2) ? true : false;
+        }
+
         public void Shoot(Actor attacker, Actor defender, bool specialAttack = false)
         {
             DungeonMap dungeonMap = Game.DungeonMap;
@@ -418,28 +431,40 @@ namespace RuneRogue.Systems
             else
             {
                 diff = attacker.AttackSkill - defender.DefenseSkill;
-            }
 
-            if (attacker.SASenseThoughts && !defender.IsUndead)
-            {
-                diff += 4;
-            }
-            if (defender.SASenseThoughts && !attacker.IsUndead)
-            {
-                diff -= 4;
-            }
-            diff += adjustment;
-            if (attacker.IsInvisible && defender is Monster)
-            {
-                Monster monster = defender as Monster;
-                // if defender thinks attacker's location is not true location, critical
-                if (!(monster.LastLocationPlayerSeen.X == attacker.X && monster.LastLocationPlayerSeen.Y == attacker.Y))
+            
+                // ESP helps in melee combat against non-undead
+                if (attacker.SASenseThoughts && !defender.IsUndead)
                 {
-                    attackMessage.AppendFormat("{1} ambushes {0}! ", monster.Name, attacker.Name);
-                    diff += 6;
-                    critical = true;
+                    diff += 4;
                 }
-            }    
+                if (defender.SASenseThoughts && !attacker.IsUndead)
+                {
+                    diff -= 4;
+                }
+                diff += adjustment;
+                if (attacker.SAStealthy && defender is Monster && !defender.SASenseThoughts)
+                {
+                    Monster monster = defender as Monster;
+                    // if defender thinks attacker's location is not true location, critical
+                    if (!(monster.LastLocationPlayerSeen.X == attacker.X && monster.LastLocationPlayerSeen.Y == attacker.Y))
+                    {
+                        attackMessage.AppendFormat("{1} ambushes {0}! ", monster.Name, attacker.Name);
+                        diff += 6;
+                        critical = true;
+                    }
+                }
+                if (attacker.IsInvisible && defender is Player && !defender.SASenseThoughts)
+                {
+                    // 50% chance of critical
+                    if (Dice.Roll("1d2") == 1)
+                    {
+                        attackMessage.AppendFormat("{1} ambushes {0}! ", Game.Player.Name, attacker.Name);
+                        diff += 6;
+                        critical = true;
+                    }
+                }
+            }
             double chanceDouble = Math.Exp(0.11 * Convert.ToDouble(diff)) /
                 (1 + Math.Exp(0.11 * Convert.ToDouble(diff)));
             double unadjustedChanceDouble = Math.Exp(0.11 * Convert.ToDouble(attacker.AttackSkill)) /
@@ -449,6 +474,11 @@ namespace RuneRogue.Systems
             int roll = Dice.Roll("1D100");
             if (roll < chanceInt)
             {
+                if (defender.IsInvisible)
+                {
+                    defender.IsInvisible = false;
+                    attackMessage.AppendFormat("{0} finds {1}. ", attacker.Name, defender.Name);
+                }
                 attackMessage.AppendFormat("{0} hits {1} (roll {2} < {3}).", attacker.Name, 
                     defender.Name, roll, chanceInt);
                 attackHit = true;
@@ -656,9 +686,8 @@ namespace RuneRogue.Systems
                     }
                     else
                     {
-                        Gold gold = new Gold()
+                        Gold gold = new Gold(defender.Gold)
                         {
-                            Amount = defender.Gold,
                             X = defender.X,
                             Y = defender.Y,
                         };

@@ -253,8 +253,8 @@ namespace RuneRogue
                 if (finished)
                 {
                     SecondaryConsoleActive = false;
-                    keyPress = null;
-                    rLMouse = null;
+                    //keyPress = null;
+                    //rLMouse = null;
                     if (completionMessage != "Cancelled" && !(CurrentSecondary is InputConsole))
                     {
                         if (CurrentSecondary is TargetingSystem)
@@ -300,7 +300,7 @@ namespace RuneRogue
                 _renderRequired = true;
             }
 
-            if (_quittingGame)
+            else if (_quittingGame)
             {
                 if (keyPress != null || rLMouse.GetLeftClick() || rLMouse.GetRightClick())
                 {
@@ -309,7 +309,7 @@ namespace RuneRogue
 
             }
 
-            if (CommandSystem.IsPlayerTurn)
+            else if (CommandSystem.IsPlayerTurn)
             {
                 if (DungeonMap.PlayerPeril)
                 {
@@ -321,30 +321,28 @@ namespace RuneRogue
                 {
                     didPlayerAct = AutoActionAndProcessInput(keyPress, rLMouse);
                 }
-                
+
                 if (CommandSystem.IsPlayerTurn && didPlayerAct && Game.XpOnAction)
                 {
                     Player.CheckAdvancementXP();
                 }
-
-                if (didPlayerAct)
-                {
-                    _renderRequired = true;
-                    CommandSystem.EndPlayerTurn();
-                }
-                // if player did not act and there was a keypress, it hit a wall
-                // or something else, probably. Therefore stop acceleration loop.
-                if (!(keyPress == null) && !(didPlayerAct))
-                {
-                    AcceleratePlayer = false;
-                }
-
             }
             else if (Player.Health > 0)
             {
                 CommandSystem.ActivateMonsters();
                 _renderRequired = true;
             }
+            if (didPlayerAct)
+            {
+                _renderRequired = true;
+                CommandSystem.EndPlayerTurn();
+            }
+            // if player did not act and there was a keypress, it hit a wall
+            // or something else, probably. Therefore stop acceleration loop.
+            //if (!(keyPress == null) && !(didPlayerAct))
+            //{
+            //    AcceleratePlayer = false;
+            //}
             if (_gameOver && !_quittingGame)
             {
                 NewScore();

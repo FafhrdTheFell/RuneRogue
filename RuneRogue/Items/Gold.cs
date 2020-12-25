@@ -17,9 +17,9 @@ namespace RuneRogue.Items
             set { _amount = value; }
         }
 
-        public Gold()
+        public Gold(int amount)
         {
-            _amount = 0;
+            _amount = amount;
             Symbol = '$';
             Color = Colors.Gold;
         }
