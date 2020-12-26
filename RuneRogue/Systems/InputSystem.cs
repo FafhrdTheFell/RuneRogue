@@ -18,7 +18,8 @@ namespace RuneRogue.Systems
             [RLKey.Number1] = "item",
             [RLKey.Number2] = "shop",
             [RLKey.Number3] = "door",
-            [RLKey.Number4] = "explorable"
+            [RLKey.Number4] = "explorable",
+            [RLKey.Number5] = "monster"
         };
 
         public static Dictionary<RLKey, Direction> directionKeys = new Dictionary<RLKey, Direction>

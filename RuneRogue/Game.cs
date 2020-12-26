@@ -310,7 +310,7 @@ namespace RuneRogue
 
             else if (CommandSystem.IsPlayerTurn)
             {
-                if (DungeonMap.PlayerPeril)
+                if (Player.PlayerPeril)
                 {
                     AcceleratePlayer = false;
                     AutoMovePlayer = false;
@@ -479,6 +479,11 @@ namespace RuneRogue
             {
                 if (rLMouse.X <= MapWidth && rLMouse.Y <= MapHeight)
                 {
+                    if (Player.PlayerPeril)
+                    {
+                        Player.MonstersIgnoreList = DungeonMap.MonstersInFOV();
+                        Player.PlayerPeril = false;
+                    }
                     if (DungeonMap.GetCell(rLMouse.X, rLMouse.Y).IsExplored)
                     {
                         AutoMovePlayer = true;
@@ -523,6 +528,11 @@ namespace RuneRogue
                     }
                     else if (InputSystem.autoKeys.ContainsKey(keyPress.Key))
                     {
+                        if (Player.PlayerPeril)
+                        {
+                            Player.MonstersIgnoreList = DungeonMap.MonstersInFOV();
+                            Player.PlayerPeril = false;
+                        }
                         Cell target = null;
                         target = DungeonMap.GetNearestObject(InputSystem.autoKeys[keyPress.Key], true);
 
@@ -531,6 +541,8 @@ namespace RuneRogue
                             AutoMovePlayer = true;
                             AutoMoveXTarget = target.X;
                             AutoMoveYTarget = target.Y;
+                            AutoMoveMonsterTarget = (InputSystem.autoKeys[keyPress.Key]) == "monster" ?
+                                DungeonMap.GetMonsterAt(target.X, target.Y) : null;
 
                         }
                     }

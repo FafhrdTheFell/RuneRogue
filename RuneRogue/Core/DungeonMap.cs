@@ -42,9 +42,6 @@ namespace RuneRogue.Core
             get { return _exploredMap; }
         }
 
-        // PlayerPeril is true if player can see monster
-        public bool PlayerPeril;
-
         public DungeonMap()
         {
             Game.SchedulingSystem.Clear();
@@ -59,7 +56,7 @@ namespace RuneRogue.Core
             Shops = new List<Shop>();
             _exploredMap = new Map();
             _exploredMap.Initialize(Game.MapWidth, Game.MapHeight);
-            PlayerPeril = false;
+            Game.Player.PlayerPeril = false;
         }
 
         // This method will be called any time we move the player to update field-of-view
@@ -84,7 +81,8 @@ namespace RuneRogue.Core
                     }
                 }
             }
-            PlayerPeril = (MonstersInFOV().Count > 0);
+            //PlayerPeril = (MonstersInFOV().Count > 0);
+            player.PlayerPeril = player.IgnoreMonsters(MonstersInFOV());
         }
 
         public List<Monster> MonstersInFOV(bool skipInvisible = true)
@@ -223,7 +221,7 @@ namespace RuneRogue.Core
             SetIsWalkable(monster.X, monster.Y, true);
             Game.SchedulingSystem.Remove(monster);
             ComputeFov(Game.Player.X, Game.Player.Y, Game.Player.Awareness, true);
-            PlayerPeril = (MonstersInFOV().Count > 0);
+            Game.Player.PlayerPeril = Game.Player.IgnoreMonsters(MonstersInFOV());
 
         }
 
@@ -366,6 +364,31 @@ namespace RuneRogue.Core
                 else
                 {
                     nearest = Shops.
+                        OrderBy(item => Math.Abs(item.X - targetX) + Math.Abs(item.Y - targetY)).FirstOrDefault();
+                }
+                if (nearest != null)
+                {
+                    return GetCell(nearest.X, nearest.Y);
+                }
+                else
+                {
+                    return nullCell;
+                }
+            }
+            else if (objectType == "monster")
+            {
+                Monster nearest;
+                if (previouslySeen)
+                {
+                    nearest = _monsters.
+                        OrderBy(item => Math.Abs(item.X - targetX) + Math.Abs(item.Y - targetY)).
+                        Where(item => GetCell(item.X, item.Y).IsExplored).
+                        FirstOrDefault();
+
+                }
+                else
+                {
+                    nearest = _monsters.
                         OrderBy(item => Math.Abs(item.X - targetX) + Math.Abs(item.Y - targetY)).FirstOrDefault();
                 }
                 if (nearest != null)

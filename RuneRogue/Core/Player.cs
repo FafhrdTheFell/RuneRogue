@@ -2,6 +2,8 @@
 using System;
 using RogueSharp;
 using RogueSharp.DiceNotation;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace RuneRogue.Core
 {
@@ -13,6 +15,7 @@ namespace RuneRogue.Core
         private int _xpTotalReceived;
         private int _lifetimeGold;
         private int _stealth;
+        private List<Monster> _monstersIgnore;
 
         public int StatLines = 26;
 
@@ -36,11 +39,24 @@ namespace RuneRogue.Core
             }
         }
 
-        public int Stealth
+        public List<Monster> MonstersIgnoreList
         {
-            get { return _stealth; }
-            set { _stealth = value; }
+            get { return _monstersIgnore; }
+            set { _monstersIgnore = value; }
         }
+
+        public bool IgnoreMonsters(List<Monster> monsterList)
+        {
+            if (_monstersIgnore.Count < monsterList.Count)
+            {
+                Game.PrintDebugMessage(" < true");
+                return true;
+            }
+            return monsterList.Except(_monstersIgnore).Any();
+        }
+
+        // PlayerPeril is true if player can see monster
+        public bool PlayerPeril;
 
         public int XpAttackSkill
         {
@@ -107,6 +123,7 @@ namespace RuneRogue.Core
             Name = "";
             Speed = 10;
             Symbol = '@';
+            MonstersIgnoreList = new List<Monster>();
         }
 
         public void CheckAdvancementXP()

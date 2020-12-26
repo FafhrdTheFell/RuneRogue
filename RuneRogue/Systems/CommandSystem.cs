@@ -377,10 +377,6 @@ namespace RuneRogue.Systems
         {
             StringBuilder attackMessage = new StringBuilder();
 
-            if  (defender is Player)
-            {
-                Game.AutoMovePlayer = false;
-            }
 
             bool attackHit = ResolveAttack(attacker, defender, attackMessage, missileAttack, 
                 out bool isCritical, adjustment: hitBonus);
@@ -397,16 +393,6 @@ namespace RuneRogue.Systems
             }
 
             ResolveDamage(attacker, defender, damage, missileAttack, attackMessage);
-
-            if (defender.Health <= 0)
-            {
-                if (Game.AutoMoveMonsterTarget == defender)
-                {
-                    Game.AutoMoveMonsterTarget = null;
-                    Game.AutoMovePlayer = false;
-                }
-                //ResolveDeath(attacker, defender, attackMessage);
-            }
 
             if (!string.IsNullOrWhiteSpace(attackMessage.ToString()))
             {
@@ -588,9 +574,7 @@ namespace RuneRogue.Systems
         {
             if (damage > 0)
             {
-                ResolveDamage(attacker.Name, defender, damage, missileAttack, attackMessage);
-
-                if (attacker.SAVenomous && !missileAttack && defender.Health > 0)
+                if (attacker.SAVenomous && !missileAttack && defender.Health - damage > 0)
                 {
                     int poisonPotency = attacker.MaxHealth / 10 + 1;
                     Poison poison = new Poison(defender, poisonPotency);
@@ -612,7 +596,7 @@ namespace RuneRogue.Systems
                     attacker.Health = Math.Min(attacker.Health + gain, attacker.MaxHealth);
                     attackMessage.AppendFormat(" {0} feeds on {1}'s life.", attacker.Name, defender.Name);
                 }
-                if (attacker.SALifedrainOnDamage && !missileAttack && defender.Health > 0)
+                if (attacker.SALifedrainOnDamage && !missileAttack && defender.Health - damage > 0)
                 {
                     int drain = Math.Max(damage / 2, 1);
                     defender.MaxHealth -= drain;
@@ -622,6 +606,7 @@ namespace RuneRogue.Systems
                         Game.Player.XpHealth += drain * 3;
                     }
                 }
+                ResolveDamage(attacker.Name, defender, damage, missileAttack, attackMessage);
             }
         }
 
@@ -630,6 +615,15 @@ namespace RuneRogue.Systems
             if (damage > 0)
             {
                 defender.Health -= damage;
+
+                if (defender is Player)
+                {
+                    Game.AutoMovePlayer = false;
+                    // cancel automove if attacked by monster not autoattacking, or lose 33% of remaining health
+                    //if (Game.AutoMoveMonsterTarget != defender || ((double)damage / (double)defender.Health)>0.33)
+                }
+
+                
 
                 if (defender.Health > 0)
                 {
@@ -676,6 +670,12 @@ namespace RuneRogue.Systems
             }
             else if (defender is Monster)
             {
+                if (Game.AutoMoveMonsterTarget == defender)
+                {
+                    Game.AutoMoveMonsterTarget = null;
+                    Game.AutoMovePlayer = false;
+                }
+
                 if (defender.Gold > 0)
                 {
 
