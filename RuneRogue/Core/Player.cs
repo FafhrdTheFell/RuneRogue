@@ -49,7 +49,6 @@ namespace RuneRogue.Core
         {
             if (_monstersIgnore.Count < monsterList.Count)
             {
-                Game.PrintDebugMessage(" < true");
                 return true;
             }
             return monsterList.Except(_monstersIgnore).Any();

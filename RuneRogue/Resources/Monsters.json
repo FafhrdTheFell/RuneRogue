@@ -15,7 +15,9 @@
     "numberAppearing": "d3+d6-1",
     "minLevel": 1,
     "maxLevel": 6,
-    "saVenomous": true
+    "special": [
+      "Venomous"
+    ]
   },
   {
     "kind": "boneClaws",
@@ -33,7 +35,9 @@
     "numberAppearing": "5-2d4k1",
     "minLevel": 1,
     "maxLevel": 8,
-    "isUndead": true
+    "special": [
+      "Undead"
+    ]
   },
   {
     "kind": "boneBarrager",
@@ -45,16 +49,18 @@
     "defenseChance": "15D3",
     "gold": "5D5",
     "maxHealth": "1D2",
-    "missileAttack": 10,
-    "missileRange": 8,
-    "missileType": "Arrow",
     "name": "Bone-Barrager",
     "speed": 12,
     "symbol": "b",
     "numberAppearing": "5-2d4k1",
     "minLevel": 1,
     "maxLevel": 8,
-    "isUndead": true
+    "ranged": [
+      "Missile Arrow 8 10"
+    ],
+    "special": [
+      "Undead"
+    ]
   },
   {
     "kind": "dragon",
@@ -72,9 +78,12 @@
     "numberAppearing": "1",
     "minLevel": 2,
     "maxLevel": 14,
-    "saHighImpact": true,
-    "specialAttackType": "Fire",
-    "specialAttackRange": 6
+    "special": [
+      "High Impact"
+    ],
+    "ranged": [
+      "Special Fire 6"
+    ]
   },
   {
     "kind": "goblin",
@@ -84,9 +93,9 @@
     "color": "DbBrightWood",
     "defense": "2D2",
     "defenseChance": "10D4",
-    "missileAttack": 8,
-    "missileRange": 8,
-    "missileType": "Arrow",
+    "ranged": [
+      "Missile Arrow 8 8"
+    ],
     "gold": "5D5",
     "maxHealth": "2D5",
     "name": "Goblin",
@@ -104,9 +113,9 @@
     "color": "DbWood",
     "defense": "2D2",
     "defenseChance": "10D4",
-    "missileAttack": 10,
-    "missileRange": 10,
-    "missileType": "Arrow",
+    "ranged": [
+      "Missile Arrow 10 10"
+    ],
     "gold": "5D5",
     "maxHealth": "2D5",
     "name": "Goblin Tracker",
@@ -115,7 +124,9 @@
     "numberAppearing": "5-2d4k1",
     "minLevel": 1,
     "maxLevel": 10,
-    "saSenseThoughts": true
+    "special": [
+      "Sense Thoughts"
+    ]
   },
   {
     "kind": "goblinsneak",
@@ -125,9 +136,9 @@
     "color": "DbWood",
     "defense": "2D2",
     "defenseChance": "14D4",
-    "missileAttack": 8,
-    "missileRange": 8,
-    "missileType": "Arrow",
+    "ranged": [
+      "Missile Arrow 8 8"
+    ],
     "gold": "7D5",
     "maxHealth": "2D5",
     "name": "Goblin Sneak",
@@ -136,7 +147,9 @@
     "numberAppearing": "5-2d4k1",
     "minLevel": 1,
     "maxLevel": 8,
-    "saStealthy": true
+    "special": [
+      "Stealthy"
+    ]
   },
   {
     "kind": "terrorbird",
@@ -189,7 +202,9 @@
     "numberAppearing": "5-2d4k1",
     "minLevel": 1,
     "maxLevel": 8,
-    "isUndead": true
+    "special": [
+      "Undead"
+    ]
   },
   {
     "kind": "corruptedelf",
@@ -201,9 +216,9 @@
     "defenseChance": "20D6",
     "gold": "8D5",
     "maxHealth": "2D7",
-    "missileAttack": 14,
-    "missileRange": 12,
-    "missileType": "Arrow",
+    "ranged": [
+      "Missile Arrow 12 14"
+    ],
     "name": "Corrupted Elf",
     "speed": 10,
     "symbol": "e",
@@ -221,9 +236,9 @@
     "defenseChance": "24D6",
     "gold": "8D8",
     "maxHealth": "3D6",
-    "missileAttack": 18,
-    "missileRange": 12,
-    "missileType": "Arrow",
+    "ranged": [
+      "Missile Arrow 12 18"
+    ],
     "name": "Elven Darklord",
     "speed": 8,
     "symbol": "e",
@@ -231,7 +246,9 @@
     "minLevel": 4,
     "maxLevel": 13,
     "rarity": 40,
-    "saFerocious": true,
+    "special": [
+      "Ferocious"
+    ],
     "followerKinds": [
       "corruptedelf"
     ],
@@ -277,8 +294,9 @@
     "minLevel": 4,
     "maxLevel": 8,
     "rarity": 40,
-    "specialAttackType": "Deathchant",
-    "specialAttackRange": 8,
+    "ranged": [
+      "Special Deathchant 8"
+    ],
     "followerKinds": [
       "boneClaws",
       "boneBarrager"
@@ -308,7 +326,9 @@
     "numberAppearing": "2d4-1",
     "minLevel": 1,
     "maxLevel": 10,
-    "saFerocious": true
+    "special": [
+      "Ferocious"
+    ]
   },
   {
     "kind": "werewolf",
@@ -326,7 +346,9 @@
     "numberAppearing": "4 - 2d3k1",
     "minLevel": 3,
     "maxLevel": 12,
-    "saFerocious": true
+    "special": [
+      "Ferocious"
+    ]
   },
   {
     "kind": "minotaur",
@@ -344,9 +366,12 @@
     "numberAppearing": "1",
     "minLevel": 3,
     "maxLevel": 13,
-    "saFerocious": true,
-    "specialAttackType": "Ram",
-    "specialAttackRange": 6
+    "special": [
+      "Ferocious"
+    ],
+    "ranged": [
+      "Special Ram 6"
+    ]
   },
   {
     "kind": "burningidol",
@@ -364,10 +389,13 @@
     "numberAppearing": "1",
     "minLevel": 3,
     "maxLevel": 11,
-    "saHighImpact": true,
-    "specialAttackType": "Fire",
-    "specialAttackRange": 6,
-    "isImmobile": true
+    "special": [
+      "High Impact",
+      "Immobile"
+    ],
+    "ranged": [
+      "Special Fire 6"
+    ]
   },
   {
     "kind": "bonehemoth",
@@ -385,9 +413,11 @@
     "numberAppearing": "5-2d4k1",
     "minLevel": 3,
     "maxLevel": 11,
-    "saHighImpact": true,
-    "isUndead": true,
-    "saCausesStun": true
+    "special": [
+      "High Impact",
+      "Undead",
+      "Stuns"
+    ]
   },
   {
     "kind": "shockerant",
@@ -405,7 +435,9 @@
     "numberAppearing": "2d2",
     "minLevel": 1,
     "maxLevel": 12,
-    "saCausesStun": true
+    "special": [
+      "Stuns"
+    ]
   },
   {
     "kind": "giantwolfspider",
@@ -434,9 +466,9 @@
     "defenseChance": "12D8",
     "gold": "10D16",
     "maxHealth": "7D6",
-    "missileAttack": 20,
-    "missileRange": 9,
-    "missileType": "Boulder",
+    "ranged": [
+      "Missile Boulder 9 20"
+    ],
     "name": "Corrupted Titan",
     "speed": 12,
     "symbol": "T",
@@ -453,9 +485,9 @@
     "color": "DwForestGreen",
     "defense": "2D3",
     "defenseChance": "10D7",
-    "missileAttack": 10,
-    "missileRange": 12,
-    "missileType": "Arrow",
+    "ranged": [
+      "Missile Arrow 12 10"
+    ],
     "gold": "5D8",
     "maxHealth": "3D5k2",
     "name": "Goblin Huntsman",
@@ -476,9 +508,9 @@
     "defenseChance": "3D10",
     "gold": "4D5",
     "maxHealth": "5D6",
-    "missileAttack": 14,
-    "missileRange": 5,
-    "missileType": "Spit",
+    "ranged": [
+      "Missile Spit 5 14"
+    ],
     "name": "Slime",
     "speed": 16,
     "symbol": "S",
@@ -520,8 +552,10 @@
     "numberAppearing": "2d3-1",
     "minLevel": 2,
     "maxLevel": 14,
-    "saLifedrainOnHit": true,
-    "isUndead": true
+    "special": [
+      "Life Drain On Hit",
+      "Undead"
+    ]
   },
   {
     "kind": "spectralhound",
@@ -539,9 +573,11 @@
     "numberAppearing": "2d2-1",
     "minLevel": 3,
     "maxLevel": 12,
-    "saLifedrainOnDamage": true,
-    "saLifedrainOnHit": true,
-    "isUndead": true
+    "special": [
+      "Life Drain On Hit",
+      "Life Drain On Damage",
+      "Undead"
+    ]
   },
   {
     "kind": "spectralknight",
@@ -559,9 +595,11 @@
     "numberAppearing": "1",
     "minLevel": 5,
     "maxLevel": 14,
-    "saLifedrainOnDamage": true,
-    "saHighImpact": true,
-    "isUndead": true
+    "special": [
+      "Life Drain On Damage",
+      "High Impact",
+      "Undead"
+    ]
   },
   {
     "kind": "mummifiedgoblin",
@@ -580,8 +618,10 @@
     "minLevel": 3,
     "maxLevel": 13,
     "rarity": 40,
-    "saVampiric": true,
-    "isUndead": true
+    "special": [
+      "Vampiric",
+      "Undead"
+    ]
   },
   {
     "kind": "doppelganger",
@@ -599,7 +639,9 @@
     "numberAppearing": "1d2",
     "minLevel": 1,
     "maxLevel": 14,
-    "saDoppelganger": true
+    "special": [
+      "Doppelganger"
+    ]
   },
   {
     "kind": "trollspider",
@@ -617,7 +659,9 @@
     "numberAppearing": "5-2d4k1",
     "minLevel": 2,
     "maxLevel": 12,
-    "saRegeneration": true
+    "special": [
+      "Regeneration"
+    ]
   },
   {
     "kind": "goblincaptain",
@@ -670,8 +714,10 @@
     "numberAppearing": "1",
     "minLevel": 6,
     "maxLevel": 13,
-    "saHighImpact": true,
-    "saFerocious": true,
+    "special": [
+      "High Impact",
+      "Ferocious"
+    ],
     "followerKinds": [
       "werewolf"
     ],
@@ -699,8 +745,10 @@
     "minLevel": 4,
     "maxLevel": 14,
     "rarity": 40,
-    "saHighImpact": true,
-    "saRegeneration": true,
+    "special": [
+      "High Impact",
+      "Regeneration"
+    ],
     "followerKinds": [
       "trollspider"
     ],

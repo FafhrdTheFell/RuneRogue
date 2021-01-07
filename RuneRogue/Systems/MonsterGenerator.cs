@@ -22,9 +22,8 @@ namespace RuneRogue.Systems
 
     public class MonsterGenerator
     {
-        private MonsterStats[] _monsterManual;
-        private Dictionary<string, int> _manualPage;
-        private Array _monsterKinds;
+        private List<string> _monsterKinds;
+        private Dictionary<string, MonsterStats> _fiendFolio;
 
         private string _monsterDataFile;
         private JsonSerializerOptions _jsonOptions;
@@ -35,7 +34,7 @@ namespace RuneRogue.Systems
             set { _monsterDataFile = value; }
         }
  
-        public Array MonsterKinds
+        public List<string> MonsterKinds
         {
             get { return _monsterKinds; }
         }
@@ -57,20 +56,33 @@ namespace RuneRogue.Systems
         {
             MonsterDataFile = FileName;
             string jsonString = File.ReadAllText(MonsterDataFile);
-            _monsterManual = JsonSerializer.Deserialize<MonsterStats[]>(jsonString, _jsonOptions);
-            GenerateKinds();
-            GenerateIndex();
+            MonsterStats[] monsterManual = JsonSerializer.Deserialize<MonsterStats[]>(jsonString, _jsonOptions);
+            _fiendFolio = new Dictionary<string, MonsterStats>();
+            foreach (MonsterStats m in monsterManual)
+            {
+                if (_fiendFolio.ContainsKey(m.Name))
+                {
+                    throw new MonsterDataFormatInvalid($"Duplicate monster entries for {m.Name}.");
+                }
+                else
+                {
+                    _fiendFolio[m.Kind] = m;
+                    m.CheckDefinition();
+                }
+            }
+            _monsterKinds = new List<string>(_fiendFolio.Keys);
         }
 
         public void WriteMonsterData(string FileName)
         {
-            string jsonString = JsonSerializer.Serialize(_monsterManual, _jsonOptions);
+            MonsterStats[] monsterManual = _fiendFolio.Values.ToArray();
+            string jsonString = JsonSerializer.Serialize(monsterManual, _jsonOptions);
             File.WriteAllText(FileName, jsonString);
         }
 
         public void PrintMonsterString(string monster)
         {
-            MonsterStats data = _monsterManual[_manualPage[monster]];
+            MonsterStats data = _fiendFolio[monster];
             string jsonString = JsonSerializer.Serialize(data, _jsonOptions);
             Console.WriteLine(jsonString);
         }
@@ -82,86 +94,37 @@ namespace RuneRogue.Systems
             Console.WriteLine(jsonString);
         }
 
-        public void GenerateIndex()
-        {
-            _manualPage = new Dictionary<string, int>();
-            for (int i = 0; i < _monsterManual.Length; i++)
-            {
-                _manualPage.Add(_monsterManual[i].Kind, i);
-            }
-        }
-
-        public void GenerateKinds()
-        {
-            List<string> monsterKinds = new List<string>();
-            for (int i = 0; i < _monsterManual.Length; i++)
-            {
-                monsterKinds.Add(_monsterManual[i].Kind);
-                // check that followers data formatted correctly
-                // could do more checks here
-                if (!(_monsterManual[i].FollowerKinds == null))
-                {
-                    bool followerFormatBad =
-                        (!(_monsterManual[i].FollowerKinds.Length == _monsterManual[i].FollowerNumberAppearing.Length) ||
-                        !(_monsterManual[i].FollowerKinds.Length == _monsterManual[i].FollowerProbability.Length));
-                    if (followerFormatBad)
-                    {
-                        throw new MonsterDataFormatInvalid($"{_monsterManual[i].Name} follower arrays of different lengths.");
-                    }
-                    // if own type is follower and has 100% chance of being generated, causes infinite loop.
-                    // note that an infinite loop also occurs if monster1 is follower of monster2 is follower
-                    // of monster1, but program does not check for that.
-                    for (int j = 0; j < _monsterManual[i].FollowerKinds.Length; j++)
-                    {
-                        if ((_monsterManual[i].FollowerKinds[j] == _monsterManual[i].Kind))
-                        {
-                            throw new MonsterDataFormatInvalid($"{_monsterManual[i].Name} creates itself as follower," +
-                                " risking infinite loop.");
-                        }
-                    }
-                }
-            }
-            bool isUnique = monsterKinds.Distinct().Count() == monsterKinds.Count();
-            if (isUnique)
-            {
-                _monsterKinds = monsterKinds.ToArray();
-            }
-            else
-            {
-                throw new MonsterDataFormatInvalid($"Monster kinds values not unique: {monsterKinds.ToArray()}.");
-            }
-        }
 
         // if monster = GEN, generate a level-appropriate monster list, else if
         // monster is specified, generate a list of those monsters and their followers,
         // if any
-        public List<Monster> CreateEncounter(int DungeonLevel, string monsterToAdd="GEN", string monsterNumAppearing = "GEN")
+        public List<Monster> CreateEncounter(int DungeonLevel, string monsterToAdd = "GEN", string monsterNumAppearing = "GEN")
         {
             List<Monster> encounterMonsters = new List<Monster>();
-            string monsterType = "compiler complains if not set";
+            string monsterKind;
             string numInRoomDice; // = "compiler complains if not set";
-            Monster monster = new Monster();
+            MonsterStats monsterType = null;
 
             if (monsterToAdd == "GEN")
             {
                 bool rerollMonster = true;
                 while (rerollMonster)
                 {
-                    monsterType = (string)Game.RandomArrayValue(MonsterKinds);
+                    monsterKind = (string)Game.RandomArrayValue(MonsterKinds.ToArray());
                     rerollMonster = false;
 
-                    monster = CreateMonster(monsterType);
+                    monsterType = _fiendFolio[monsterKind];
                     
-                    if (DungeonLevel < monster.MinLevel || DungeonLevel > monster.MaxLevel)
+                    if (DungeonLevel < monsterType.MinLevel || DungeonLevel > monsterType.MaxLevel)
                     {
                         rerollMonster = true;
                     }
                     // EncounterRarity is percent chance to find relative to most common
                     // monsters on a level. Check it.
-                    if (!(monster.EncounterRarity == 0))
+                    if (!(monsterType.EncounterRarity == 0))
                     {
                         int rarityRoll = Dice.Roll("1d100");
-                        if (monster.EncounterRarity <= rarityRoll)
+                        if (monsterType.EncounterRarity <= rarityRoll)
                         {
                             rerollMonster = true;
                         }
@@ -170,37 +133,36 @@ namespace RuneRogue.Systems
             }
             else
             {
-                monsterType = monsterToAdd;
-                monster = CreateMonster(monsterType);
+                monsterType = _fiendFolio[monsterToAdd];
             }
+
             if (monsterNumAppearing == "GEN")
             {
-                numInRoomDice = monster.NumberAppearing;
+                numInRoomDice = monsterType.NumberAppearing;
             }
             else
             {
                 numInRoomDice = monsterNumAppearing;
             }
-
             int numberOfMonsters = Dice.Roll(numInRoomDice);
 
-            //monsterType = "goblintracker";
+            //monsterType = _fiendFolio["goblin"];
 
             for (int i = 0; i < numberOfMonsters; i++)
             {
 
-                monster = CreateMonster(monsterType);
+                Monster monster = CreateMonster(monsterType);
                 encounterMonsters.Add(monster);
-                if (!(monster.FollowerKinds == null))
+                if (!(monsterType.FollowerKinds == null))
                 {
-                    for (int j=0; j < monster.FollowerKinds.Length; j++)
+                    for (int j=0; j < monsterType.FollowerKinds.Length; j++)
                     {
                         // check if should generate this follower type
-                        if (Dice.Roll("1D100") <= monster.FollowerProbability[j])
+                        if (Dice.Roll("1D100") <= monsterType.FollowerProbability[j])
                         {
                             List<Monster> followerMonsters = CreateEncounter(DungeonLevel,
-                                monster.FollowerKinds[j],
-                                monster.FollowerNumberAppearing[j]);
+                                monsterType.FollowerKinds[j],
+                                monsterType.FollowerNumberAppearing[j]);
                             encounterMonsters.AddRange(followerMonsters);
                         }
                     }
@@ -210,49 +172,47 @@ namespace RuneRogue.Systems
             return encounterMonsters;
         }
 
-        public Monster CreateMonster(string monsterKind)
+        public Monster CreateMonster(MonsterStats monsterType)
         {
-            Monster monster = new Monster();
-            int page = _manualPage[monsterKind];
-            monster.Attack = Dice.Roll(_monsterManual[page].Attack);
-            monster.AttackChance = Dice.Roll(_monsterManual[page].AttackChance);
-            monster.AttackSkill = monster.AttackChance / 10;
-            monster.MissileAttack = _monsterManual[page].MissileAttack;
-            monster.MissileRange = _monsterManual[page].MissileRange;
-            monster.MissileType = _monsterManual[page].MissileType;
-            monster.SpecialAttackRange = _monsterManual[page].SpecialAttackRange;
-            monster.SpecialAttackType = _monsterManual[page].SpecialAttackType;
-            monster.Awareness = _monsterManual[page].Awareness;
-            monster.Color = Colors.ColorLookup(_monsterManual[page].Color);
-            monster.Defense = Dice.Roll(_monsterManual[page].Defense);
-            monster.DefenseChance = Dice.Roll(_monsterManual[page].DefenseChance);
-            monster.DefenseSkill = monster.DefenseChance / 10;
-            monster.Gold = Dice.Roll(_monsterManual[page].Gold);
-            monster.MaxHealth = Dice.Roll(_monsterManual[page].MaxHealth);
+            Monster monster = new Monster()
+            {
+                Attack = Dice.Roll(monsterType.Attack),
+                AttackChance = Dice.Roll(monsterType.AttackChance),
+                AttackSkill = Dice.Roll(monsterType.AttackChance) / 10,
+                MissileAttack = monsterType.MissileAttack,
+                MissileRange = monsterType.MissileRange,
+                MissileType = monsterType.MissileType,
+                SpecialAttackRange = monsterType.SpecialAttackRange,
+                SpecialAttackType = monsterType.SpecialAttackType,
+                Awareness = monsterType.Awareness,
+                Color = Colors.ColorLookup(monsterType.Color),
+                Defense = Dice.Roll(monsterType.Defense),
+                DefenseChance = Dice.Roll(monsterType.DefenseChance),
+                DefenseSkill = Dice.Roll(monsterType.DefenseChance) / 10,
+                Gold = Dice.Roll(monsterType.Gold),
+                MaxHealth = Dice.Roll(monsterType.MaxHealth),
+                Name = monsterType.Name,
+                Speed = monsterType.Speed,
+                Symbol = monsterType.Symbol,
+                SAFerocious = monsterType.HasSpecialAbility("Ferocious"),
+                SALifedrainOnHit = monsterType.HasSpecialAbility("Life Drain On Hit"),
+                SALifedrainOnDamage = monsterType.HasSpecialAbility("Life Drain On Damage"),
+                SARegeneration = monsterType.HasSpecialAbility("Regeneration"),
+                SASenseThoughts = monsterType.HasSpecialAbility("Sense Thoughts"),
+                SAStealthy = monsterType.HasSpecialAbility("Stealthy"),
+                SAVampiric = monsterType.HasSpecialAbility("Vampiric"),
+                SAVenomous = monsterType.HasSpecialAbility("Venomous"),
+                SACausesStun = monsterType.HasSpecialAbility("Stuns"),
+                SADoppelganger = monsterType.HasSpecialAbility("Doppelganger"),
+                SAHighImpact = monsterType.HasSpecialAbility("High Impact"),
+                IsUndead = monsterType.HasSpecialAbility("Undead"),
+                IsImmobile = monsterType.HasSpecialAbility("Immobile")
+            };
             monster.Health = monster.MaxHealth;
-            monster.Name = _monsterManual[page].Name;
-            monster.Speed = _monsterManual[page].Speed;
-            monster.Symbol = _monsterManual[page].Symbol;
-            monster.NumberAppearing = _monsterManual[page].NumberAppearing;
-            monster.MinLevel = _monsterManual[page].MinLevel;
-            monster.MaxLevel = _monsterManual[page].MaxLevel;
-            monster.SAFerocious = _monsterManual[page].SAFerocious;
-            monster.SALifedrainOnHit = _monsterManual[page].SALifedrainOnHit;
-            monster.SALifedrainOnDamage = _monsterManual[page].SALifedrainOnDamage; 
-            monster.SARegeneration = _monsterManual[page].SARegeneration;
-            monster.SASenseThoughts = _monsterManual[page].SASenseThoughts;
-            monster.SAStealthy = _monsterManual[page].SAStealthy;
-            monster.SAVampiric = _monsterManual[page].SAVampiric;
-            monster.SAVenomous = _monsterManual[page].SAVenomous;
-            monster.SACausesStun = _monsterManual[page].SACausesStun;
-            monster.SADoppelganger = _monsterManual[page].SADoppelganger;
-            monster.SAHighImpact = _monsterManual[page].SAHighImpact;
-            monster.IsUndead = _monsterManual[page].IsUndead;
-            monster.IsImmobile = _monsterManual[page].IsImmobile;
-            monster.FollowerKinds = _monsterManual[page].FollowerKinds;
-            monster.FollowerNumberAppearing = _monsterManual[page].FollowerNumberAppearing;
-            monster.FollowerProbability = _monsterManual[page].FollowerProbability;
-            monster.EncounterRarity = _monsterManual[page].EncounterRarity;
+            
+            
+                
+                
 
             return monster;
         }

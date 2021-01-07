@@ -7,74 +7,10 @@ using RogueSharp;
 
 namespace RuneRogue.Core
 {
-    public class Monster : Actor, INPC
+    public class Monster : Actor
     {
         public int? TurnsAlerted { get; set; }
         public Cell LastLocationPlayerSeen { get; set; }
-
-        private string _numberAppearing;
-        private int _minLevel;
-        private int _maxLevel;
-        private string[] _followerKinds;
-        private string[] _followerNumberAppearing;
-        private int[] _followerProbability;
-        private int _encounterRarity;
-
-        public string NumberAppearing
-        {
-            get
-            {
-                return _numberAppearing;
-            }
-            set
-            {
-                _numberAppearing = value;
-            }
-        }
-        public int MinLevel
-        {
-            get
-            {
-                return _minLevel;
-            }
-            set
-            {
-                _minLevel = value;
-            }
-        }
-        public int MaxLevel
-        {
-            get
-            {
-                return _maxLevel;
-            }
-            set
-            {
-                _maxLevel = value;
-            }
-        }
-        public string[] FollowerKinds
-        {
-            get { return _followerKinds; }
-            set { _followerKinds = value; }
-        }
-        public string[] FollowerNumberAppearing
-        {
-            get { return _followerNumberAppearing; }
-            set { _followerNumberAppearing = value; }
-        }
-        public int[] FollowerProbability
-        {
-            get { return _followerProbability; }
-            set { _followerProbability = value; }
-        }
-        public int EncounterRarity
-        {
-            get { return _encounterRarity; }
-            set { _encounterRarity = value; }
-        }
-
-
 
         public void DrawStats(RLConsole statConsole, int position, bool highlight=false)
         {

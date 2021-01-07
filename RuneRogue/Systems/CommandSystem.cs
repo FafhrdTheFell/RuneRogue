@@ -623,7 +623,7 @@ namespace RuneRogue.Systems
                     //if (Game.AutoMoveMonsterTarget != defender || ((double)damage / (double)defender.Health)>0.33)
                 }
 
-                
+
 
                 if (defender.Health > 0)
                 {
