@@ -447,7 +447,6 @@ namespace RuneRogue.Core
                 foreach (Actor target in TargetActors())
                 {
                     damage = Dice.Roll("2d10");
-                    target.Health -= damage;
 
                     attackMessage.AppendFormat("Flames engulf {0}. ", target.Name);
                     CommandSystem.WakeMonster(target);
