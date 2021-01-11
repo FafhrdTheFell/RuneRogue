@@ -30,7 +30,7 @@ namespace RuneRogue.Shops
             _costs.Add(10);
 
             _targets.Add("Attack");
-            _targets.Add("Defense");
+            _targets.Add("Armor");
             _targets.Add("Health");
 
             UpdateInventory();
@@ -40,7 +40,7 @@ namespace RuneRogue.Shops
         public override void UpdateInventory()
         {
             double newAttack = Convert.ToDouble(Game.Player.Attack + 1);
-            double newDefense = Convert.ToDouble(Game.Player.Defense + 1);
+            double newDefense = Convert.ToDouble(Game.Player.Armor + 1);
             Costs[0] = RoundFive(1.5 * Math.Pow(newAttack, 1.35) * DungeonLevelFactor(Game.mapLevel));
             Costs[1] = RoundFive(2.0 * Math.Pow(newDefense, 1.55) * DungeonLevelFactor(Game.mapLevel));
             if (Game.Player.Health == Game.Player.MaxHealth)
@@ -63,8 +63,8 @@ namespace RuneRogue.Shops
                     Game.Player.Attack += 1;
                     Game.MessageLog.Add(Game.Player.Name + " upgrades their weaponry.");
                     break;
-                case "Defense":
-                    Game.Player.Defense += 1;
+                case "Armor":
+                    Game.Player.Armor += 1;
                     Game.MessageLog.Add(Game.Player.Name + " upgrades their armor.");
                     break;
                 case "Health":

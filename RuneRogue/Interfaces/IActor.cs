@@ -3,12 +3,10 @@
     public interface IActor
     {
         int Attack { get; set; }
-        int AttackSkill { get; set; }
-        int AttackChance { get; set; }
+        int WeaponSkill { get; set; }
         int Awareness { get; set; }
-        int Defense { get; set; }
-        int DefenseSkill { get; set; }
-        int DefenseChance { get; set; }
+        int Armor { get; set; }
+        int DodgeSkill { get; set; }
         int Gold { get; set; }
         int Health { get; set; }
         int MaxHealth { get; set; }

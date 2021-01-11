@@ -412,11 +412,11 @@ namespace RuneRogue.Systems
             // missile attacks use 1/2 defense skill
             if (missileAttack)
             {
-                diff = attacker.AttackSkill - 3 - defender.DefenseSkill / 2;
+                diff = attacker.WeaponSkill - 3 - defender.DodgeSkill / 2;
             }
             else
             {
-                diff = attacker.AttackSkill - defender.DefenseSkill;
+                diff = attacker.WeaponSkill - defender.DodgeSkill;
 
             
                 // ESP helps in melee combat against non-undead
@@ -453,8 +453,8 @@ namespace RuneRogue.Systems
             }
             double chanceDouble = Math.Exp(0.11 * Convert.ToDouble(diff)) /
                 (1 + Math.Exp(0.11 * Convert.ToDouble(diff)));
-            double unadjustedChanceDouble = Math.Exp(0.11 * Convert.ToDouble(attacker.AttackSkill)) /
-                (1 + Math.Exp(0.11 * Convert.ToDouble(attacker.AttackSkill)));
+            double unadjustedChanceDouble = Math.Exp(0.11 * Convert.ToDouble(attacker.WeaponSkill)) /
+                (1 + Math.Exp(0.11 * Convert.ToDouble(attacker.WeaponSkill)));
             int chanceInt = Convert.ToInt32(chanceDouble * 100 + 0.5) + 1;
             int unadjustedChanceInt = Convert.ToInt32(unadjustedChanceDouble * 100 + 0.5) + 1;
             int roll = Dice.Roll("1D100");
@@ -497,7 +497,7 @@ namespace RuneRogue.Systems
                 // Player gets attack XP on hit
                 if (attacker == Game.Player && Game.XpOnAction)
                 {
-                    Game.Player.XpAttackSkill += Math.Max(defender.DefenseSkill - attacker.AttackSkill, 1);
+                    Game.Player.XpAttackSkill += Math.Max(defender.DodgeSkill - attacker.WeaponSkill, 1);
                     Game.Player.XpHealth += 1;
                 }
             }
@@ -513,7 +513,7 @@ namespace RuneRogue.Systems
             }
             if (roll < unadjustedChanceInt && defender == Game.Player && Game.XpOnAction)
             {
-                Game.Player.XpDefenseSkill += Math.Max(attacker.AttackSkill - defender.DefenseSkill, 1);
+                Game.Player.XpDefenseSkill += Math.Max(attacker.WeaponSkill - defender.DodgeSkill, 1);
                 Game.Player.XpHealth += 1;
 
             }
@@ -543,9 +543,9 @@ namespace RuneRogue.Systems
             }
             int attackResult = Dice.Roll(attackDice);
             int defenseResult;
-            if (defender.Defense > 0)
+            if (defender.Armor > 0)
             {
-                defenseResult = Dice.Roll("3d" + defender.Defense.ToString() + "k1");
+                defenseResult = Dice.Roll("3d" + defender.Armor.ToString() + "k1");
             }
             else
             {
@@ -559,7 +559,7 @@ namespace RuneRogue.Systems
             {
                 attackMessage.AppendFormat(" The weak blow does no damage.", attacker.Name);
             }
-            else if (attackResult >= defender.Defense * 2)
+            else if (attackResult >= defender.Armor * 2)
             {
                 attackMessage.AppendFormat(" The blow lands hard!", attacker.Name);
             }
@@ -694,6 +694,8 @@ namespace RuneRogue.Systems
                         Game.DungeonMap.AddItem(gold);
                     }
                 }
+
+                ((Monster)defender).MonsterType.NumberKilled++;
                 Game.DungeonMap.RemoveMonster((Monster)defender);
             }
         }

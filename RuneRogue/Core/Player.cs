@@ -14,7 +14,6 @@ namespace RuneRogue.Core
         private int _xpHealth;
         private int _xpTotalReceived;
         private int _lifetimeGold;
-        private int _stealth;
         private List<Monster> _monstersIgnore;
 
         public int StatLines = 26;
@@ -105,13 +104,11 @@ namespace RuneRogue.Core
         public Player()
         {
             Attack = 10;
-            AttackChance = 50;
-            AttackSkill = 5;
+            WeaponSkill = 5;
             Awareness = 15;
             Color = Colors.Player;
-            Defense = 5;
-            DefenseChance = 50;
-            DefenseSkill = 5;
+            Armor = 5;
+            DodgeSkill = 5;
             Gold = 100;
             XpAttackSkill = 0;
             XpDefenseSkill = 0;
@@ -129,11 +126,11 @@ namespace RuneRogue.Core
         {
             int factor = 8;
             int factorHealth = 2;
-            if (XpAttackSkill >= AttackSkill * factor)
+            if (XpAttackSkill >= WeaponSkill * factor)
             {
                 CheckAdvancement("attack", 1);
             }
-            if (XpDefenseSkill >= DefenseSkill * factor)
+            if (XpDefenseSkill >= DodgeSkill * factor)
             {
                 CheckAdvancement("defense", 1);
             }
@@ -150,16 +147,16 @@ namespace RuneRogue.Core
                 switch (skill)
                 {
                     case "attack":
-                        if (Dice.Roll("1d20") >= AttackSkill)
+                        if (Dice.Roll("1d20") >= WeaponSkill)
                         {
-                            AttackSkill += 1;
+                            WeaponSkill += 1;
                             Game.MessageLog.Add($"{Name} has learned more about attacking.");
                         }
                         break;
                     case "defense":
-                        if (Dice.Roll("1d20") >= DefenseSkill)
+                        if (Dice.Roll("1d20") >= DodgeSkill)
                         {
-                            DefenseSkill += 1;
+                            DodgeSkill += 1;
                             Game.MessageLog.Add($"{Name} has learned more about defending.");
                         }
                         break;
@@ -185,11 +182,11 @@ namespace RuneRogue.Core
             statConsole.Print(1,  5, $"    {Name}", Colors.Text);
             statConsole.Print(1,  7, $"Health:", Colors.Text);
             statConsole.Print(1, 11, $"Attack:", Colors.Text);
-            statConsole.Print(1, 13, $"    {AttackSkill} skill", Colors.Text);
+            statConsole.Print(1, 13, $"    {WeaponSkill} skill", Colors.Text);
             statConsole.Print(1, 14, $"    {Attack} weaponry", Colors.Text);
-            statConsole.Print(1, 16, $"Defense:", Colors.Text);
-            statConsole.Print(1, 18, $"    {DefenseSkill} skill", Colors.Text);
-            statConsole.Print(1, 19, $"    {Defense} armor", Colors.Text);
+            statConsole.Print(1, 16, $"Armor:", Colors.Text);
+            statConsole.Print(1, 18, $"    {DodgeSkill} skill", Colors.Text);
+            statConsole.Print(1, 19, $"    {Armor} armor", Colors.Text);
             statConsole.Print(1, 21, $"Gold:", Colors.Gold);
             statConsole.Print(1, 23, $"    {Gold}", Colors.Gold);
             statConsole.Print(1, 24, $"    {LifetimeGold} (lifetime)", Colors.Gold);

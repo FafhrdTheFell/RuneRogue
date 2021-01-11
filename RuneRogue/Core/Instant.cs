@@ -581,7 +581,7 @@ namespace RuneRogue.Core
                 else if (source is Monster)
                 {
                     Game.MessageLog.Add($"{source.Name} charges {TargetActor().Name}!");
-                    hitBonus = 2 + source.AttackSkill / 4;
+                    hitBonus = 2 + source.WeaponSkill / 4;
                     // set damageBonus to replace source.Attack damage with MissileAttack damage
                     damageBonus = source.Attack / 2;
                 }

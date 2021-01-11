@@ -15,17 +15,15 @@ namespace RuneRogue.Core
     {
         // IActor
         private int _attack;
-        private int _attackChance;
-        private int _attackSkill;
+        private int _weaponSkill;
         private int _missileAttack;
         private int _missileRange;
         private int _specialAttackRange;
         private string _specialAttackType;
         private string _missileType;
         private int _awareness;
-        private int _defense;
-        private int _defenseChance;
-        private int _defenseSkill;
+        private int _armor;
+        private int _dodgeSkill;
         protected int _gold;
         private int _health;
         private int _maxHealth;
@@ -113,27 +111,16 @@ namespace RuneRogue.Core
             set { _specialAttackType = value; }
         }
 
-        public int AttackChance
-        {
-            get
-            {
-                return _attackChance;
-            }
-            set
-            {
-                _attackChance = value;
-            }
-        }
 
-        public int AttackSkill
+        public int WeaponSkill
         {
             get
             {
-                return _attackSkill;
+                return _weaponSkill;
             }
             set
             {
-                _attackSkill = value;
+                _weaponSkill = value;
             }
         }
 
@@ -149,39 +136,27 @@ namespace RuneRogue.Core
             }
         }
 
-        public int Defense
+        public int Armor
         {
             get
             {
-                return _defense;
+                return _armor;
             }
             set
             {
-                _defense = value;
+                _armor = value;
             }
         }
 
-        public int DefenseChance
+        public int DodgeSkill
         {
             get
             {
-                return _defenseChance;
+                return _dodgeSkill;
             }
             set
             {
-                _defenseChance = value;
-            }
-        }
-
-        public int DefenseSkill
-        {
-            get
-            {
-                return _defenseSkill;
-            }
-            set
-            {
-                _defenseSkill = value;
+                _dodgeSkill = value;
             }
         }
 
@@ -324,6 +299,11 @@ namespace RuneRogue.Core
             set { _senseThoughts = value; }
         }
 
+        public bool NextTo(Actor actor)
+        {
+            return ((this.X - actor.X) * (this.X - actor.X) < 2 && (this.Y - actor.Y) * (this.Y - actor.Y) < 2);
+        }
+
         public bool WithinDistance(Actor actor, int distance)
         {
             return ((this.X - actor.X) * (this.X - actor.X) + (this.Y - actor.Y) * (this.Y - actor.Y) <= 
@@ -343,10 +323,10 @@ namespace RuneRogue.Core
             MaxHealth = 3 + Game.Player.MaxHealth / 3;
             Health = MaxHealth;
             Attack = Convert.ToInt32((double)Game.Player.Attack * 0.9);
-            Defense = Convert.ToInt32((double)Game.Player.Defense * 0.9);
+            Armor = Convert.ToInt32((double)Game.Player.Armor * 0.9);
             Gold = Game.Player.Gold / 2;
-            AttackSkill = Game.Player.AttackSkill - 2;
-            DefenseSkill = Game.Player.DefenseSkill - 2;
+            WeaponSkill = Game.Player.WeaponSkill - 2;
+            DodgeSkill = Game.Player.DodgeSkill - 2;
             Speed = Game.Player.Speed;
         }
 
@@ -389,15 +369,20 @@ namespace RuneRogue.Core
         {
             get
             {
-                if (SAFerocious)
-                    switch (Dice.Roll("1d2"))
-                    {
-                        case 1:
-                            return Speed;
-                        case 2:
-                            return Speed / 2;
-                    }
-                return Speed;
+                int turnSpeed = Speed;
+                // Ferocious Actors have 50% chance of moving twice as quickly
+                turnSpeed = (SAFerocious && Dice.Roll("1d2") == 1) ? (turnSpeed * 2) : turnSpeed;
+                
+                // round (100 / Speed) probabilistically so that expect Actor
+                // with speed x to have an average of x turns per 100 clicks
+                int turnClicks = 100 / turnSpeed;
+                int remainder = 100 % turnSpeed;
+                if (Dice.Roll("1d"+(Speed*100).ToString()) <= remainder * 100)
+                {
+                    turnClicks++;
+                }
+
+                return turnClicks;
             }
         }
     }

@@ -11,14 +11,13 @@ using System.Text.Encodings.Web;
 
 namespace RuneRogue.Systems
 {
-    class MonsterDataFormatInvalid : Exception
+    class MonsterNotFound : Exception
     {
-        public MonsterDataFormatInvalid(string message)
+        public MonsterNotFound(string message)
             : base(message)
         {
         }
     }
-
 
     public class MonsterGenerator
     {
@@ -39,6 +38,11 @@ namespace RuneRogue.Systems
             get { return _monsterKinds; }
         }
 
+        public Dictionary<string, MonsterStats> FiendFolio
+        {
+            get { return _fiendFolio; }
+        }
+
         public MonsterGenerator()
         {
             _jsonOptions = new JsonSerializerOptions
@@ -47,6 +51,7 @@ namespace RuneRogue.Systems
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
                 ReadCommentHandling = JsonCommentHandling.Skip,
+                IgnoreNullValues = true
             };
             // serialize enums as strings
             _jsonOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
@@ -60,17 +65,20 @@ namespace RuneRogue.Systems
             _fiendFolio = new Dictionary<string, MonsterStats>();
             foreach (MonsterStats m in monsterManual)
             {
-                if (_fiendFolio.ContainsKey(m.Name))
+                if (_fiendFolio.ContainsKey(m.Kind))
                 {
-                    throw new MonsterDataFormatInvalid($"Duplicate monster entries for {m.Name}.");
+                    throw new MonsterDataFormatInvalid($"Duplicate monster entries for {m.Kind}.");
                 }
                 else
                 {
                     _fiendFolio[m.Kind] = m;
-                    m.CheckDefinition();
                 }
             }
             _monsterKinds = new List<string>(_fiendFolio.Keys);
+            foreach (string m in _monsterKinds)
+            {
+                _fiendFolio[m].CheckDefinition();
+            }
         }
 
         public void WriteMonsterData(string FileName)
@@ -80,78 +88,79 @@ namespace RuneRogue.Systems
             File.WriteAllText(FileName, jsonString);
         }
 
-        public void PrintMonsterString(string monster)
+        public void PrintMonsterJSONString(string monster)
         {
             MonsterStats data = _fiendFolio[monster];
             string jsonString = JsonSerializer.Serialize(data, _jsonOptions);
             Console.WriteLine(jsonString);
         }
 
+        public void PrintMonsterJSONString(MonsterStats monster)
+        {
+            string jsonString = JsonSerializer.Serialize(monster, _jsonOptions);
+            Console.WriteLine(jsonString);
+        }
+
         // useful function for examining how different data structures get serialized
-        public void PrintDataStructure(object data)
+        public void PrintDataStructureSerialization(object data)
         {
             string jsonString = JsonSerializer.Serialize(data, _jsonOptions);
             Console.WriteLine(jsonString);
         }
 
 
-        // if monster = GEN, generate a level-appropriate monster list, else if
-        // monster is specified, generate a list of those monsters and their followers,
-        // if any
-        public List<Monster> CreateEncounter(int DungeonLevel, string monsterToAdd = "GEN", string monsterNumAppearing = "GEN")
+        public List<Monster> CreateEncounter(int DungeonLevel)
         {
-            List<Monster> encounterMonsters = new List<Monster>();
-            string monsterKind;
-            string numInRoomDice; // = "compiler complains if not set";
+            string monsterToAdd = null;
             MonsterStats monsterType = null;
 
-            if (monsterToAdd == "GEN")
+            bool rerollMonster = true;
+            while (rerollMonster)
             {
-                bool rerollMonster = true;
-                while (rerollMonster)
-                {
-                    monsterKind = (string)Game.RandomArrayValue(MonsterKinds.ToArray());
-                    rerollMonster = false;
+                monsterToAdd = (string)Game.RandomArrayValue(MonsterKinds.ToArray());
+                rerollMonster = false;
 
-                    monsterType = _fiendFolio[monsterKind];
-                    
-                    if (DungeonLevel < monsterType.MinLevel || DungeonLevel > monsterType.MaxLevel)
-                    {
-                        rerollMonster = true;
-                    }
-                    // EncounterRarity is percent chance to find relative to most common
-                    // monsters on a level. Check it.
-                    if (!(monsterType.EncounterRarity == 0))
-                    {
-                        int rarityRoll = Dice.Roll("1d100");
-                        if (monsterType.EncounterRarity <= rarityRoll)
-                        {
-                            rerollMonster = true;
-                        }
-                    }
+                if (!_fiendFolio.TryGetValue(monsterToAdd, out monsterType))
+                {
+                    throw new MonsterNotFound($"{monsterToAdd} monster statistics not in Fiend Folio.");
+                }
+
+                if (DungeonLevel < monsterType.MinLevel || DungeonLevel > monsterType.MaxLevel)
+                {
+                    rerollMonster = true;
+                }
+                if (monsterType.IsUnique && monsterType.NumberGenerated > 0)
+                {
+                    rerollMonster = true;
+                }
+                // Rarity is percent chance that monster will not show compared to monsters without rarity defined
+                // on a level (who have default rarity 0). Check it.
+                int rarityRoll = Dice.Roll("1d200") - 100;
+                if (rarityRoll < monsterType.Rarity)
+                {
+                    rerollMonster = true;
                 }
             }
-            else
-            {
-                monsterType = _fiendFolio[monsterToAdd];
-            }
 
-            if (monsterNumAppearing == "GEN")
-            {
-                numInRoomDice = monsterType.NumberAppearing;
-            }
-            else
-            {
-                numInRoomDice = monsterNumAppearing;
-            }
-            int numberOfMonsters = Dice.Roll(numInRoomDice);
+            return CreateEncounter(DungeonLevel, monsterToAdd, monsterType.NumberAppearing);
+        }
 
-            //monsterType = _fiendFolio["goblin"];
+        public List<Monster> CreateEncounter(int DungeonLevel, string monsterToAdd, string monsterNumAppearingDice)
+        {
+            List<Monster> encounterMonsters = new List<Monster>();
+            if (!_fiendFolio.TryGetValue(monsterToAdd, out MonsterStats monsterType))
+            {
+                throw new MonsterNotFound($"{monsterToAdd} monster statistics not in Fiend Folio.");
+            }
+            monsterType.NumberGenerated++;
+
+            int numberOfMonsters = Dice.Roll(monsterNumAppearingDice);
+
+            //monsterType = _fiendFolio["beetleclone"];
 
             for (int i = 0; i < numberOfMonsters; i++)
             {
-
-                Monster monster = CreateMonster(monsterType);
+                Monster monster = monsterType.CreateMonster();
                 encounterMonsters.Add(monster);
                 if (!(monsterType.FollowerKinds == null))
                 {
@@ -168,53 +177,8 @@ namespace RuneRogue.Systems
                     }
                 }
             }
-
             return encounterMonsters;
         }
 
-        public Monster CreateMonster(MonsterStats monsterType)
-        {
-            Monster monster = new Monster()
-            {
-                Attack = Dice.Roll(monsterType.Attack),
-                AttackChance = Dice.Roll(monsterType.AttackChance),
-                AttackSkill = Dice.Roll(monsterType.AttackChance) / 10,
-                MissileAttack = monsterType.MissileAttack,
-                MissileRange = monsterType.MissileRange,
-                MissileType = monsterType.MissileType,
-                SpecialAttackRange = monsterType.SpecialAttackRange,
-                SpecialAttackType = monsterType.SpecialAttackType,
-                Awareness = monsterType.Awareness,
-                Color = Colors.ColorLookup(monsterType.Color),
-                Defense = Dice.Roll(monsterType.Defense),
-                DefenseChance = Dice.Roll(monsterType.DefenseChance),
-                DefenseSkill = Dice.Roll(monsterType.DefenseChance) / 10,
-                Gold = Dice.Roll(monsterType.Gold),
-                MaxHealth = Dice.Roll(monsterType.MaxHealth),
-                Name = monsterType.Name,
-                Speed = monsterType.Speed,
-                Symbol = monsterType.Symbol,
-                SAFerocious = monsterType.HasSpecialAbility("Ferocious"),
-                SALifedrainOnHit = monsterType.HasSpecialAbility("Life Drain On Hit"),
-                SALifedrainOnDamage = monsterType.HasSpecialAbility("Life Drain On Damage"),
-                SARegeneration = monsterType.HasSpecialAbility("Regeneration"),
-                SASenseThoughts = monsterType.HasSpecialAbility("Sense Thoughts"),
-                SAStealthy = monsterType.HasSpecialAbility("Stealthy"),
-                SAVampiric = monsterType.HasSpecialAbility("Vampiric"),
-                SAVenomous = monsterType.HasSpecialAbility("Venomous"),
-                SACausesStun = monsterType.HasSpecialAbility("Stuns"),
-                SADoppelganger = monsterType.HasSpecialAbility("Doppelganger"),
-                SAHighImpact = monsterType.HasSpecialAbility("High Impact"),
-                IsUndead = monsterType.HasSpecialAbility("Undead"),
-                IsImmobile = monsterType.HasSpecialAbility("Immobile")
-            };
-            monster.Health = monster.MaxHealth;
-            
-            
-                
-                
-
-            return monster;
-        }
     }
 }

@@ -11,6 +11,9 @@ namespace RuneRogue.Core
     {
         public int? TurnsAlerted { get; set; }
         public Cell LastLocationPlayerSeen { get; set; }
+        public int ShootPropensity { get; set; }
+        public int WanderPropensity { get; set; }
+        public MonsterStats MonsterType { get; set; }
 
         public void DrawStats(RLConsole statConsole, int position, bool highlight=false)
         {
