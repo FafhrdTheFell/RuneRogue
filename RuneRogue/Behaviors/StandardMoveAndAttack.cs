@@ -230,7 +230,6 @@ namespace RuneRogue.Behaviors
                     - 1 * Convert.ToInt32(targetCell.X > player.X);
                 int dy = 1 * Convert.ToInt32(targetCell.Y > monster.Y)
                     - 1 * Convert.ToInt32(targetCell.Y > player.Y);
-                Game.PrintDebugMessage("fast move");
                 if (!(dx == 0) && !(dy == 0))
                 {
                     // pick random direction

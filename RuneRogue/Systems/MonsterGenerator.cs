@@ -19,6 +19,14 @@ namespace RuneRogue.Systems
         }
     }
 
+    class MonsterConstructionFailure : Exception
+    {
+        public MonsterConstructionFailure(string message)
+            : base(message)
+        {
+        }
+    }
+
     public class MonsterGenerator
     {
         private List<string> _monsterKinds;
@@ -63,8 +71,17 @@ namespace RuneRogue.Systems
             string jsonString = File.ReadAllText(MonsterDataFile);
             MonsterStats[] monsterManual = JsonSerializer.Deserialize<MonsterStats[]>(jsonString, _jsonOptions);
             _fiendFolio = new Dictionary<string, MonsterStats>();
+            string lastKind = "";
             foreach (MonsterStats m in monsterManual)
             {
+                if (m.Kind == null && lastKind != "")
+                {
+                    throw new MonsterDataFormatInvalid($"Monster missing kind definition (after {lastKind}).");
+                }
+                else if (m.Kind == null)
+                {
+                    throw new MonsterDataFormatInvalid($"Initial monster is missing kind definition.");
+                }
                 if (_fiendFolio.ContainsKey(m.Kind))
                 {
                     throw new MonsterDataFormatInvalid($"Duplicate monster entries for {m.Kind}.");
@@ -72,6 +89,7 @@ namespace RuneRogue.Systems
                 else
                 {
                     _fiendFolio[m.Kind] = m;
+                    lastKind = m.Kind;
                 }
             }
             _monsterKinds = new List<string>(_fiendFolio.Keys);

@@ -462,20 +462,15 @@
   },
   {
     "kind": "goblinhuntsman",
-    "attack": "10",
-    "weaponSkill": "25D6",
+    "baseKind":  "goblin",
     "awareness": "14",
     "color": "DwForestGreen",
-    "armor": "2D3",
-    "dodgeSkill": "10D7",
+    "role":  "Skirmisher",
     "ranged": [
       "Missile Arrow 12 10"
     ],
-    "gold": "5D8",
-    "maxHealth": "3D5k2",
+    "gold": "+1D8",
     "name": "Goblin Huntsman",
-    "speed": "10",
-    "symbol": "g",
     "numberAppearing": "5-2d4k1",
     "minLevel": 2,
     "maxLevel": 12,
@@ -682,18 +677,27 @@
     ]
   },
   {
+    "kind": "fieldmarshallgratgruk",
+    "name": "Field Marshall Grat'gruk",
+    "isUnique": true,
+    "baseKind": "goblincaptain",
+    "role": "boss",
+    "followerKinds": [
+      "goblincaptain"
+    ],
+    "followerNumberAppearing": [
+      "2"
+    ],
+    "followerProbability": [
+      90
+    ]
+  },
+  {
     "kind": "alphawerewolf",
-    "attack": "18",
-    "weaponSkill": "20D8",
-    "awareness": "14",
+    "attack": "+2",
+    "baseKind": "werewolf",
+    "role":  "boss",
     "color": "DbBlood",
-    "armor": "2D4",
-    "dodgeSkill": "8D14",
-    "gold": "8d8",
-    "maxHealth": "5d5",
-    "name": "Werewolf Alpha",
-    "speed": "14",
-    "symbol": "W",
     "numberAppearing": "1",
     "minLevel": 6,
     "maxLevel": 13,
@@ -745,11 +749,11 @@
   {
     "kind": "tricklepudding",
     "attack": "11",
-    "attackChance": "27D3",
+    "weaponSkill": "27D3",
     "awareness": "12",
     "color": "DbGrass",
-    "defense": "2D3",
-    "defenseChance": "3D10",
+    "armor": "2D3",
+    "dodgeSkill": "3D10",
     "gold": "4D5",
     "maxHealth": "4D6",
     "ranged": [
@@ -764,20 +768,13 @@
   },
   {
     "kind": "goblinveteran",
-    "attack": "10",
-    "attackChance": "27D3",
-    "awareness": "12",
-    "color": "DbBrightWood",
-    "defense": "2D3",
-    "defenseChance": "12D4",
+    "baseKind": "goblin",
+    "role": "elite",
     "ranged": [
       "Missile Arrow 9 9"
     ],
-    "gold": "5D5",
-    "maxHealth": "3D4",
+    "gold": "+2D8",
     "name": "Goblin Veteran",
-    "speed": "8",
-    "symbol": "g",
     "numberAppearing": "1d4",
     "minLevel": 2,
     "maxLevel": 6
@@ -785,11 +782,11 @@
   {
     "kind": "spectralhoundalpha",
     "attack": "11",
-    "attackChance": "29D4",
+    "weaponSkill": "29D4",
     "awareness": "12",
     "color": "DbGrass",
-    "defense": "3D2",
-    "defenseChance": "9D4",
+    "armor": "3D2",
+    "dodgeSkill": "9D4",
     "gold": "3D5",
     "maxHealth": "5D4k4",
     "name": "Spectral Alpha",
@@ -818,20 +815,12 @@
   },
   {
     "kind": "narlehewnwillowisp",
-    "attack": "110",
-    "attackChance": "25D4",
-    "awareness": "12",
-    "color": "DbLight",
-    "defense": "1D3",
-    "defenseChance": "7D4",
-    "gold": "1D5",
-    "maxHealth": "1D4",
+    "baseKind": "willowisp",
+    "role":  "elite",
     "name": "Narle Hewn will-o-wisp",
-    "speed": "8",
     "ranged": [
       "Missile Arrow 7 9"
     ],
-    "symbol": "*",
     "numberAppearing": "2d2",
     "minLevel": 2,
     "maxLevel": 14,
@@ -843,11 +832,11 @@
   {
     "kind": "dracolich",
     "attack": "14+3d4",
-    "attackChance": "25D6",
+    "weaponSkill": "25D6",
     "awareness": "10",
     "color": "DbOldStone",
-    "defense": "5D5k3",
-    "defenseChance": "12D3",
+    "armor": "5D5k3",
+    "dodgeSkill": "12D3",
     "gold": "10D20",
     "maxHealth": "6D4k5",
     "name": "Dracolich",
@@ -865,11 +854,11 @@
   {
     "kind": "ogre",
     "attack": "12",
-    "attackChance": "27D3",
+    "weaponSkill": "27D3",
     "awareness": "12",
     "color": "DbBrightWood",
-    "defense": "3D2",
-    "defenseChance": "7D4",
+    "armor": "3D2",
+    "dodgeSkill": "7D4",
     "gold": "5D5",
     "maxHealth": "4D5",
     "name": "Ogre",
