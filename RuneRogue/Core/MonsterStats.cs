@@ -255,7 +255,7 @@ namespace RuneRogue.Core
                     !(FollowerKinds.Length == FollowerProbability.Length));
                 if (followerFormatBad)
                 {
-                    throw new MonsterDataFormatInvalid($"{Name} follower arrays of different lengths.");
+                    throw new MonsterDataFormatInvalid($"{Kind} follower arrays of different lengths.");
                 }
                 // if own type is follower and has 100% chance of being generated, causes infinite loop.
                 // note that an infinite loop also occurs if monster1 is follower of monster2 is follower
@@ -324,9 +324,18 @@ namespace RuneRogue.Core
 
         private void CheckStatDefined(string kindRoll, string baseRoll, string stat)
         {
+            int testRoll;
             if (kindRoll == null && baseRoll == null)
             {
                 throw new MonsterDataFormatInvalid($"{Kind} missing stat {stat}.");
+            }
+            try
+            {
+                testRoll = CombinedDiceRoll(kindRoll, baseRoll);
+            }
+            catch
+            {
+                throw new MonsterDataFormatInvalid($"{Kind} stat {stat} mispecified.");
             }
         }
 

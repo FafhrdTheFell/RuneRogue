@@ -180,6 +180,7 @@ namespace RuneRogue.Systems
             {
                 Monster monster = monsterType.CreateMonster();
                 encounterMonsters.Add(monster);
+                string followerAppearing = null;
                 if (!(monsterType.FollowerKinds == null))
                 {
                     for (int j=0; j < monsterType.FollowerKinds.Length; j++)
@@ -187,9 +188,15 @@ namespace RuneRogue.Systems
                         // check if should generate this follower type
                         if (Dice.Roll("1D100") <= monsterType.FollowerProbability[j])
                         {
+                            followerAppearing = monsterType.FollowerNumberAppearing[j];
+                             if (_fiendFolio[monsterType.FollowerKinds[j]].IsUnique && 
+                                _fiendFolio[monsterType.FollowerKinds[j]].NumberGenerated > 0)
+                            {
+                                followerAppearing = "0";
+                            }
                             List<Monster> followerMonsters = CreateEncounter(DungeonLevel,
                                 monsterType.FollowerKinds[j],
-                                monsterType.FollowerNumberAppearing[j]);
+                                followerAppearing);
                             encounterMonsters.AddRange(followerMonsters);
                         }
                     }
