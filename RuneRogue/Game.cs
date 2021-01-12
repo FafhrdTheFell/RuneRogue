@@ -253,8 +253,8 @@ namespace RuneRogue
                 if (finished)
                 {
                     SecondaryConsoleActive = false;
-                    //keyPress = null;
-                    //rLMouse = null;
+                    // possibly might need to set up post-completion processing unless cancelled
+                    // or was getting character name
                     if (completionMessage != "Cancelled" && !(CurrentSecondary is InputConsole))
                     {
                         if (CurrentSecondary is TargetingSystem)
@@ -288,6 +288,10 @@ namespace RuneRogue
                             if (CurrentSecondary.UsesTurn())
                             {
                                 didPlayerAct = true;
+                            }
+                            else if (completionMessage == "Keypress")
+                            {
+                                didPlayerAct = AutoActionAndProcessInput(keyPress, rLMouse);
                             }
                         }
                     }

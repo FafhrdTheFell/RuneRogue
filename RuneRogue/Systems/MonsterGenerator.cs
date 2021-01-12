@@ -95,6 +95,7 @@ namespace RuneRogue.Systems
             _monsterKinds = new List<string>(_fiendFolio.Keys);
             foreach (string m in _monsterKinds)
             {
+                _fiendFolio[m].Init();
                 _fiendFolio[m].CheckDefinition();
             }
         }
@@ -180,7 +181,7 @@ namespace RuneRogue.Systems
             {
                 Monster monster = monsterType.CreateMonster();
                 encounterMonsters.Add(monster);
-                string followerAppearing = null;
+                string followerAppearing;
                 if (!(monsterType.FollowerKinds == null))
                 {
                     for (int j=0; j < monsterType.FollowerKinds.Length; j++)

@@ -669,6 +669,7 @@ namespace RuneRogue.Core
                 DoEffectOnTarget();
                 if (_specialOption == "Rune")
                 Game.RuneSystem.CheckDecay(Effect);
+                message = "Keypress";
                 return true;
             }
         }

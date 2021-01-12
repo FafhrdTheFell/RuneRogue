@@ -135,6 +135,21 @@
     ]
   },
   {
+    "kind": "skadmoor",
+    "name": "Skadmoor the Red",
+    "baseKind": "goblinsneak",
+    "isUnique": true,
+    "numberAppearing": "1",
+    "role": "boss",
+    "special": [
+      "Sense Thoughts",
+      "Stealthy",
+      "High Impact"
+    ],
+    "minLevel": 1,
+    "maxLevel": 13
+  },
+  {
     "kind": "terrorbird",
     "attack": "10",
     "weaponSkill": "18D3",
@@ -677,8 +692,8 @@
     ]
   },
   {
-    "kind": "fieldmarshallgratgruk",
-    "name": "Field Marshall Grat'gruk",
+    "kind": "warlordgratgruk",
+    "name": "Warlord Grat'gruk",
     "isUnique": true,
     "baseKind": "goblincaptain",
     "role": "boss",
@@ -690,10 +705,12 @@
     ],
     "followerProbability": [
       90
-    ]
+    ],
+    "rarity": -100
   },
   {
     "kind": "alphawerewolf",
+    "name": "Werewolf Alpha",
     "attack": "+2",
     "baseKind": "werewolf",
     "role":  "boss",
@@ -817,7 +834,7 @@
     "kind": "narlehewnwillowisp",
     "baseKind": "willowisp",
     "role":  "elite",
-    "name": "Narle Hewn will-o-wisp",
+    "name": "Narle Hewn 'wisp",
     "ranged": [
       "Missile Arrow 7 9"
     ],

@@ -96,23 +96,68 @@ namespace RuneRogue.Core
         private int? _rarity;
         private bool? _isUnique;
 
+        private string _attack;
+        private string _weaponSkill;
+        private string _awareness;
+        private string _color;
+        private string _armor;
+        private string _dodgeSkill;
+        private string _gold;
+        private string _maxHealth;
+        private string _speed;
+
         public string Kind { get; set; }
         public string BaseKind { get; set; }
-        public string Attack { get; set; }
-        public string WeaponSkill { get; set; }
-        public string Awareness { get; set; }
-        public string Color { get; set; }
-        public string Armor { get; set; }
-        public string DodgeSkill { get; set; }
-        public string Gold { get; set; }
-        public string MaxHealth { get; set; }
+        public string Attack 
+        { 
+            get { return (BaseType != null) ? CombineDiceStrings(_attack, BaseType.Attack) : _attack; }
+            set { _attack = value; } 
+        }
+        public string WeaponSkill 
+        {
+            get { return (BaseType != null) ? CombineDiceStrings(_weaponSkill, BaseType.WeaponSkill) : _weaponSkill; }
+            set { _weaponSkill = value; }
+        }
+        public string Awareness 
+        { 
+            get { return (BaseType != null) ? CombineDiceStrings(_awareness, BaseType.Awareness) : _awareness; }
+            set { _awareness = value; }
+        }
+        public string Color 
+        { 
+            get { return _color ?? BaseType.Color; }
+            set { _color = value; } 
+        }
+        public string Armor 
+        { 
+            get { return (BaseType != null) ? CombineDiceStrings(_armor, BaseType.Armor) : _armor; }
+            set { _armor = value; }
+        }
+        public string DodgeSkill 
+        { 
+            get { return (BaseType != null) ? CombineDiceStrings(_dodgeSkill, BaseType.DodgeSkill) : _dodgeSkill; }
+            set { _dodgeSkill = value; }
+        }
+        public string Gold 
+        {
+            get { return (BaseType != null) ? CombineDiceStrings(_gold, BaseType.Gold) : _gold; }
+            set { _gold = value; }
+        }
+        public string MaxHealth 
+        { 
+            get { return (BaseType != null) ? CombineDiceStrings(_maxHealth, BaseType.MaxHealth) : _maxHealth; }
+            set { _maxHealth = value; }
+        }
+        public string Speed {
+            get { return (BaseType != null) ? CombineDiceStrings(_speed, BaseType.Speed) : _speed; }
+            set { _speed = value; }
+        }
         public int MissileAttack { get { return Int32.Parse(RangedAttackMissile[3]); } }
         public int MissileRange { get { return Int32.Parse(RangedAttackMissile[2]); } }
         public string MissileType { get { return RangedAttackMissile[1]; } }
         public int SpecialAttackRange { get { return Int32.Parse(RangedAttackSpecial[2]); } }
         public string SpecialAttackType { get { return RangedAttackSpecial[1]; } }
         public string Name { get; set; }
-        public string Speed { get; set; }
         public string Role
         {
             get { return _role ?? "none"; }
@@ -150,10 +195,54 @@ namespace RuneRogue.Core
         public int NumberKilled { get; set; }
         // number of encounters generated
         public int NumberGenerated { get; set; }
-        public MonsterStats()
+        // applies role adjustments
+        public void Init()
         {
             NumberKilled = 0;
             NumberGenerated = 0;
+
+            // apply modifiers for role if monster kind is derived from some other kind
+            if (BaseKind != null)
+            {
+                switch (Role.ToLower())
+                {
+                    case "none":
+                        break;
+                    case "sneak":
+                        Attack += "+1";
+                        DodgeSkill += "+1";
+                        break;
+                    case "boss":
+                        Attack += "+2";
+                        Armor += "+2";
+                        WeaponSkill += "+2";
+                        DodgeSkill += "+2";
+                        Speed += "+3";
+                        MaxHealth += "+2d6k1";
+                        break;
+                    case "shooter":
+                        WeaponSkill = "-2";
+                        DodgeSkill += "+2";
+                        break;
+                    case "elite":
+                        Attack += "+2";
+                        Armor += "+1";
+                        WeaponSkill += "+2";
+                        DodgeSkill += "+2";
+                        Speed += "+2";
+                        break;
+                    case "skirmisher":
+                        DodgeSkill += "+2";
+                        Speed += "+3";
+                        break;
+                    case "brute":
+                        Attack += "+3";
+                        WeaponSkill += "+2";
+                        DodgeSkill += "-2";
+                        MaxHealth += "+2d4k1";
+                        break;
+                }
+            }
         }
 
         public string[] FollowerKinds { get; set; }
@@ -273,11 +362,11 @@ namespace RuneRogue.Core
                 {
                     throw new MonsterDataFormatInvalid($"{Kind} has invalid missile weapon type {RangedAttackMissile[1]}.");
                 }
-                if (!Int32.TryParse(RangedAttackMissile[2], out int Range))
+                if (!Int32.TryParse(RangedAttackMissile[2], out int _))
                 {
                     throw new MonsterDataFormatInvalid($"{Kind} has invalid missile weapon range {RangedAttackMissile[2]}.");
                 }
-                if (!Int32.TryParse(RangedAttackMissile[3], out int Attack))
+                if (!Int32.TryParse(RangedAttackMissile[3], out int _))
                 {
                     throw new MonsterDataFormatInvalid($"{Kind} has invalid missile weapon attack {RangedAttackMissile[3]}.");
                 }
@@ -288,7 +377,7 @@ namespace RuneRogue.Core
                 {
                     throw new MonsterDataFormatInvalid($"{Kind} has invalid special ranged attack {RangedAttackSpecial[1]}.");
                 }
-                if (!Int32.TryParse(RangedAttackSpecial[2], out int Range))
+                if (!Int32.TryParse(RangedAttackSpecial[2], out int _))
                 {
                     throw new MonsterDataFormatInvalid($"{Kind} has invalid special ranged attack range value {RangedAttackSpecial[2]}.");
                 }
@@ -299,19 +388,35 @@ namespace RuneRogue.Core
             }
             MonsterStats monsterType = this;
             MonsterStats baseType = Game.MonsterGenerator.FiendFolio[this.BaseKind ?? this.Kind];
-            if (monsterType.Name == "") throw new MonsterDataFormatInvalid($"{Kind} is missing name.");
-            CheckStatDefined(monsterType.Attack, baseType.Attack, "Attack");
-            CheckStatDefined(monsterType.WeaponSkill, baseType.WeaponSkill, "WeaponSkill");
-            CheckStatDefined(monsterType.Awareness, baseType.Awareness, "Awareness");
-            CheckStatDefined(monsterType.Armor, baseType.Armor, "Armor");
-            CheckStatDefined(monsterType.DodgeSkill, baseType.DodgeSkill, "DodgeSkill");
-            CheckStatDefined(monsterType.Gold, baseType.Gold, "Gold");
-            CheckStatDefined(monsterType.MaxHealth, baseType.MaxHealth, "MaxHealth");
-            CheckStatDefined(monsterType.Speed, baseType.Speed, "Speed");
-            CheckStatDefined(monsterType.NumberAppearing, baseType.NumberAppearing, "NumberAppearing");
-            CheckStatDefined(monsterType.MinLevel, baseType.MinLevel, "MinLevel");
-            CheckStatDefined(monsterType.MaxLevel, baseType.MaxLevel, "MaxLevel");
+            if (monsterType.Name == null || monsterType.Name == "")
+            {
+                throw new MonsterDataFormatInvalid($"{Kind} is missing name.");
+            }
+            CheckStatDefined(monsterType.Attack, "Attack");
+            CheckStatDefined(monsterType.WeaponSkill, "WeaponSkill");
+            CheckStatDefined(monsterType.Awareness,  "Awareness");
+            CheckStatDefined(monsterType.Armor, "Armor");
+            CheckStatDefined(monsterType.DodgeSkill, "DodgeSkill");
+            CheckStatDefined(monsterType.Gold, "Gold");
+            CheckStatDefined(monsterType.MaxHealth, "MaxHealth");
+            CheckStatDefined(monsterType.Speed, "Speed");
+            CheckStatDefined(monsterType.NumberAppearing,  "NumberAppearing");
+            CheckStatDefined(monsterType.MinLevel, "MinLevel");
+            CheckStatDefined(monsterType.MaxLevel, "MaxLevel");
+            int nameChars = Game.StatWidth - 4;
+            if (monsterType.Name.Length > nameChars)
+            {
+                throw new MonsterDataFormatInvalid($"{Kind} name is too long ({monsterType.Name.Length}" +
+                    $" characters > {nameChars} max).");
+            }
+        }
 
+        private void CheckStatDefined(int kindRoll, string stat)
+        {
+            if (kindRoll == -666)
+            {
+                throw new MonsterDataFormatInvalid($"{Kind} missing stat {stat}.");
+            }
         }
 
         private void CheckStatDefined(int kindRoll, int baseRoll, string stat)
@@ -319,6 +424,22 @@ namespace RuneRogue.Core
             if (kindRoll == -666 && baseRoll == -666)
             {
                 throw new MonsterDataFormatInvalid($"{Kind} missing stat {stat}.");
+            }
+        }
+
+        private void CheckStatDefined(string kindRoll, string stat)
+        {
+            if (kindRoll == null)
+            {
+                throw new MonsterDataFormatInvalid($"{Kind} missing stat {stat}.");
+            }
+            try
+            {
+                int _ = Dice.Roll(kindRoll);
+            }
+            catch
+            {
+                throw new MonsterDataFormatInvalid($"{Kind} stat {stat} mispecified (is {kindRoll}).");
             }
         }
 
@@ -337,6 +458,19 @@ namespace RuneRogue.Core
             {
                 throw new MonsterDataFormatInvalid($"{Kind} stat {stat} mispecified.");
             }
+        }
+
+        private string CombineDiceStrings(string kindRoll, string baseRoll)
+        {
+            // if kindRoll defined and begins with + or -, add that to base roll
+            // and roll. Otherwise, if kind roll defined, roll that, and if
+            // not, roll base roll
+            char firstChar = (kindRoll != null) ? kindRoll.TrimStart()[0] : ' ';
+            if (firstChar == '+' || firstChar == '-')
+            {
+                return (baseRoll + kindRoll);
+            }
+            return (kindRoll ?? baseRoll);
         }
 
         private int CombinedDiceRoll(string kindRoll, string baseRoll)
@@ -369,14 +503,14 @@ namespace RuneRogue.Core
                 Color = Colors.ColorLookup(monsterType.Color ?? baseType.Color),
                 MonsterType = this,
 
-                Attack = CombinedDiceRoll(monsterType.Attack, baseType.Attack),
-                WeaponSkill = CombinedDiceRoll(monsterType.WeaponSkill, baseType.WeaponSkill) / 10,
-                Awareness = CombinedDiceRoll(monsterType.Awareness, baseType.Awareness),
-                Armor = CombinedDiceRoll(monsterType.Armor, baseType.Armor),
-                DodgeSkill = CombinedDiceRoll(monsterType.DodgeSkill, baseType.DodgeSkill) / 10,
-                Gold = CombinedDiceRoll(monsterType.Gold, baseType.Gold),
-                MaxHealth = CombinedDiceRoll(monsterType.MaxHealth, baseType.MaxHealth),
-                Speed = CombinedDiceRoll(monsterType.Speed, baseType.Speed),
+                Attack = Dice.Roll(monsterType.Attack),
+                WeaponSkill = Dice.Roll(monsterType.WeaponSkill) / 10,
+                Awareness = Dice.Roll(monsterType.Awareness),
+                Armor = Dice.Roll(monsterType.Armor),
+                DodgeSkill = Dice.Roll(monsterType.DodgeSkill) / 10,
+                Gold = Dice.Roll(monsterType.Gold),
+                MaxHealth = Dice.Roll(monsterType.MaxHealth),
+                Speed = Dice.Roll(monsterType.Speed),
 
                 MissileAttack = monsterType.MissileAttack,
                 MissileRange = monsterType.MissileRange,
@@ -401,50 +535,6 @@ namespace RuneRogue.Core
                 IsUndead = monsterType.HasSpecialAbility("Undead"),
                 IsImmobile = monsterType.HasSpecialAbility("Immobile")
             };
-
-            // apply modifiers for role if monster kind is derived from some other kind
-            if (BaseKind != null)
-            {
-                switch (Role.ToLower())
-                {
-                    case "none":
-                        break;
-                    case "sneak":
-                        monster.Attack += 1;
-                        monster.DodgeSkill += 1;
-                        break;
-                    case "boss":
-                        monster.Attack += 2;
-                        monster.Armor += 2;
-                        monster.WeaponSkill += 2;
-                        monster.DodgeSkill += 2;
-                        monster.Speed += 3;
-                        monster.MaxHealth = monster.MaxHealth * 3 / 2;
-                        monster.Gold = monster.Gold * 2;
-                        break;
-                    case "shooter":
-                        monster.WeaponSkill -= 2;
-                        monster.DodgeSkill += 2;
-                        break;
-                    case "elite":
-                        monster.Attack += 2;
-                        monster.Armor += 1;
-                        monster.WeaponSkill += 2;
-                        monster.DodgeSkill += 2;
-                        monster.Speed += 2;
-                        break;
-                    case "skirmisher":
-                        monster.DodgeSkill += 2;
-                        monster.Speed += 3;
-                        break;
-                    case "brute":
-                        monster.Attack += 3;
-                        monster.WeaponSkill += 2;
-                        monster.DodgeSkill -= 2;
-                        monster.MaxHealth = monster.MaxHealth * 4 / 3;
-                        break;
-                }
-            }
 
             monster.Health = monster.MaxHealth;
             return monster;
