@@ -11,6 +11,7 @@ using RuneRogue.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Windows.Forms;
 
 namespace RuneRogue
 {
@@ -49,6 +50,7 @@ namespace RuneRogue
 
         public static int mapLevel = 1;
         private static bool _renderRequired = true;
+        private static bool _skipRender = false;
 
         public const int MaxDungeonLevel = 14;
         public const bool XpOnAction = false;
@@ -106,6 +108,7 @@ namespace RuneRogue
         public static bool AutoMovePlayer;
         private static int AutoMoveXTarget;
         private static int AutoMoveYTarget;
+        public static bool AutoMoveExploring;
         public static Monster AutoMoveMonsterTarget;
 
         public static bool SecondaryConsoleActive;
@@ -142,6 +145,9 @@ namespace RuneRogue
             int fontHeight = 15;
             int fontWidth = 15;
 
+            int x = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Width;
+            int y = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Height;
+            PrintDebugMessage(x.ToString() + " " + y.ToString());
 
             // The title will appear at the top of the console window along with the seed used to generate the level
             string consoleTitle = $"RuneRogue - Level {mapLevel} - Seed {seed}";
@@ -206,6 +212,7 @@ namespace RuneRogue
             MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, mapLevel);
             DungeonMap = mapGenerator.CreateMap();
             DungeonMap.UpdatePlayerFieldOfView();
+            DungeonMap.SaveLevel();
 
             CommandSystem = new CommandSystem();
 
@@ -333,7 +340,10 @@ namespace RuneRogue
             else if (Player.Health > 0)
             {
                 CommandSystem.ActivateMonsters();
-                _renderRequired = true;
+                if (Game.DungeonMap.MonstersInFOV().Count > 0)
+                {
+                    _renderRequired = true;
+                }
             }
             if (didPlayerAct)
             {
@@ -350,6 +360,17 @@ namespace RuneRogue
             {
                 NewScore();
             }
+            else if (_renderRequired && (AutoMovePlayer || AcceleratePlayer) && !Player.PlayerPeril)
+            {
+                // let player move twice if not in any danger
+                _skipRender = (!_skipRender) ? true : false;
+                if (_skipRender)
+                {
+                    keyPress = _rootConsole.Keyboard.GetKeyPress();
+                    rLMouse = _rootConsole.Mouse;
+                    didPlayerAct = AutoActionAndProcessInput(keyPress, rLMouse);
+                }
+            }
         }
 
         public static void DrawRoot(RLConsole drawnConsole)
@@ -361,7 +382,10 @@ namespace RuneRogue
         // Event handler for RLNET's Render event
         private static void OnRootConsoleRender(object sender, UpdateEventArgs e)
         {
+            if (_renderRequired)
+            PrintDebugMessage(" >>> " + SchedulingSystem.GetTime().ToString() + " " + _skipRender.ToString() + " " + _renderRequired.ToString());
             // Don't bother redrawing all of the consoles if nothing has changed.
+            // But nb this render function gets called with speed based on FPS
             if (_renderRequired)
             {
                 _mapConsole.Clear();
@@ -443,7 +467,27 @@ namespace RuneRogue
                     {
                         didPlayerAct = CommandSystem.PickupItemPlayer();
                     }
-                    AutoMovePlayer = false;
+                    if (AutoMoveExploring)
+                    {
+                        Cell target = null;
+                        target = DungeonMap.GetNearestObject("item", true) ??
+                            DungeonMap.GetNearestObject("explorable", true) ?? 
+                            DungeonMap.GetNearestObject("downstairs", true);
+
+                        if (target != null && !(Player.X == target.X && Player.Y == target.Y))
+                        {
+                            AutoMoveXTarget = target.X;
+                            AutoMoveYTarget = target.Y;
+                        }
+                        else
+                        {
+                            AutoMovePlayer = false;
+                        }
+                    }
+                    else
+                    {
+                        AutoMovePlayer = false;
+                    }
                 }
                 if (DungeonMap.GetShopAt(Player.X, Player.Y) != null)
                 {
@@ -525,10 +569,15 @@ namespace RuneRogue
                 {
                     if (InputSystem.directionKeys.ContainsKey(keyPress.Key))
                     {
-                    Direction direction = InputSystem.directionKeys[keyPress.Key];
-                    AcceleratePlayer = InputSystem.ShiftDown(keyPress);
-                    AccelerateDirection = direction;
-                    didPlayerAct = CommandSystem.MovePlayer(direction);
+                        Direction direction = InputSystem.directionKeys[keyPress.Key];
+                        AcceleratePlayer = InputSystem.ShiftDown(keyPress);
+                        AccelerateDirection = direction;
+                        didPlayerAct = CommandSystem.MovePlayer(direction);
+                        if (AcceleratePlayer && Player.PlayerPeril)
+                        {
+                            Player.MonstersIgnoreList = DungeonMap.MonstersInFOV();
+                            Player.PlayerPeril = false;
+                        }
                     }
                     else if (InputSystem.autoKeys.ContainsKey(keyPress.Key))
                     {
@@ -539,12 +588,19 @@ namespace RuneRogue
                         }
                         Cell target = null;
                         target = DungeonMap.GetNearestObject(InputSystem.autoKeys[keyPress.Key], true);
+                        if (InputSystem.autoKeys[keyPress.Key] == "explorable" && target == null)
+                        {
+                            target = DungeonMap.GetNearestObject("item", true) ??
+                                DungeonMap.GetNearestObject("explorable", true) ??
+                                DungeonMap.GetNearestObject("downstairs", true);
+                        }
 
                         if (target != null)
                         {
                             AutoMovePlayer = true;
                             AutoMoveXTarget = target.X;
                             AutoMoveYTarget = target.Y;
+                            AutoMoveExploring = (InputSystem.autoKeys[keyPress.Key] == "explorable") ? true : false;
                             AutoMoveMonsterTarget = (InputSystem.autoKeys[keyPress.Key]) == "monster" ?
                                 DungeonMap.GetMonsterAt(target.X, target.Y) : null;
 
@@ -552,8 +608,9 @@ namespace RuneRogue
                     }
                     else if (InputSystem.TravelKeyPressed(keyPress))
                     {
-                        Game.SecondaryConsoleActive = true;
-                        Game.AcceleratePlayer = false;
+                        SecondaryConsoleActive = true;
+                        AcceleratePlayer = false;
+                        AutoMoveExploring = false;
                         Game.CurrentSecondary = new TargetingSystem("travel-info", Math.Max(MapWidth, MapHeight));
                         //Game.PostSecondary = new Instant(rune, radius:
                         //    _offensiveRadius[rune], special: "Rune");

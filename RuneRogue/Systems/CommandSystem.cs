@@ -258,6 +258,7 @@ namespace RuneRogue.Systems
             IsPlayerTurn = false;
         }
 
+
         public void ActivateMonsters()
         {
             IScheduleable scheduleable = Game.SchedulingSystem.Get();
@@ -266,6 +267,7 @@ namespace RuneRogue.Systems
             if (scheduleable is Actor)
             {
                 Actor actor = scheduleable as Actor;
+                Game.PrintDebugMessage(actor.Name);
                 if (actor.SARegeneration && actor.Health < actor.MaxHealth)
                 {
                     int regained = Math.Min(Dice.Roll("4-2d3k1"), actor.MaxHealth - actor.Health);
@@ -281,14 +283,12 @@ namespace RuneRogue.Systems
             if (scheduleable is Player)
             {
                 Game.RuneSystem.CheckDecayAllRunes();
-            }
 
-            if (scheduleable is Player)
-            {
                 IsPlayerTurn = true;
                 Game.SchedulingSystem.Add(Game.Player);
+                return;
             }
-            else if (scheduleable is Monster)
+            if (scheduleable is Monster)
             {
                 Monster monster = scheduleable as Monster;
 
@@ -298,14 +298,8 @@ namespace RuneRogue.Systems
                     Game.SchedulingSystem.Add(monster);
                 }
 
-                // activate next schedulable without returning to main loop:
-                // makes game faster and only need main loop for player input
-                if (!Game.SecondaryConsoleActive && Game.Player.Health > 0)
-                {
-                    ActivateMonsters();
-                }
             }
-            else if (scheduleable is Effect)
+            if (scheduleable is Effect)
             {
                 Effect effect = scheduleable as Effect;
 
@@ -316,6 +310,12 @@ namespace RuneRogue.Systems
                     effect.DoEffect();
                 }
 
+            }
+
+            // activate next schedulable without returning to main loop:
+            // makes game faster and only need main loop for player input
+            if (!Game.SecondaryConsoleActive && Game.Player.Health > 0)
+            {
                 ActivateMonsters();
             }
         }

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Xml.Serialization;
 using OpenTK.Graphics.ES11;
 using OpenTK.Graphics.OpenGL;
 using RLNET;
@@ -8,6 +11,8 @@ using RogueSharp;
 using RogueSharp.DiceNotation;
 using RuneRogue.Items;
 using RuneRogue.Systems;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace RuneRogue.Core
 {
@@ -24,6 +29,11 @@ namespace RuneRogue.Core
         private readonly List<Cell> _badExplorationCells;
 
         private Map _exploredMap;
+
+        public MapState MapState { 
+            get { return Save(); }
+            set { Restore(value); }
+        }
 
         public List<Rectangle> Rooms { get; set; }
         public List<Door> Doors { get; set; }
@@ -81,8 +91,8 @@ namespace RuneRogue.Core
                     }
                 }
             }
-            //PlayerPeril = (MonstersInFOV().Count > 0);
-            player.PlayerPeril = player.IgnoreMonsters(MonstersInFOV());
+            player.PlayerPeril = (MonstersInFOV().Count == 0) ? false : player.IgnoreMonsters(MonstersInFOV());
+            //player.PlayerPeril = player.IgnoreMonsters(MonstersInFOV());
         }
 
         public List<Monster> MonstersInFOV(bool skipInvisible = true)
@@ -349,6 +359,19 @@ namespace RuneRogue.Core
                 {
                     return nullCell;
                 }
+            }
+            else if (objectType == "downstairs")
+            {
+                Cell stairsCell = GetCell(StairsDown.X, StairsDown.Y);
+                if (previouslySeen && stairsCell.IsExplored)
+                {
+                    return stairsCell;
+                }
+                else if (!previouslySeen)
+                {
+                    return stairsCell;
+                }
+                return nullCell;
             }
             else if (objectType == "shop")
             {
@@ -636,6 +659,28 @@ namespace RuneRogue.Core
                     console.Set(cell.X, cell.Y, Colors.Wall, Colors.WallBackground, '#');
                 }
             }
+        }
+
+        public void SaveLevel()
+        {
+            JsonSerializerOptions jsonOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                ReadCommentHandling = JsonCommentHandling.Skip,
+                IgnoreNullValues = true
+            };
+            //Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            string jsonString = JsonSerializer.Serialize(this, options: jsonOptions);
+            Game.PrintDebugMessage(jsonString);
+            //XmlSerializer serializer = new XmlSerializer(typeof(DungeonMap));
+            //var sb = new StringBuilder();
+            //using (var sr = new System.IO.StringWriter(sb))
+            //{
+            // Seriaize the data.
+            //    serializer.Serialize(sr, this);
+            //}
+            File.WriteAllText("test-sav.json", jsonString);
         }
     }
 }
