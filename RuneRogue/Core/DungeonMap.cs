@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using OpenTK.Graphics.ES11;
-using OpenTK.Graphics.OpenGL;
 using RLNET;
 using RogueSharp;
 using RogueSharp.DiceNotation;
@@ -308,30 +306,6 @@ namespace RuneRogue.Core
                 targetY = targetCell.Y;
             }
             Cell nullCell = null;
-            //List<Cell> cellsWithObject = new List<Cell>();
-            //IOrderedEnumerable<IDrawable> cellsList = null;
-
-            //IDrawable nearestD;
-            //Item nearestI;
-            //nearestI = _items.
-            //    OrderBy(item => Math.Abs(item.X - targetX) + Math.Abs(item.Y - targetY)).
-            //    Where(item => GetCell(item.X, item.Y).IsExplored).
-            //    FirstOrDefault();
-            //nearestD = (IDrawable)nearestI;
-            //return GetCell(nearestD.X, nearestD.Y);
-            //if (objectType == "item")
-            //{
-            //    cellsList = _items.
-            //            OrderBy(item => Math.Abs(item.X - targetX) + Math.Abs(item.Y - targetY));
-            //}
-            //else if (objectType == "door")
-            //{
-            //    cellsList = Doors.
-            //            OrderBy(item => Math.Abs(item.X - targetX) + Math.Abs(item.Y - targetY)).
-            //            Where(d => GetCell(d.X, d.Y).IsExplored && !d.IsOpen).
-            //            Where(d => !(d.X == targetX && d.Y == targetY)).
-            //            FirstOrDefault();
-            //}
 
             if (objectType == "item")
             {
@@ -668,16 +642,8 @@ namespace RuneRogue.Core
                 ReadCommentHandling = JsonCommentHandling.Skip,
                 IgnoreNullValues = true
             };
-            //Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             string jsonString = JsonSerializer.Serialize(this, options: jsonOptions);
             Game.PrintDebugMessage(jsonString);
-            //XmlSerializer serializer = new XmlSerializer(typeof(DungeonMap));
-            //var sb = new StringBuilder();
-            //using (var sr = new System.IO.StringWriter(sb))
-            //{
-            // Seriaize the data.
-            //    serializer.Serialize(sr, this);
-            //}
             File.WriteAllText("test-sav.json", jsonString);
         }
     }

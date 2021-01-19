@@ -160,39 +160,5 @@ namespace RuneRogue.Core
             console.Set(X, Y, Color, BackgroundColor, Symbol);
         }
 
-        // DrawConsole draws secondary console displaying shop
-        // items and prices
-        //public override void DrawConsole()
-        //{
-        //    int displayNumber;
-        //    string nameOfGood;
-        //    string costString;
-
-        //    Console.Clear();
-        //    Console.SetBackColor(0, 0, Game.MapWidth, Game.MapHeight, Swatch.Compliment);
-
-        //    UpdateInventory();
-
-        //    int descriptionOffset = 0;
-        //    if (HasDescription())
-        //    {
-        //        Console.Print(_horizontalOffset, _verticalOffset, StoreDescription, Colors.TextHeading);
-        //        descriptionOffset += 4;
-        //    }
-        //    for (int i = 0; i < _goods.Count; i++)
-        //    {
-        //        displayNumber = i + 1;
-        //        nameOfGood = Goods[i];
-        //        // trailing spaces so when costs drop from 10 to 1, the 0 gets overwritten
-        //        costString = Costs[i].ToString() + "   ";
-        //        Console.Print(_horizontalOffset, descriptionOffset + _verticalOffset + 2 * i, 
-        //            "(" + displayNumber.ToString() + ")", Colors.Text);
-        //        Console.Print(_horizontalOffset + 4, descriptionOffset + _verticalOffset + 2 * i, nameOfGood, Colors.Text);
-        //        Console.Print(_horizontalOffset + 72, descriptionOffset + _verticalOffset + 2 * i, costString, Colors.Text);
-        //    }
-        //    Console.Print(_horizontalOffset, descriptionOffset + 1 + _verticalOffset + 2 * _goods.Count,
-        //        "( X ) Exit shop.", Colors.Text);
-        //}
-
     }
 }

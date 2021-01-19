@@ -33,7 +33,6 @@ namespace RuneRogue.Systems
             {
                 _lines.Enqueue(line);
             }
-            //_lines.Enqueue(message);
 
             // When exceeding the maximum number of lines remove the oldest one.
             while (_lines.Count > _maxLines)

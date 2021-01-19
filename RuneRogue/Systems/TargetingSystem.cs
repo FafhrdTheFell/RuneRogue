@@ -454,17 +454,14 @@ namespace RuneRogue.Systems
             
             List<Cell> cells = new List<Cell>();
 
-            //foreach (Cell cell in dungeonMap.GetCellsInRadius(player.X, player.Y, _range))
             foreach (Cell cell in TargetCells())
             {
                 if (dungeonMap.GetMonsterAt(cell.X, cell.Y) != null)
                 {
-                    //Actor actor = dungeonMap.GetMonsterAt(cell.X, cell.Y) as Actor;
                     cells.Add(cell);
                 } 
                 else if (player.X == cell.X && player.Y == cell.Y)
                 {
-                    //Actor actor = player as Actor;
                     cells.Add(cell);
                 }
             }

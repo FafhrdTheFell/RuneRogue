@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using RLNET;
 using RogueSharp.DiceNotation;
 using RuneRogue.Core;
 

@@ -427,18 +427,6 @@ namespace RuneRogue.Core
                     }
                     damage = Dice.Roll("4d10");
                     CommandSystem.ResolveDamage("elemental blast", target, damage, false, attackMessage);
-                    //    if (target.Health > 0)
-                    //    {
-                    //        CommandSystem.WakeMonster(target);
-                    //        attackMessage.AppendFormat(" {0} takes {1} damage. ", target.Name, damage);
-                    //    }
-                    //    else
-                    //    {
-                    //        attackMessage.AppendFormat(" {0} takes {1} damage, killing it. ", target.Name, damage);
-                    //        CommandSystem.ResolveDeath("elemental blast", target, attackMessage);
-                    //        break;
-                    //    }
-                    //}
                 }
             }
             if (_effect == "Fire")
@@ -450,19 +438,7 @@ namespace RuneRogue.Core
 
                     attackMessage.AppendFormat("Flames engulf {0}. ", target.Name);
                     CommandSystem.WakeMonster(target);
-                    CommandSystem.ResolveDamage("fire", target, damage, false, attackMessage);
-                    //if (target.Health > 0)
-                    //{
-                    //    CommandSystem.WakeMonster(target);
-                    //    attackMessage.AppendFormat(" {0} takes {1} damage. ", target.Name, damage);
-                    //}
-                    //else
-                    //{
-                    //    attackMessage.AppendFormat(" {0} takes {1} damage, killing it. ", target.Name, damage);
-                    //    CommandSystem.ResolveDeath("fire", target, attackMessage);
-                    //    break;
-                    //}
-                   
+                    CommandSystem.ResolveDamage("fire", target, damage, false, attackMessage);     
                 }
             }
             else if (_effect == "Death")
@@ -499,18 +475,7 @@ namespace RuneRogue.Core
                     }
                     else if (target != Source)
                     {
-                        CommandSystem.ResolveDamage("deathly dirge", target, 1, false, attackMessage);
-                        //target.Health -= 1;
-
-                        //if (target.Health > 0)
-                        //{
-                        //    attackMessage.AppendFormat(" {0} takes 1 damage. ", target.Name);
-                        //}
-                        //else
-                        //{
-                        //    attackMessage.AppendFormat(" {0} takes 1 damage, killing it. ", target.Name);
-                        //    CommandSystem.ResolveDeath("deathly dirge", target, attackMessage);
-                        //}                    
+                        CommandSystem.ResolveDamage("deathly dirge", target, 1, false, attackMessage);                 
                     }
                 }
             }
@@ -546,19 +511,6 @@ namespace RuneRogue.Core
                         attackMessage.AppendFormat("{0} is perforated. ", target.Name);
                         CommandSystem.ResolveDamage("razor-spear of iron", target, damage, false, attackMessage);
                     }
-                    
-                    
-                        //if (target.Health > 0)
-                        //{
-                        //    CommandSystem.WakeMonster(target);
-                        //    attackMessage.AppendFormat(" {0} takes {1} damage. ", target.Name, damage);
-                        //}
-                        //else
-                        //{
-                        //    attackMessage.AppendFormat(" {0} takes {1} damage, killing it. ", target.Name, damage);
-                        //    CommandSystem.ResolveDeath("razor-spear of iron", target, attackMessage);
-                        //}
-                    //}
                     else
                     {
                         attackMessage.AppendFormat("The dart bounces off {0}'s armor.", target.Name);
@@ -585,35 +537,6 @@ namespace RuneRogue.Core
                     // set damageBonus to replace source.Attack damage with MissileAttack damage
                     damageBonus = source.Attack / 2;
                 }
-
-                // code if Ram-mer should stop at first target not destroyed
-                //Cell newPosition = dungeonMap.GetCell(source.X, source.Y);
-                //foreach (Cell cell in TargetCells())
-                //{
-                //    Actor target = source;
-                //    if (dungeonMap.GetMonsterAt(cell.X, cell.Y) != null)
-                //    {
-                //        target = dungeonMap.GetMonsterAt(cell.X, cell.Y);
-                //    }
-                //    else if (Game.Player.X == cell.X && Game.Player.Y == cell.Y)
-                //    {
-                //        target = Game.Player;
-                //    }
-                //    if (target != source)
-                //    {
-                //        CommandSystem.Attack(source, target);
-                //        // stop at defender that rammer attacked and failed to kill
-                //        if (target.Health > 0)
-                //        {
-                //            break;
-                //        }
-                //    }
-                //    else
-                //    {
-                //        newPosition = cell;
-                //    }
-                //    dungeonMap.SetActorPosition(source, newPosition.X, newPosition.Y);
-                //}
                 foreach (Actor target in TargetActors())
                 {
                     StringBuilder discardMessage = new StringBuilder();
