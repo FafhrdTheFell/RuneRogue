@@ -283,11 +283,6 @@ namespace RuneRogue.Systems
             }
         }
 
-        public bool AllRunesOwned
-        {
-            get { return (RunesNotOwned().Count == 0); }
-        }
-
         public bool RuneActive(string rune)
         {
             return _runesActive.Contains(rune);
@@ -295,16 +290,7 @@ namespace RuneRogue.Systems
 
         public List<string> RunesNotOwned()
         {
-            List<string> runeList = new List<string>();
-            for (int i = 0; i < _runeNames.Length; i++)
-            {
-                if (!_runesOwned.Contains(_runeNames[i]))
-                {
-                    runeList.Add(_runeNames[i]);
-                }
-            }
-
-            return runeList;
+            return AllRunes.Except(_runesOwned).ToList();
         }
 
         public List<string> RunesOwned()

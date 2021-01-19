@@ -109,12 +109,12 @@ namespace RuneRogue.Core
 
         public override bool ProcessChoice(int choiceIndex)
         {
-            UpdateInventory();
             //int[] costs = _costs.ToArray();
             if (Game.Player.Gold >= _costs[choiceIndex])
             {
                 Game.Player.Gold -= _costs[choiceIndex];
                 ReceivePurchase(choiceIndex);
+                UpdateInventory();
                 return false;
             }
             else

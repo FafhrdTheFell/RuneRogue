@@ -1,5 +1,4 @@
-﻿using System.Runtime.Hosting;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using RogueSharp;
 using RogueSharp.DiceNotation;
@@ -48,6 +47,7 @@ namespace RuneRogue.Systems
 
             if (shop != null)
             {
+                shop.UpdateInventory();
                 EnterShop(Game.Player, shop);
                 return true;
             }
@@ -267,7 +267,6 @@ namespace RuneRogue.Systems
             if (scheduleable is Actor)
             {
                 Actor actor = scheduleable as Actor;
-                Game.PrintDebugMessage(actor.Name);
                 if (actor.SARegeneration && actor.Health < actor.MaxHealth)
                 {
                     int regained = Math.Min(Dice.Roll("4-2d3k1"), actor.MaxHealth - actor.Health);

@@ -33,18 +33,11 @@ namespace RuneRogue.Shops
             List<string> runeList = Game.RuneSystem.RunesNotOwned();
             _goods = new List<string>();
             _costs = new List<int>();
-            //_targets = new List<string>();
 
             runeList.ForEach(r => _goods.Add("Forge a Rune of " + r));
             runeList.ForEach(r => _costs.Add(_runeCost));
             _targets = runeList;
 
-            //for (int i = 0; i < runeList.Count; i++)
-            //{
-            //    _goods.Add("Forge a Rune of " + runeList[i]);
-            //    _costs.Add(_runeCost);
-            //    _targets.Add(runeList[i]);
-            //}
         }
 
         public override void ReceivePurchase(int purchaseIndex)

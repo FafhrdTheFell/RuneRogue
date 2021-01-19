@@ -383,7 +383,6 @@ namespace RuneRogue
         private static void OnRootConsoleRender(object sender, UpdateEventArgs e)
         {
             if (_renderRequired)
-            PrintDebugMessage(" >>> " + SchedulingSystem.GetTime().ToString() + " " + _skipRender.ToString() + " " + _renderRequired.ToString());
             // Don't bother redrawing all of the consoles if nothing has changed.
             // But nb this render function gets called with speed based on FPS
             if (_renderRequired)

@@ -147,7 +147,8 @@
       "High Impact"
     ],
     "minLevel": 1,
-    "maxLevel": 13
+    "maxLevel": 13,
+    "rarity": 60
   },
   {
     "kind": "terrorbird",

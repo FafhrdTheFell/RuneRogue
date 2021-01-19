@@ -32,7 +32,7 @@ namespace RuneRogue.Systems
         };
         private static List<int> _runeForgeLevels = new List<int>
         {
-            4,8,12,14
+            1,4,8,12,14
         };
         private static List<int> _bookShopLevels = new List<int>
         {
