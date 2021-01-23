@@ -782,7 +782,8 @@
     "symbol": "T",
     "numberAppearing": "2d3k1",
     "minLevel": 1,
-    "maxLevel": 7
+    "maxLevel": 10,
+    "rarity": 50
   },
   {
     "kind": "goblinveteran",
