@@ -147,7 +147,7 @@ namespace RuneRogue
 
             int x = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Width;
             int y = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Height;
-            PrintDebugMessage(x.ToString() + " " + y.ToString());
+            //PrintDebugMessage(x.ToString() + " " + y.ToString());
 
             // The title will appear at the top of the console window along with the seed used to generate the level
             string consoleTitle = $"RuneRogue - Level {mapLevel} - Seed {seed}";
@@ -212,7 +212,7 @@ namespace RuneRogue
             MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, mapLevel);
             DungeonMap = mapGenerator.CreateMap();
             DungeonMap.UpdatePlayerFieldOfView();
-            DungeonMap.SaveLevel();
+            //DungeonMap.SaveLevel();
 
             CommandSystem = new CommandSystem();
 

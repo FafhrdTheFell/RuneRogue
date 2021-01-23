@@ -563,6 +563,12 @@ namespace RuneRogue.Core
 
             foreach (Item item in _items)
             {
+                Door dHere = Doors.FirstOrDefault(d => d.X == item.X && d.Y == item.Y);
+                bool dBlocking = (dHere != null) ? !dHere.IsOpen : false;
+                if (dBlocking)
+                {
+                    continue;
+                }
                 item.Draw(mapConsole, this);
             }
 
