@@ -19,46 +19,44 @@ namespace RuneRogue.Behaviors
             // Use the monsters Awareness value for the distance in the FoV check
             // If the player is in the monster's FoV then alert it, unless the
             // player is invisible and passes a stealth test
-            bool canSeePlayer = false;
             FieldOfView monsterFov = new FieldOfView(dungeonMap);
             monsterFov.ComputeFov(monster.X, monster.Y, monster.Awareness, true);
-            //int distFromPlayer = Math.Abs(player.X - monster.X) + Math.Abs(player.Y - monster.Y);
             if (monsterFov.IsInFov(player.X, player.Y))
             {
-                canSeePlayer = true;
+                monster.CanSeePlayer = true;
                 monster.LastLocationPlayerSeen = dungeonMap.GetCell(player.X, player.Y);
                 if (player.SAStealthy)
                 {
-                    if (Game.CommandSystem.CheckStealth(player, monster))
+                    if (CommandSystem.CheckStealth(player, monster))
                     {
                         // player unseen
-                        canSeePlayer = false;
+                        monster.CanSeePlayer = false;
                         // check if monster extra confused and loses awareness of player's last location
-                        if (Game.CommandSystem.CheckStealth(player, monster))
+                        if (CommandSystem.CheckStealth(player, monster))
                         {
                             // monster.TurnsAlerted = null;
                             int dx = Dice.Roll("2d3k1") - Dice.Roll("2d3k1");
                             int dy = Dice.Roll("2d3k1") - Dice.Roll("2d3k1");
                             monster.LastLocationPlayerSeen = dungeonMap.GetCell(
                                 monster.LastLocationPlayerSeen.X + dx, monster.LastLocationPlayerSeen.Y + dy);
-                            if (monster.X == monster.LastLocationPlayerSeen.X && monster.Y == monster.LastLocationPlayerSeen.Y)
-                            {
-                                monster.TurnsAlerted = null;
-                            }
                         }
                     }
                 }
+            }
+            else
+            {
+                monster.CanSeePlayer = false;
             }
 
             if (monster.SASenseThoughts)
             {
                 if (monster.WithinDistance(player, RunesSystem.DistanceSenseThoughts))
                 {
-                    canSeePlayer = true;
+                    monster.CanSeePlayer = true;
                 }
             }
 
-            if (canSeePlayer)
+            if (monster.CanSeePlayer)
             {
                 // update memory
                 monster.TurnsAlerted = 1;
@@ -66,7 +64,7 @@ namespace RuneRogue.Behaviors
                 // hide from player
                 if (monster.SAStealthy)
                 {
-                    if (Game.CommandSystem.CheckStealth(monster, player))
+                    if (CommandSystem.CheckStealth(monster, player))
                     {
                         monster.IsInvisible = true;
                         if (dungeonMap.MonstersInFOV().Contains(monster))
@@ -95,7 +93,7 @@ namespace RuneRogue.Behaviors
             string action = null;
 
             // 50% chance to use special abilities
-            if (Dice.Roll("1d100") < monster.ShootPropensity && canSeePlayer &&
+            if (Dice.Roll("1d100") < monster.ShootPropensity && monster.CanSeePlayer &&
                 monster.WithinDistance(player, Math.Max(monster.SpecialAttackRange, monster.MissileRange)) &&
                 dungeonMap.MissileNotBlocked(monster, player))
             {
@@ -185,9 +183,12 @@ namespace RuneRogue.Behaviors
 
             try
             {
-                path = pathFinder.ShortestPath(
-                   dungeonMap.GetCell(monster.X, monster.Y),
-                   dungeonMap.GetCell(targetCell.X, targetCell.Y));
+                if (!(monster.X == targetCell.X && monster.Y == targetCell.Y))
+                {
+                    path = pathFinder.ShortestPath(
+                       dungeonMap.GetCell(monster.X, monster.Y),
+                       dungeonMap.GetCell(targetCell.X, targetCell.Y));
+                }
 
                 // long paths are usually indirect. Avoid them if monster would fall asleep.
                 if (path.Length > 15)

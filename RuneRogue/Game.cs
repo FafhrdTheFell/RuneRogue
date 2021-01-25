@@ -382,7 +382,6 @@ namespace RuneRogue
         // Event handler for RLNET's Render event
         private static void OnRootConsoleRender(object sender, UpdateEventArgs e)
         {
-            if (_renderRequired)
             // Don't bother redrawing all of the consoles if nothing has changed.
             // But nb this render function gets called with speed based on FPS
             if (_renderRequired)
@@ -396,6 +395,7 @@ namespace RuneRogue
                 if (!SecondaryConsoleActive)
                 {
                     DungeonMap.Draw(_mapConsole, _statConsole);
+                    _mapConsole.SetChar(0, 0, 150);
                     Player.Draw(_mapConsole, DungeonMap);
                     Player.DrawStats(_statConsole);
                     MessageLog.Draw(_messageConsole);

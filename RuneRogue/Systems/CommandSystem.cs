@@ -330,21 +330,47 @@ namespace RuneRogue.Systems
             }
         }
 
-        public bool CheckStealth(Actor sneak, Actor observer)
+        public static bool CheckStealth(Actor sneak, Actor observer)
         {
             if (observer.SASenseThoughts)
             {
                 return false;
             }
+            bool alreadyDetected = (sneak is Player) ? ((Monster)observer).CanSeePlayer : !sneak.IsInvisible;
             int distance = (int)(Math.Pow((sneak.X - observer.X) * (sneak.X - observer.X) +
                 (sneak.Y - observer.Y) * (sneak.Y - observer.Y), 0.5) + 0.5);
-            string dieSize = (distance + 5).ToString();
+            string dieSize = alreadyDetected ? (distance + 2).ToString() : (distance + 6).ToString();
             int stealthRoll = Dice.Roll("1d" + dieSize); // higher roll = more stealthy
             return (stealthRoll > 2) ? true : false;
         }
 
+        // returns true if defender spots attacker
+        public static bool CheckStealthOnAttack(Actor attacker, Actor defender)
+        {
+            if (!(attacker is Monster && attacker.IsInvisible) &&
+                !(attacker is Player && ((Monster)defender).CanSeePlayer))
+            {
+                return false;
+            }
+            else if (attacker is Monster && attacker.IsInvisible)
+            {
+                attacker.IsInvisible = CheckStealth(attacker, defender);
+                return !attacker.IsInvisible;
+            }
+            else if (attacker is Player && ((Monster)defender).CanSeePlayer)
+            {
+                ((Monster)defender).CanSeePlayer = CheckStealth(attacker, defender);
+                return ((Monster)defender).CanSeePlayer;
+            }
+            return false;
+        }
+
         public void Shoot(Actor attacker, Actor defender, bool specialAttack = false)
         {
+            if (attacker is Player)
+            {
+                throw new Exception("Shoot method not implemented for player missile attacks.");
+            }
             DungeonMap dungeonMap = Game.DungeonMap;
             Game.SecondaryConsoleActive = true;
             Game.AcceleratePlayer = false;
@@ -358,6 +384,10 @@ namespace RuneRogue.Systems
                 Source = attacker, //Origin = dungeonMap.GetCell(attacker.X, attacker.Y),
                 Target = dungeonMap.GetCell(defender.X, defender.Y)
             };
+            if (CheckStealthOnAttack(attacker, defender))
+            {
+                Game.MessageLog.Add($"{defender.Name} spots {attacker.Name}.");
+            }
             Game.CurrentSecondary = shot;
         }
 
@@ -388,6 +418,10 @@ namespace RuneRogue.Systems
                 if (defender == Game.Player && Game.XpOnAction)
                 {
                     Game.Player.XpHealth += damage;
+                }
+                if (CheckStealthOnAttack(attacker, defender))
+                {
+                    attackMessage.Append($"{defender.Name} spots {attacker.Name}. ");
                 }
             }
 

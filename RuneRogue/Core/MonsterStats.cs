@@ -502,6 +502,7 @@ namespace RuneRogue.Core
                 Symbol = monsterType.Symbol,
                 Color = Colors.ColorLookup(monsterType.Color ?? baseType.Color),
                 MonsterType = this,
+                CanSeePlayer = false,
 
                 Attack = Dice.Roll(monsterType.Attack),
                 WeaponSkill = Dice.Roll(monsterType.WeaponSkill) / 10,

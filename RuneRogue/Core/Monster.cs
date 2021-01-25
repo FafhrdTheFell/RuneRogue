@@ -14,7 +14,7 @@ namespace RuneRogue.Core
         public int ShootPropensity { get; set; }
         public int WanderPropensity { get; set; }
         public MonsterStats MonsterType { get; set; }
-
+        public bool CanSeePlayer { get; set; }
         public void DrawStats(RLConsole statConsole, int position, bool highlight=false)
         {
             // Start at Y=28 which is below the player stats.
